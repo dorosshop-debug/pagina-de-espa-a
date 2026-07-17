@@ -1,0 +1,6 @@
+﻿.DS_Store
+Thumbs.db
+*.log
+.cursor/
+*.zip
+node_modules/
