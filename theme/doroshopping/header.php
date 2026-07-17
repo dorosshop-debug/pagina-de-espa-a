@@ -23,59 +23,46 @@
         </form>
 
         <div class="site-header__utilities">
-            <a href="<?php echo function_exists( 'wc_get_page_permalink' ) ? esc_url( wc_get_page_permalink( 'myaccount' ) ) : esc_url( wp_login_url() ); ?>" class="site-header__utility">
-                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span class="site-header__utility-text">
-                    <span class="site-header__utility-label"><?php esc_html_e( 'Bienvenido', 'doroshopping' ); ?></span>
-                    <span><?php echo is_user_logged_in() ? esc_html__( 'Mi cuenta', 'doroshopping' ) : esc_html__( 'Ingresar', 'doroshopping' ); ?></span>
-                </span>
-            </a>
-
-            <div class="site-header__utility site-header__utility--plugin">
-                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                <span class="site-header__utility-text">
-                    <?php
-                    /**
-                     * Polylang / WPML / YITH currency via hooks.
-                     *
-                     * @hook doroshopping_header_utility_language
-                     * @hook doroshopping_header_utility_currency
-                     */
-                    ob_start();
-                    do_action( 'doroshopping_header_utility_language' );
-                    do_action( 'doroshopping_header_utility_currency' );
-                    $lang_currency = trim( ob_get_clean() );
-                    if ( $lang_currency ) {
-                        echo $lang_currency; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                    } else {
-                        echo '<span class="site-header__utility-label">' . esc_html__( 'Espanol', 'doroshopping' ) . '</span>';
-                        echo '<span>' . esc_html__( 'Moneda', 'doroshopping' ) . '</span>';
-                    }
-                    ?>
-                </span>
+            <div class="site-header__dropdown-wrap" data-dropdown="account">
+                <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-account">
+                    <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="site-header__utility-text">
+                        <span class="site-header__utility-label"><?php esc_html_e( 'Bienvenido', 'doroshopping' ); ?></span>
+                        <span><?php echo is_user_logged_in() ? esc_html__( 'Mi cuenta', 'doroshopping' ) : esc_html__( 'Ingresar', 'doroshopping' ); ?></span>
+                    </span>
+                    <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <?php get_template_part( 'template-parts/header/dropdown', 'account' ); ?>
             </div>
 
-            <div class="site-header__utility site-header__utility--plugin">
-                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span class="site-header__utility-text">
-                    <?php
-                    ob_start();
-                    do_action( 'doroshopping_header_utility_location' );
-                    $location = trim( ob_get_clean() );
-                    if ( $location ) {
-                        echo $location; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                    } else {
-                        echo '<span class="site-header__utility-label">' . esc_html__( 'Ubicacion', 'doroshopping' ) . '</span>';
-                        echo '<span>' . esc_html__( 'Envio', 'doroshopping' ) . '</span>';
-                    }
-                    ?>
-                </span>
+            <div class="site-header__dropdown-wrap" data-dropdown="locale">
+                <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-locale">
+                    <img class="site-header__flag" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/flags/spain.png' ); ?>" alt="" width="22" height="22">
+                    <span class="site-header__utility-text">
+                        <span class="site-header__utility-label"><?php esc_html_e( 'Espanol', 'doroshopping' ); ?></span>
+                        <span><?php esc_html_e( 'Moneda', 'doroshopping' ); ?></span>
+                    </span>
+                    <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <?php get_template_part( 'template-parts/header/dropdown', 'locale' ); ?>
+            </div>
+
+            <div class="site-header__dropdown-wrap" data-dropdown="shipping">
+                <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-shipping">
+                    <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span class="site-header__utility-text">
+                        <span class="site-header__utility-label"><?php esc_html_e( 'Ubicacion', 'doroshopping' ); ?></span>
+                        <span><?php esc_html_e( 'Envio', 'doroshopping' ); ?></span>
+                    </span>
+                    <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <?php get_template_part( 'template-parts/header/dropdown', 'shipping' ); ?>
             </div>
 
             <a href="<?php echo function_exists( 'wc_get_cart_url' ) ? esc_url( wc_get_cart_url() ) : '#'; ?>" class="site-header__utility">
                 <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 <span class="site-header__utility-text">
-                    <span><?php esc_html_e( 'Carrito', 'doroshopping' ); ?></span>
+                    <span class="site-header__utility-label"><?php esc_html_e( 'Carrito', 'doroshopping' ); ?></span>
                     <?php if ( function_exists( 'WC' ) && WC()->cart ) : ?>
                         <span class="site-header__cart-count"><?php echo esc_html( WC()->cart->get_cart_contents_count() ); ?></span>
                     <?php else : ?>

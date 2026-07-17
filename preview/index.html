@@ -12,7 +12,7 @@
 <header class="site-header">
     <div class="site-header__top">
         <a href="#" class="site-header__logo">
-            <img src="../theme/doroshopping/assets/images/logo/logo_doro_v2.png" alt="Doroshopping">
+            <img src="../theme/doroshopping/assets/images/logo/logo_header.png" alt="Doroshopping">
         </a>
 
         <form class="site-header__search" role="search">
@@ -21,31 +21,121 @@
         </form>
 
         <div class="site-header__utilities">
-            <a href="#" class="site-header__utility">
-                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span class="site-header__utility-text">
-                    <span class="site-header__utility-label">Bienvenido</span>
-                    <span>Ingresar</span>
-                </span>
-            </a>
-            <a href="#" class="site-header__utility">
-                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                <span class="site-header__utility-text">
-                    <span class="site-header__utility-label">Espanol</span>
-                    <span>Moneda</span>
-                </span>
-            </a>
-            <a href="#" class="site-header__utility">
-                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                <span class="site-header__utility-text">
-                    <span class="site-header__utility-label">Ubicacion</span>
-                    <span>Envio</span>
-                </span>
-            </a>
+            <div class="site-header__dropdown-wrap" data-dropdown="account">
+                <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-account">
+                    <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="site-header__utility-text">
+                        <span class="site-header__utility-label">Bienvenido</span>
+                        <span>Ingresar</span>
+                    </span>
+                    <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="header-dropdown header-dropdown--account" id="dropdown-account" hidden>
+                    <a href="#" class="header-dropdown__login-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Acceder a tu cuenta
+                    </a>
+                    <a href="#" class="header-dropdown__register">Registrate</a>
+                    <ul class="header-dropdown__list">
+                        <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="18.5" cy="18.5" r="1.5"/></svg>Rastrear envio</a></li>
+                        <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12l1 7H5L6 2z"/><path d="M5 9v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/></svg>Mis Pedidos</a></li>
+                        <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16v2H4z"/><path d="M7 9V7a5 5 0 0 1 10 0v2"/><path d="M9 13h6"/></svg>Mis Cupones</a></li>
+                        <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>Centro de Ayuda &amp; Soporte</a></li>
+                        <li><a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>Lista de Deseos</a></li>
+                    </ul>
+                    <ul class="header-dropdown__list header-dropdown__list--plain">
+                        <li><a href="#">Configuracion</a></li>
+                        <li><a href="#">Mi perfil</a></li>
+                        <li><a href="#">Metodos de pago</a></li>
+                    </ul>
+                    <ul class="header-dropdown__list header-dropdown__list--footer">
+                        <li><a href="#">Centro de ayuda</a></li>
+                        <li><a href="#">FAQ's - Preguntas Frecuentes</a></li>
+                        <li><a href="#">Politica de devoluciones y reembolsos</a></li>
+                        <li><a href="#">Politica de proteccion de datos personales</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="site-header__dropdown-wrap" data-dropdown="locale">
+                <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-locale">
+                    <img class="site-header__flag" src="../theme/doroshopping/assets/images/flags/spain.png" alt="" width="22" height="22">
+                    <span class="site-header__utility-text">
+                        <span class="site-header__utility-label">Espanol</span>
+                        <span>Moneda</span>
+                    </span>
+                    <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="header-dropdown header-dropdown--locale" id="dropdown-locale" hidden>
+                    <p class="header-dropdown__title">Selecciona tu Ubicacion Lengua y Moneda de preferencia.</p>
+                    <form class="header-dropdown__form" action="#" method="post">
+                        <label for="locale-ubicacion">Ubicacion</label>
+                        <select id="locale-ubicacion" name="ubicacion">
+                            <option value="">Elegir ubicacion.</option>
+                            <option value="es">Espana</option>
+                            <option value="pt">Portugal</option>
+                            <option value="fr">Francia</option>
+                            <option value="de">Alemania</option>
+                            <option value="it">Italia</option>
+                            <option value="uk">Reino Unido</option>
+                        </select>
+                        <label for="locale-lengua">Lengua</label>
+                        <select id="locale-lengua" name="lengua">
+                            <option value="es" selected>Espanol</option>
+                            <option value="en">English</option>
+                            <option value="de">Deutsch</option>
+                            <option value="fr">Francais</option>
+                            <option value="it">Italiano</option>
+                            <option value="pt">Portugues</option>
+                        </select>
+                        <label for="locale-divisa">Divisa</label>
+                        <select id="locale-divisa" name="divisa">
+                            <option value="EUR" selected>Euro - EUR</option>
+                            <option value="USD">US Dollar - USD</option>
+                            <option value="GBP">Pound - GBP</option>
+                        </select>
+                        <button type="submit" class="header-dropdown__submit">Guardar</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="site-header__dropdown-wrap" data-dropdown="shipping">
+                <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-shipping">
+                    <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span class="site-header__utility-text">
+                        <span class="site-header__utility-label">Ubicacion</span>
+                        <span>Envio</span>
+                    </span>
+                    <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="header-dropdown header-dropdown--shipping" id="dropdown-shipping" hidden>
+                    <div class="header-dropdown__shipping-card">
+                        <h3 class="header-dropdown__shipping-title">Direccion de Envio</h3>
+                        <form class="header-dropdown__form" action="#" method="post">
+                            <label for="shipping-pais">Pais</label>
+                            <select id="shipping-pais" name="pais">
+                                <option value="es">Espana</option>
+                                <option value="pt">Portugal</option>
+                                <option value="fr">Francia</option>
+                                <option value="de">Alemania</option>
+                                <option value="it">Italia</option>
+                                <option value="ch">Suiza</option>
+                                <option value="uk">Reino Unido</option>
+                            </select>
+                            <label for="shipping-provincia">Provincia / Estado</label>
+                            <input id="shipping-provincia" type="text" name="provincia" placeholder="Provincia / Estado">
+                            <label for="shipping-ciudad">Ciudad</label>
+                            <input id="shipping-ciudad" type="text" name="ciudad" placeholder="Ciudad">
+                            <button type="submit" class="header-dropdown__submit header-dropdown__submit--solid">Guardar Direccion</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <a href="#" class="site-header__utility">
                 <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
                 <span class="site-header__utility-text">
-                    <span>Carrito</span>
+                    <span class="site-header__utility-label">Carrito</span>
                     <span class="site-header__cart-count">0</span>
                 </span>
             </a>
@@ -267,60 +357,110 @@
 
 <main class="home">
 
-    <section class="home-hero">
-        <img class="home-hero__image" src="../theme/doroshopping/assets/images/banners/Banner_mundial_doro.webp" alt="Promociones de Verano">
-        <div class="home-hero__content">
-            <h1 class="home-hero__title">Promociones de Verano.</h1>
-            <p class="home-hero__subtitle">Se parte de la alegria del Mundial 2026!</p>
-            <a href="#" class="home-hero__cta">Ver Ofertas</a>
+    <section class="home-hero" aria-roledescription="carousel" aria-label="Promociones principales">
+        <div class="home-hero__track">
+            <article class="home-hero__slide is-active" data-slide="0">
+                <img class="home-hero__image" src="../theme/doroshopping/assets/images/banners/hero1.png" alt="Tecnologia para tu hogar">
+                <div class="home-hero__content">
+                    <h2 class="home-hero__title">Tecnologia para tu hogar.</h2>
+                    <p class="home-hero__subtitle">Descubre gadgets inteligentes y accesorios esenciales.</p>
+                    <a href="#" class="home-hero__cta">Ver Ofertas</a>
+                </div>
+            </article>
+            <article class="home-hero__slide" data-slide="1" hidden>
+                <img class="home-hero__image" src="../theme/doroshopping/assets/images/banners/hero2.webp" alt="Gadgets de ultima generacion">
+                <div class="home-hero__content">
+                    <h2 class="home-hero__title">Gadgets de ultima generacion.</h2>
+                    <p class="home-hero__subtitle">Lo ultimo en tecnologia al mejor precio.</p>
+                    <a href="#" class="home-hero__cta">Comprar ahora</a>
+                </div>
+            </article>
+            <article class="home-hero__slide" data-slide="2" hidden>
+                <img class="home-hero__image" src="../theme/doroshopping/assets/images/banners/hero3.webp" alt="Promociones de Verano">
+                <div class="home-hero__content">
+                    <h2 class="home-hero__title">Promociones de Verano.</h2>
+                    <p class="home-hero__subtitle">Se parte de la alegria del Mundial 2026!</p>
+                    <a href="#" class="home-hero__cta">Ver Ofertas</a>
+                </div>
+            </article>
+        </div>
+        <button type="button" class="home-hero__nav home-hero__nav--prev" aria-label="Anterior">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button type="button" class="home-hero__nav home-hero__nav--next" aria-label="Siguiente">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <div class="home-hero__dots" role="tablist">
+            <button type="button" class="home-hero__dot is-active" data-slide="0" aria-label="Ir a slide 1"></button>
+            <button type="button" class="home-hero__dot" data-slide="1" aria-label="Ir a slide 2"></button>
+            <button type="button" class="home-hero__dot" data-slide="2" aria-label="Ir a slide 3"></button>
         </div>
     </section>
 
     <section class="home-categories">
         <h2 class="home-categories__title">Categorias &amp; Ofertas</h2>
         <div class="home-categories__grid">
-            <div class="home-categories__col">
+            <div class="home-categories__col" data-block="0">
                 <h3 class="home-categories__col-title">Tecnologia para tu hogar</h3>
-                <div class="home-categories__carousel">
-                    <div class="home-categories__carousel-item"><img src="../theme/doroshopping/assets/images/banners/Banner_doro_6.webp" alt=""></div>
-                    <div class="home-categories__carousel-item"><img src="../theme/doroshopping/assets/images/banners/Banner_mundial_doro.webp" alt=""></div>
-                    <div class="home-categories__carousel-item"><img src="../theme/doroshopping/assets/images/banners/Banner_doro_6.webp" alt=""></div>
+                <div class="home-categories__carousel-wrap">
+                    <button type="button" class="home-categories__arrow home-categories__arrow--prev" aria-label="Anterior">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <div class="home-categories__carousel" data-carousel>
+                        <div class="home-categories__carousel-track">
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto1.jpg" alt="Auriculares"></div><p class="home-categories__product-price">23.99 EUR</p><h4 class="home-categories__product-name">Auriculares</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto2.png" alt="Monitor"></div><p class="home-categories__product-price">45.50 EUR</p><h4 class="home-categories__product-name">Monitor</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto3.jpg" alt="Cable USB-C"></div><p class="home-categories__product-price">12.99 EUR</p><h4 class="home-categories__product-name">Cable USB-C</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto4.jpg" alt="Teclado RGB"></div><p class="home-categories__product-price">89.00 EUR</p><h4 class="home-categories__product-name">Teclado RGB</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto5.jpg" alt="Raton"></div><p class="home-categories__product-price">34.75 EUR</p><h4 class="home-categories__product-name">Raton</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto6.jpg" alt="Tablet"></div><p class="home-categories__product-price">156.00 EUR</p><h4 class="home-categories__product-name">Tablet</h4></a></article>
+                        </div>
+                    </div>
+                    <button type="button" class="home-categories__arrow home-categories__arrow--next" aria-label="Siguiente">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
                 </div>
-                <div class="home-categories__dots">
-                    <span class="home-categories__dot is-active"></span>
-                    <span class="home-categories__dot"></span>
-                    <span class="home-categories__dot"></span>
-                </div>
+                <div class="home-categories__dots" data-dots></div>
                 <div class="home-categories__tiles">
-                    <a href="#" class="home-categories__tile">
-                        <img src="../theme/doroshopping/assets/images/banners/Banner_doro_6.webp" alt="Microfonos y auriculares">
+                    <a href="#" class="home-categories__tile" data-category-file="auriculares.png">
+                        <img src="../theme/doroshopping/assets/images/categories/auriculares.png" alt="Microfonos y auriculares">
                         <span class="home-categories__tile-label">Microfonos y auriculares</span>
                     </a>
-                    <a href="#" class="home-categories__tile">
-                        <img src="../theme/doroshopping/assets/images/banners/Banner_mundial_doro.webp" alt="Gaming">
+                    <a href="#" class="home-categories__tile" data-category-file="videjuegos.png">
+                        <img src="../theme/doroshopping/assets/images/categories/videjuegos.png" alt="Gaming">
                         <span class="home-categories__tile-label">Gaming</span>
                     </a>
                 </div>
             </div>
-            <div class="home-categories__col">
+
+            <div class="home-categories__col" data-block="1">
                 <h3 class="home-categories__col-title">Promociones de Lanzamiento</h3>
-                <div class="home-categories__carousel">
-                    <div class="home-categories__carousel-item"><img src="../theme/doroshopping/assets/images/banners/Banner_mundial_doro.webp" alt=""></div>
-                    <div class="home-categories__carousel-item"><img src="../theme/doroshopping/assets/images/banners/Banner_doro_6.webp" alt=""></div>
-                    <div class="home-categories__carousel-item"><img src="../theme/doroshopping/assets/images/banners/Banner_mundial_doro.webp" alt=""></div>
+                <div class="home-categories__carousel-wrap">
+                    <button type="button" class="home-categories__arrow home-categories__arrow--prev" aria-label="Anterior">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <div class="home-categories__carousel" data-carousel>
+                        <div class="home-categories__carousel-track">
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto7.jpg" alt="Altavoz"></div><p class="home-categories__product-price">28.50 EUR</p><h4 class="home-categories__product-name">Altavoz</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto8.jpg" alt="Smartwatch"></div><p class="home-categories__product-price">67.99 EUR</p><h4 class="home-categories__product-name">Smartwatch</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto1.jpg" alt="Auriculares Pro"></div><p class="home-categories__product-price">39.99 EUR</p><h4 class="home-categories__product-name">Auriculares Pro</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto3.jpg" alt="Accesorio"></div><p class="home-categories__product-price">9.99 EUR</p><h4 class="home-categories__product-name">Accesorio</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto5.jpg" alt="Periferico"></div><p class="home-categories__product-price">22.00 EUR</p><h4 class="home-categories__product-name">Periferico</h4></a></article>
+                            <article class="home-categories__product"><a href="#" class="home-categories__product-link"><div class="home-categories__product-image"><img src="../theme/doroshopping/assets/images/products/Producto2.png" alt="Pantalla"></div><p class="home-categories__product-price">119.00 EUR</p><h4 class="home-categories__product-name">Pantalla</h4></a></article>
+                        </div>
+                    </div>
+                    <button type="button" class="home-categories__arrow home-categories__arrow--next" aria-label="Siguiente">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
                 </div>
-                <div class="home-categories__dots">
-                    <span class="home-categories__dot is-active"></span>
-                    <span class="home-categories__dot"></span>
-                    <span class="home-categories__dot"></span>
-                </div>
+                <div class="home-categories__dots" data-dots></div>
                 <div class="home-categories__tiles">
-                    <a href="#" class="home-categories__tile">
-                        <img src="../theme/doroshopping/assets/images/banners/Banner_mundial_doro.webp" alt="Deportes">
+                    <a href="#" class="home-categories__tile" data-category-file="deportes.png">
+                        <img src="../theme/doroshopping/assets/images/categories/deportes.png" alt="Deportes">
                         <span class="home-categories__tile-label">Deportes</span>
                     </a>
-                    <a href="#" class="home-categories__tile">
-                        <img src="../theme/doroshopping/assets/images/banners/Banner_doro_6.webp" alt="Hogar y Gadgets">
+                    <a href="#" class="home-categories__tile" data-category-file="hogar.png">
+                        <img src="../theme/doroshopping/assets/images/categories/hogar.png" alt="Hogar y Gadgets">
                         <span class="home-categories__tile-label">Hogar y Gadgets</span>
                     </a>
                 </div>
@@ -328,11 +468,23 @@
         </div>
     </section>
 
-    <section class="home-promo">
-        <img class="home-promo__image" src="../theme/doroshopping/assets/images/banners/Banner_doro_6.webp" alt="Gadgets de Ultima Generacion">
+    <section class="home-promo" data-promo-parallax>
+        <img class="home-promo__image" src="../theme/doroshopping/assets/images/banners/banner_seccion_3.png" alt="Gadgets de Ultima Generacion">
         <div class="home-promo__content">
             <h2 class="home-promo__title">Gadgets de Ultima Generacion que no sabias que necesitabas.</h2>
             <a href="#" class="home-promo__cta">Comprar</a>
+        </div>
+        <div class="home-promo__floats">
+            <a href="#" class="home-promo__float home-promo__float--1" data-float="1">
+                <span class="home-promo__float-inner">
+                    <img src="../theme/doroshopping/assets/images/products/Producto7.jpg" alt="Producto destacado 1">
+                </span>
+            </a>
+            <a href="#" class="home-promo__float home-promo__float--2" data-float="2">
+                <span class="home-promo__float-inner">
+                    <img src="../theme/doroshopping/assets/images/products/Producto8.jpg" alt="Producto destacado 2">
+                </span>
+            </a>
         </div>
     </section>
 
@@ -348,37 +500,83 @@
 </main>
 
 <footer class="site-footer">
-    <div class="site-footer__inner">
-        <div class="site-footer__col">
-            <h4>Doro Shopping</h4>
-            <a href="#">Sobre nosotros</a>
-            <a href="#">Contacto</a>
-            <a href="#">Blog</a>
-        </div>
-        <div class="site-footer__col">
-            <h4>Ayuda</h4>
-            <a href="#">Envios</a>
-            <a href="#">Devoluciones</a>
-            <a href="#">Preguntas frecuentes</a>
-        </div>
-        <div class="site-footer__col">
-            <h4>Legal</h4>
-            <a href="#">Terminos y condiciones</a>
-            <a href="#">Politica de privacidad</a>
-            <a href="#">Cookies</a>
-        </div>
-        <div class="site-footer__col">
-            <h4>Siguenos</h4>
-            <a href="#">Instagram</a>
-            <a href="#">Facebook</a>
-            <a href="#">TikTok</a>
+    <div class="site-footer__edge" aria-hidden="true"></div>
+
+    <div class="site-footer__main">
+        <div class="site-footer__grid">
+            <div class="site-footer__col site-footer__col--brand">
+                <a href="#" class="site-footer__logo">
+                    <img src="../theme/doroshopping/assets/images/logo/logo_doro_blanco.png" alt="Doroshopping">
+                </a>
+                <h4 class="site-footer__heading">Atencion al Cliente</h4>
+                <ul class="site-footer__links">
+                    <li><a href="#">Sobre Nosotros</a></li>
+                    <li><a href="#">Politicas de Privacidad</a></li>
+                    <li><a href="#">Ayuda y FAQ's</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+
+            <div class="site-footer__col">
+                <h4 class="site-footer__heading">Guia de Compra</h4>
+                <ul class="site-footer__links">
+                    <li><a href="#">Pago</a></li>
+                    <li><a href="#">Envio</a></li>
+                    <li><a href="#">Crear una cuenta</a></li>
+                    <li><a href="#">Proteccion del Comprador</a></li>
+                </ul>
+            </div>
+
+            <div class="site-footer__col site-footer__col--visual">
+                <h4 class="site-footer__heading">Medios de Pago</h4>
+                <div class="site-footer__payments">
+                    <img src="../theme/doroshopping/assets/images/payment.png" alt="Medios de pago">
+                </div>
+                <img class="site-footer__figure" src="../theme/doroshopping/assets/images/imagen_footer.webp" alt="">
+            </div>
+
+            <div class="site-footer__col site-footer__col--newsletter">
+                <h4 class="site-footer__heading">Registrate y recibe novedades unicas.</h4>
+                <form class="site-footer__newsletter" action="#" method="post">
+                    <label class="screen-reader-text" for="footer-newsletter-email">Direccion de Correo electronico</label>
+                    <input id="footer-newsletter-email" type="email" name="email" placeholder="Direccion de Correo electronico" required>
+                    <button type="submit">Suscribirse</button>
+                </form>
+
+                <h4 class="site-footer__heading site-footer__heading--social">Siguenos</h4>
+                <div class="site-footer__social">
+                    <a href="#" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                    </a>
+                    <a href="#" aria-label="Facebook">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h2.5l.5-3H14V9z"/></svg>
+                    </a>
+                    <a href="#" aria-label="YouTube">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.3 3.5-6.3 3.5z"/></svg>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="site-footer__payments">
-        <img src="../theme/doroshopping/assets/images/payment.png" alt="Metodos de pago">
+
+    <div class="site-footer__bottom">
+        <div class="site-footer__bottom-inner">
+            <p class="site-footer__copy">DOROSHOPPING &copy; 2026 &ndash; All Rights Reserved</p>
+            <nav class="site-footer__legal" aria-label="Enlaces legales">
+                <a href="#">Refund policy</a>
+                <span aria-hidden="true">|</span>
+                <a href="#">Privacy policy</a>
+                <span aria-hidden="true">|</span>
+                <a href="#">Terms of service</a>
+            </nav>
+        </div>
     </div>
-    <p class="site-footer__copy">&copy; 2026 Doroshopping.es. Todos los derechos reservados.</p>
 </footer>
+
+<a href="#" class="site-fab-cart" aria-label="Ver carrito">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span class="site-fab-cart__count">0</span>
+</a>
 
 <script src="../theme/doroshopping/assets/js/main.js"></script>
 <script src="preview-data.js"></script>

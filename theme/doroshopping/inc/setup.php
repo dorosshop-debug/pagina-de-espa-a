@@ -45,5 +45,34 @@ function doroshopping_logo_url() {
             return $url;
         }
     }
-    return get_template_directory_uri() . '/assets/images/logo/logo_doro_v2.png';
+    return get_template_directory_uri() . '/assets/images/logo/logo_header.png';
 }
+
+/**
+ * Logo del footer.
+ *
+ * @return string
+ */
+function doroshopping_footer_logo_url() {
+    return get_template_directory_uri() . '/assets/images/logo/logo_doro_blanco.png';
+}
+
+/**
+ * Favicon / icono del sitio.
+ *
+ * @return string
+ */
+function doroshopping_icon_url() {
+    return get_template_directory_uri() . '/assets/images/icon.png';
+}
+
+/**
+ * Encolar favicon del tema.
+ */
+function doroshopping_site_icon() {
+    if ( has_site_icon() ) {
+        return;
+    }
+    echo '<link rel="icon" href="' . esc_url( doroshopping_icon_url() ) . '" type="image/png">' . "\n";
+}
+add_action( 'wp_head', 'doroshopping_site_icon', 5 );
