@@ -1,0 +1,532 @@
+/* Pagina de producto - layout AliExpress */
+.doro-product {
+    width: 100%;
+    background: #f5f5f5;
+    padding: var(--spacing-md) 0 var(--spacing-2xl);
+}
+
+.doro-product__container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.doro-product__inner {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}
+
+.doro-product__anchors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: 10px 16px;
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-product__anchors a {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-grey-text);
+}
+
+.doro-product__anchors a:hover {
+    color: var(--color-orange);
+}
+
+.doro-product__top {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.05fr) minmax(280px, 1.2fr) minmax(260px, 0.85fr);
+    gap: var(--spacing-lg);
+    align-items: start;
+    margin-bottom: var(--spacing-xl);
+}
+
+.doro-product__gallery {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    position: sticky;
+    top: 12px;
+}
+
+.doro-product__gallery .woocommerce-product-gallery {
+    width: 100% !important;
+    float: none !important;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    opacity: 1 !important;
+}
+
+.doro-product__gallery .woocommerce-product-gallery__wrapper {
+    flex: 1;
+    min-width: 0;
+    order: 2;
+}
+
+.doro-product__gallery .flex-viewport {
+    border-radius: var(--radius-sm);
+    background: #fafafa;
+}
+
+.doro-product__gallery .woocommerce-product-gallery__image img,
+.doro-product__gallery img {
+    width: 100%;
+    height: auto;
+    max-height: 480px;
+    object-fit: contain;
+    margin: 0 auto;
+}
+
+.doro-product__gallery .flex-control-thumbs,
+.doro-product__gallery ol.flex-control-nav {
+    order: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 64px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    float: none !important;
+}
+
+.doro-product__gallery .flex-control-thumbs li {
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: #fafafa;
+}
+
+.doro-product__gallery .flex-control-thumbs li img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.doro-product__gallery .flex-control-thumbs li img.flex-active,
+.doro-product__gallery .flex-control-thumbs li img:hover {
+    opacity: 1;
+    border-color: var(--color-orange);
+}
+
+.doro-product__summary {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    width: 100% !important;
+    float: none !important;
+    margin: 0 !important;
+}
+
+.doro-product__summary .product_title {
+    font-size: 22px;
+    margin: 0 0 var(--spacing-sm);
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.doro-product__rating-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-product__rating-count,
+.doro-product__sold {
+    font-size: var(--font-size-sm);
+    color: var(--color-grey-text);
+}
+
+.doro-product__rating-count:hover {
+    color: var(--color-orange);
+}
+
+.doro-product__summary .price {
+    display: block;
+    color: #e53935;
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 var(--spacing-md);
+    line-height: 1.1;
+}
+
+.doro-product__summary .price del {
+    font-size: var(--font-size-base);
+    color: var(--color-grey-text);
+    font-weight: 400;
+    margin-left: 8px;
+}
+
+.doro-product__summary .price ins {
+    text-decoration: none;
+}
+
+.doro-product__summary .woocommerce-product-details__short-description {
+    color: var(--color-grey-text);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.5;
+    border-top: 1px solid var(--color-grey-border);
+    padding-top: var(--spacing-md);
+}
+
+.doro-product__summary .variations {
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-product__summary .variations td,
+.doro-product__summary .variations th {
+    padding: 6px 0;
+    font-size: var(--font-size-sm);
+}
+
+/* Buy box */
+.doro-product__buybox {
+    position: sticky;
+    top: 12px;
+}
+
+.doro-buybox {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    position: relative;
+}
+
+.doro-buybox__badge {
+    display: inline-block;
+    background: #fff3e0;
+    color: #e65100;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-buybox__perks {
+    list-style: none;
+    margin: 0 0 var(--spacing-md);
+    padding: 0;
+}
+
+.doro-buybox__perks li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: var(--font-size-sm);
+    color: var(--color-dark);
+    margin-bottom: 8px;
+    line-height: 1.35;
+}
+
+.doro-buybox__perks svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: #2e7d32;
+    margin-top: 2px;
+}
+
+.doro-buybox__shipping {
+    background: #fafafa;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-buybox__shipping-title {
+    margin: 0 0 4px;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+}
+
+.doro-buybox__shipping-text {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-grey-text);
+    line-height: 1.4;
+}
+
+.doro-buybox__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-buybox__actions form.cart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin: 0;
+}
+
+.doro-buybox__actions .quantity {
+    order: 1;
+    margin: 0;
+}
+
+.doro-buybox__buy-now {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    background: #e53935;
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    cursor: pointer;
+    order: 2;
+    transition: opacity var(--transition);
+}
+
+.doro-buybox__actions .single_add_to_cart_button {
+    order: 3;
+    width: 100%;
+    height: 48px;
+    background: var(--color-white);
+    color: var(--color-dark);
+    border: 1px solid var(--color-dark);
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+}
+
+.doro-buybox__actions .quantity .qty {
+    width: 100%;
+    height: 42px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    font-family: inherit;
+}
+
+.doro-buybox__actions .single_add_to_cart_button:hover {
+    background: var(--color-dark);
+    color: var(--color-white);
+}
+
+.doro-buybox__buy-now:hover {
+    opacity: 0.92;
+    color: var(--color-white);
+}
+
+.doro-buybox__secondary {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-buybox__wish,
+.doro-buybox__share {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-dark);
+    cursor: pointer;
+}
+
+.doro-buybox__wish svg,
+.doro-buybox__share svg {
+    width: 16px;
+    height: 16px;
+}
+
+.doro-buybox__wish:hover,
+.doro-buybox__share:hover {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+}
+
+.doro-buybox__meta {
+    border-top: 1px solid var(--color-grey-border);
+    padding-top: var(--spacing-md);
+    font-size: 12px;
+    color: var(--color-grey-text);
+}
+
+.doro-buybox__meta a {
+    color: var(--color-dark);
+}
+
+.doro-buybox__meta a:hover {
+    color: var(--color-orange);
+}
+
+/* Tabs / reviews / related */
+.doro-product__below {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+}
+
+.doro-product__below .woocommerce-tabs {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.doro-product__below .woocommerce-tabs ul.tabs {
+    list-style: none;
+    display: flex;
+    gap: 0;
+    margin: 0 0 var(--spacing-lg);
+    padding: 0;
+    border-bottom: 1px solid var(--color-grey-border);
+}
+
+.doro-product__below .woocommerce-tabs ul.tabs li {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.doro-product__below .woocommerce-tabs ul.tabs li a {
+    display: block;
+    padding: 12px 18px;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    color: var(--color-grey-text);
+    border-bottom: 2px solid transparent;
+}
+
+.doro-product__below .woocommerce-tabs ul.tabs li.active a,
+.doro-product__below .woocommerce-tabs ul.tabs li a:hover {
+    color: var(--color-orange);
+    border-bottom-color: var(--color-orange);
+}
+
+.doro-product__below .woocommerce-Tabs-panel {
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--color-dark);
+}
+
+.doro-product__related-wrap > h2,
+.doro-product__below .related > h2,
+.doro-product__below .upsells > h2 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 1100px) {
+    .doro-product__top {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .doro-product__buybox {
+        grid-column: 1 / -1;
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .doro-product__top {
+        grid-template-columns: 1fr;
+    }
+
+    .doro-product__gallery {
+        position: static;
+    }
+
+    .doro-product__gallery .woocommerce-product-gallery {
+        flex-direction: column-reverse;
+    }
+
+    .doro-product__gallery .flex-control-thumbs,
+    .doro-product__gallery ol.flex-control-nav {
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .doro-product__summary .product_title {
+        font-size: 18px;
+    }
+
+    .doro-product__summary .price {
+        font-size: 26px;
+    }
+
+    .doro-product__below {
+        padding: var(--spacing-md);
+    }
+}
+
+.doro-product__variations {
+    margin: var(--spacing-md) 0 var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+    border-top: 1px solid var(--color-grey-border);
+    border-bottom: 1px solid var(--color-grey-border);
+}
+
+.doro-product__variations .variations {
+    width: 100%;
+}
+
+.doro-product__variations .variations td,
+.doro-product__variations .variations th {
+    padding: 8px 0;
+    vertical-align: middle;
+}
+
+.doro-product__variations select {
+    width: 100%;
+    max-width: 320px;
+    height: 40px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    padding: 0 10px;
+}
+
+.doro-buybox table.variations.doro-product__variations-source {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.doro-product__oos {
+    color: #c62828;
+    font-weight: 600;
+    margin: var(--spacing-sm) 0;
+}
