@@ -1,0 +1,184 @@
+.doro-account-page {
+    width: 100%;
+    padding: var(--spacing-2xl) 0;
+}
+
+.doro-account-page--auth {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.doro-account-page__title {
+    margin: 0 0 var(--spacing-xl);
+    text-align: center;
+    font-size: clamp(24px, 3vw, 32px);
+}
+
+.woocommerce-account .woocommerce,
+.doro-account {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+}
+
+.woocommerce-MyAccount-navigation,
+.doro-account__nav {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.woocommerce-MyAccount-navigation ul,
+.doro-account__nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.woocommerce-MyAccount-navigation li a,
+.doro-account__nav a {
+    display: block;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--color-grey-border);
+    color: var(--color-dark);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: background var(--transition), color var(--transition);
+}
+
+.woocommerce-MyAccount-navigation li:last-child a,
+.doro-account__nav li:last-child a {
+    border-bottom: none;
+}
+
+.woocommerce-MyAccount-navigation li.is-active a,
+.woocommerce-MyAccount-navigation li a:hover,
+.doro-account__nav a.is-active,
+.doro-account__nav a:hover {
+    background: #fff7ef;
+    color: var(--color-orange);
+}
+
+.woocommerce-MyAccount-content,
+.doro-account__content {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl);
+}
+
+.doro-auth {
+    max-width: 880px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+}
+
+.doro-auth__card {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.doro-auth__card h2 {
+    margin: 0 0 var(--spacing-md);
+    font-size: 22px;
+}
+
+.doro-auth__card p {
+    margin: 0 0 var(--spacing-lg);
+    color: var(--color-grey-text);
+    font-size: var(--font-size-sm);
+}
+
+.doro-auth__form label,
+.woocommerce-form-login label,
+.woocommerce-form-register label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-auth__form .form-row,
+.woocommerce-form-login .form-row,
+.woocommerce-form-register .form-row {
+    margin-bottom: var(--spacing-md);
+}
+
+.doro-auth__form input[type="text"],
+.doro-auth__form input[type="email"],
+.doro-auth__form input[type="password"],
+.woocommerce-form-login input.input-text,
+.woocommerce-form-register input.input-text {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    background: var(--color-white);
+}
+
+.doro-auth__form input:focus,
+.woocommerce-form-login input.input-text:focus,
+.woocommerce-form-register input.input-text:focus {
+    outline: none;
+    border-color: var(--color-orange);
+}
+
+.doro-auth__submit,
+.woocommerce-form-login .woocommerce-button,
+.woocommerce-form-register .woocommerce-button {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--color-orange);
+    color: var(--color-white);
+    font-weight: 700;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: opacity var(--transition);
+}
+
+.doro-auth__submit:hover,
+.woocommerce-form-login .woocommerce-button:hover,
+.woocommerce-form-register .woocommerce-button:hover {
+    opacity: 0.92;
+}
+
+.doro-auth__meta,
+.woocommerce-form-login .woocommerce-LostPassword {
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+.doro-auth__meta a,
+.woocommerce-form-login .woocommerce-LostPassword a {
+    color: var(--color-orange);
+    font-weight: 600;
+}
+
+.woocommerce-form__label-for-checkbox {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600 !important;
+}
+
+@media (max-width: 860px) {
+    .woocommerce-account .woocommerce,
+    .doro-account,
+    .doro-auth {
+        grid-template-columns: 1fr;
+    }
+}

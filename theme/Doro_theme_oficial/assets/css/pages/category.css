@@ -1,0 +1,179 @@
+/* Pagina de categoria - estilo AliExpress */
+.doro-category {
+    width: 100%;
+    background: #f5f5f5;
+    padding-bottom: var(--spacing-2xl);
+    min-height: 50vh;
+}
+
+.doro-category__title-bar {
+    background: #eceae6;
+    border-bottom: 1px solid var(--color-grey-border);
+}
+
+.doro-category__title-inner {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--spacing-lg) var(--spacing-lg);
+}
+
+.doro-category__title {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-category__container {
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-lg) 0;
+}
+
+.doro-category__subs {
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl) var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.doro-category__subs-grid {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--spacing-lg) var(--spacing-md);
+    justify-items: center;
+}
+
+.doro-category__sub {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 110px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--color-dark);
+    transition: color var(--transition);
+}
+
+.doro-category__sub:hover {
+    color: var(--color-orange);
+}
+
+.doro-category__sub-circle {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: #f3f3f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid transparent;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.doro-category__sub:hover .doro-category__sub-circle {
+    border-color: var(--color-orange);
+    box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.12);
+}
+
+.doro-category__sub-circle img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+}
+
+.doro-category__sub-label {
+    font-size: 12px;
+    line-height: 1.3;
+    font-weight: 500;
+}
+
+.doro-category__shop {
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.doro-category__shop-header {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.doro-category__shop-title {
+    margin: 0 0 var(--spacing-md);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+}
+
+.doro-category__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--color-dark);
+    color: var(--color-white);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.doro-category .products {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--spacing-md);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.doro-category .doro-product-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    height: 100%;
+}
+
+.doro-category__empty {
+    text-align: center;
+    color: var(--color-grey-text);
+    padding: var(--spacing-xl);
+}
+
+@media (max-width: 1200px) {
+    .doro-category__subs-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .doro-category .products {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .doro-category__subs-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .doro-category .products {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .doro-category__subs-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--spacing-md);
+    }
+
+    .doro-category__sub-circle {
+        width: 72px;
+        height: 72px;
+    }
+
+    .doro-category .products {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

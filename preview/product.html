@@ -1,0 +1,501 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doroshopping - Producto</title>
+    <link rel="icon" href="../theme/Doro_theme_oficial/assets/images/icon.png">
+    <link rel="stylesheet" href="../theme/Doro_theme_oficial/assets/css/main.css">
+</head>
+<body class="woocommerce single-product">
+
+<header class="site-header site-header--compact">
+    <div class="site-header__top">
+        <div class="site-header__brand">
+            <a href="index.html" class="site-header__logo">
+                <img src="../theme/Doro_theme_oficial/assets/images/logo/logo_header.png" alt="Doroshopping">
+            </a>
+            <div class="site-nav__categories site-header__menu-wrap">
+                <button type="button" class="site-header__menu-btn site-nav__categories-btn" aria-expanded="false" aria-controls="mega-menu" aria-label="Abrir menu de categorias">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                </button>
+                <div class="mega-menu" id="mega-menu" hidden>
+                    <div class="mega-menu__inner">
+                        <aside class="mega-menu__sidebar">
+                            <ul class="mega-menu__cats" role="tablist">
+                                <li>
+                                    <a href="category.html?c=electronica" class="mega-menu__cat is-active" data-panel="electronica" role="tab" aria-selected="true">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                                        Electronica
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="category.html?c=informatica" class="mega-menu__cat" data-panel="informatica" role="tab" aria-selected="false">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                                        Informatica
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="category.html?c=hogar" class="mega-menu__cat" data-panel="hogar" role="tab" aria-selected="false">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+                                        Hogar y Cocina
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="category.html?c=deportes" class="mega-menu__cat" data-panel="deportes" role="tab" aria-selected="false">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20"/></svg>
+                                        Deportes y Recreacion
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="category.html?c=promociones" class="mega-menu__cat" data-panel="promociones" role="tab" aria-selected="false">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>
+                                        Promociones & Ofertas
+                                    </a>
+                                </li>
+                            </ul>
+                        </aside>
+
+                        <div class="mega-menu__panels">
+                            <div class="mega-menu__panel is-active" data-panel="electronica" role="tabpanel">
+                                <div class="mega-menu__columns">
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Telefonos y Tabletas</h4>
+                                        <ul>
+                                            <li><a href="#">Accesorios para moviles y tabletas</a></li>
+                                            <li><a href="#">Auriculares con microfono</a></li>
+                                            <li><a href="#">Auriculares Bluetooth con microfono</a></li>
+                                            <li><a href="#">Relojes inteligentes</a></li>
+                                            <li><a href="#">Telefonos moviles</a></li>
+                                            <li><a href="#">Tabletas</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_doro_6.webp" alt="">
+                                        <h4 class="mega-menu__heading">Sonido</h4>
+                                        <ul>
+                                            <li><a href="#">Barras de sonido</a></li>
+                                            <li><a href="#">Auriculares Bluetooth</a></li>
+                                            <li><a href="#">Auriculares inalambricos</a></li>
+                                            <li><a href="#">Componentes y Accesorios</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Fotografia y Video</h4>
+                                        <ul>
+                                            <li><a href="#">Accesorios para Camaras y Videocamaras</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mega-menu__panel" data-panel="informatica" role="tabpanel" hidden>
+                                <div class="mega-menu__columns">
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_doro_6.webp" alt="">
+                                        <h4 class="mega-menu__heading">Ordenadores</h4>
+                                        <ul>
+                                            <li><a href="#">Portatiles</a></li>
+                                            <li><a href="#">Sobremesa</a></li>
+                                            <li><a href="#">Monitores</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Componentes</h4>
+                                        <ul>
+                                            <li><a href="#">Almacenamiento</a></li>
+                                            <li><a href="#">Tarjetas graficas</a></li>
+                                            <li><a href="#">Memoria RAM</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_doro_6.webp" alt="">
+                                        <h4 class="mega-menu__heading">Perifericos</h4>
+                                        <ul>
+                                            <li><a href="#">Teclados</a></li>
+                                            <li><a href="#">Ratones</a></li>
+                                            <li><a href="#">Webcams</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mega-menu__panel" data-panel="hogar" role="tabpanel" hidden>
+                                <div class="mega-menu__columns">
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Cocina</h4>
+                                        <ul>
+                                            <li><a href="#">Electrodomesticos</a></li>
+                                            <li><a href="#">Utensilios</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_doro_6.webp" alt="">
+                                        <h4 class="mega-menu__heading">Hogar inteligente</h4>
+                                        <ul>
+                                            <li><a href="#">Iluminacion</a></li>
+                                            <li><a href="#">Seguridad</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Gadgets</h4>
+                                        <ul>
+                                            <li><a href="#">Novedades hogar</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mega-menu__panel" data-panel="deportes" role="tabpanel" hidden>
+                                <div class="mega-menu__columns">
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_doro_6.webp" alt="">
+                                        <h4 class="mega-menu__heading">Outdoor</h4>
+                                        <ul>
+                                            <li><a href="#">Camping</a></li>
+                                            <li><a href="#">Ciclismo</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Fitness</h4>
+                                        <ul>
+                                            <li><a href="#">Wearables</a></li>
+                                            <li><a href="#">Accesorios deporte</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_doro_6.webp" alt="">
+                                        <h4 class="mega-menu__heading">Recreacion</h4>
+                                        <ul>
+                                            <li><a href="#">Juegos exteriores</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mega-menu__panel" data-panel="promociones" role="tabpanel" hidden>
+                                <div class="mega-menu__columns">
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Ofertas</h4>
+                                        <ul>
+                                            <li><a href="#">Super Ofertas</a></li>
+                                            <li><a href="#">Liquidacion</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_doro_6.webp" alt="">
+                                        <h4 class="mega-menu__heading">Lanzamientos</h4>
+                                        <ul>
+                                            <li><a href="#">Novedades</a></li>
+                                            <li><a href="#">Productos Virales</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="mega-menu__column">
+                                        <img class="mega-menu__thumb" src="../theme/Doro_theme_oficial/assets/images/banners/Banner_mundial_doro.webp" alt="">
+                                        <h4 class="mega-menu__heading">Reacondicionados</h4>
+                                        <ul>
+                                            <li><a href="#">Remanufacturados</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="site-header__search-wrap" data-live-search>
+            <form class="site-header__search" role="search" action="shop.html" autocomplete="off">
+                
+                <input type="search" name="s" class="site-header__search-input" placeholder="Buscar productos" data-live-search-input aria-autocomplete="list" aria-controls="live-search-results" aria-expanded="false">
+                                <div class="site-header__visual-search" data-visual-search>
+                    <button type="button" class="site-header__visual-search-btn" data-visual-search-trigger aria-label="Buscar por imagen" title="Buscar por imagen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </button>
+                    <input type="file" class="site-header__visual-search-input" data-visual-search-input accept="image/jpeg,image/png,image/webp,image/gif" capture="environment" hidden aria-hidden="true">
+                </div>
+                <button type="submit" class="site-header__search-submit" aria-label="Buscar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </button>
+            </form>
+            <div class="live-search" id="live-search-panel" hidden data-live-search-panel>
+                <ul class="live-search__list" id="live-search-results" data-live-search-results role="listbox"></ul>
+                <a href="shop.html" class="live-search__all" data-live-search-all hidden>Ver todos los resultados</a>
+                <p class="live-search__empty" data-live-search-empty hidden>No se encontraron productos.</p>
+                <p class="live-search__loading" data-live-search-loading hidden>Buscando...</p>
+            </div>
+        </div>
+
+        <div class="site-header__utilities">
+            <a href="#" class="site-header__utility">
+                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span class="site-header__utility-text">
+                    <span class="site-header__utility-label">Bienvenido</span>
+                    <span>Ingresar</span>
+                </span>
+            </a>
+            <a href="#" class="site-header__utility">
+                <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <span class="site-header__utility-text site-header__utility-text--cart">
+                    <span class="site-header__cart-count" data-cart-count>0</span>
+                    <span class="site-header__utility-label">Carrito</span>
+                </span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="doro-product">
+    <div class="doro-product__container">
+        <div class="doro-product__inner">
+            <nav class="doro-product__anchors">
+                <a href="#doro-reviews">Valoraciones</a>
+                <a href="#doro-details">Detalles</a>
+                <a href="#doro-description">Descripcion</a>
+                <a href="#doro-related">Articulos similares</a>
+            </nav>
+
+            <div class="doro-product__top">
+                <div class="doro-product__gallery">
+                    <div class="woocommerce-product-gallery" style="display:flex;gap:12px;">
+                        <ol class="flex-control-nav flex-control-thumbs" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;width:64px;">
+                            <li><img src="../theme/Doro_theme_oficial/assets/images/products/Producto1.jpg" alt="" class="flex-active"></li>
+                            <li><img src="../theme/Doro_theme_oficial/assets/images/products/Producto7.jpg" alt=""></li>
+                            <li><img src="../theme/Doro_theme_oficial/assets/images/products/Producto8.jpg" alt=""></li>
+                        </ol>
+                        <div class="woocommerce-product-gallery__wrapper" style="flex:1;">
+                            <img src="../theme/Doro_theme_oficial/assets/images/products/Producto1.jpg" alt="Auriculares Bluetooth TWS Pro">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="doro-product__summary summary">
+                    <h1 class="product_title">Auriculares Bluetooth TWS Pro con cancelacion de ruido y estuche de carga</h1>
+                    <div class="doro-product__rating-row">
+                        <div class="product-rating" role="img" aria-label="4.5 de 5">
+                            <span class="product-rating__star"><svg class="product-rating__star-empty" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="product-rating__star-fill" style="width:100%"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="currentColor"/></svg></span></span>
+                            <span class="product-rating__star"><svg class="product-rating__star-empty" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="product-rating__star-fill" style="width:100%"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="currentColor"/></svg></span></span>
+                            <span class="product-rating__star"><svg class="product-rating__star-empty" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="product-rating__star-fill" style="width:100%"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="currentColor"/></svg></span></span>
+                            <span class="product-rating__star"><svg class="product-rating__star-empty" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="product-rating__star-fill" style="width:100%"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="currentColor"/></svg></span></span>
+                            <span class="product-rating__star"><svg class="product-rating__star-empty" viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span class="product-rating__star-fill" style="width:50%"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="currentColor"/></svg></span></span>
+                        </div>
+                        <a class="doro-product__rating-count" href="#doro-reviews">12 valoraciones</a>
+                        <span class="doro-product__sold">2000+ vendidos</span>
+                    </div>
+                    <p class="price"><span>EUR 23.99</span> <del>EUR 39.99</del></p>
+                    <div class="woocommerce-product-details__short-description">
+                        <p>Auriculares inalambricos con cancelacion de ruido, estuche de carga y autonomia de hasta 24 horas. Compatibles con iOS y Android.</p>
+                    </div>
+                </div>
+
+                <aside class="doro-product__buybox">
+                    <div class="doro-buybox">
+                        <div class="doro-buybox__badge">Envio Doro</div>
+                        <ul class="doro-buybox__perks">
+                            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Envio gratis en pedidos seleccionados</li>
+                            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Entrega rapida disponible</li>
+                            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Devoluciones faciles</li>
+                        </ul>
+                        <div class="doro-buybox__shipping">
+                            <p class="doro-buybox__shipping-title">Envio</p>
+                            <p class="doro-buybox__shipping-text">Entrega estimada en 3-7 dias laborables segun tu ubicacion.</p>
+                        </div>
+                        <div class="doro-buybox__actions">
+                            <a href="#" class="doro-buybox__buy-now">Comprar ahora</a>
+                            <form class="cart" action="#" method="post">
+                                <div class="quantity"><input type="number" class="qty" value="1" min="1"></div>
+                                <button type="submit" class="single_add_to_cart_button">Agregar al carrito</button>
+                            </form>
+                        </div>
+                        <div class="doro-buybox__secondary">
+                            <button type="button" class="doro-buybox__wish" data-wishlist-toggle data-product-id="0" aria-pressed="false" aria-label="Anadir a lista de deseos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg> Lista de deseos</button>
+                            <button type="button" class="doro-buybox__share">Compartir</button>
+                        </div>
+                        <div class="doro-buybox__meta">
+                            <span>SKU: DORO-TWS-01</span><br>
+                            <span>Categoria: <a href="shop.html">Electronica</a></span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="doro-product__below" id="doro-details">
+                <div class="woocommerce-tabs" id="doro-description">
+                    <ul class="tabs">
+                        <li class="active"><a href="#tab-description">Descripcion</a></li>
+                        <li><a href="#doro-reviews">Valoraciones (12)</a></li>
+                    </ul>
+                    <div class="woocommerce-Tabs-panel" id="tab-description">
+                        <p>Disfruta de un sonido nitido y graves potentes con estos auriculares TWS. Resistencia al sudor IPX4 y microfono integrado para llamadas.</p>
+                    </div>
+                </div>
+
+                <section id="doro-reviews">
+                    <h2>Valoraciones</h2>
+                    <p style="color:#666;font-size:14px;">Los clientes destacan la calidad de sonido y la comodidad durante el uso diario.</p>
+                </section>
+
+                <div id="doro-related" class="doro-product__related-wrap" style="margin-top:32px;">
+                    <h2>Articulos similares</h2>
+                    <ul class="products" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;list-style:none;padding:0;margin:0;">
+                        <li class="product doro-product-card">
+                            <a href="product.html">
+                                <div class="doro-product-card__media"><img src="../theme/Doro_theme_oficial/assets/images/products/Producto7.jpg" alt=""></div>
+                                <div class="doro-product-card__body"><span class="price">EUR 28.50</span><h2 class="woocommerce-loop-product__title">Altavoz portatil</h2></div>
+                            </a>
+                        </li>
+                        <li class="product doro-product-card">
+                            <a href="product.html">
+                                <div class="doro-product-card__media"><img src="../theme/Doro_theme_oficial/assets/images/products/Producto8.jpg" alt=""></div>
+                                <div class="doro-product-card__body"><span class="price">EUR 67.99</span><h2 class="woocommerce-loop-product__title">Smartwatch GPS</h2></div>
+                            </a>
+                        </li>
+                        <li class="product doro-product-card">
+                            <a href="product.html">
+                                <div class="doro-product-card__media"><img src="../theme/Doro_theme_oficial/assets/images/products/Producto4.jpg" alt=""></div>
+                                <div class="doro-product-card__body"><span class="price">EUR 89.00</span><h2 class="woocommerce-loop-product__title">Teclado RGB</h2></div>
+                            </a>
+                        </li>
+                        <li class="product doro-product-card">
+                            <a href="product.html">
+                                <div class="doro-product-card__media"><img src="../theme/Doro_theme_oficial/assets/images/products/Producto2.png" alt=""></div>
+                                <div class="doro-product-card__body"><span class="price">EUR 45.50</span><h2 class="woocommerce-loop-product__title">Monitor LED 24"</h2></div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="site-footer__edge" aria-hidden="true"></div>
+
+    <div class="site-footer__main">
+        <div class="site-footer__grid">
+            <div class="site-footer__col site-footer__col--brand">
+                <a href="index.html" class="site-footer__logo">
+                    <img src="../theme/Doro_theme_oficial/assets/images/logo/logo_doro_blanco.png" alt="Doroshopping">
+                </a>
+                <h4 class="site-footer__heading">Atencion al Cliente</h4>
+                <ul class="site-footer__links">
+                    <li><a href="#">Sobre Nosotros</a></li>
+                    <li><a href="#">Politicas de Privacidad</a></li>
+                    <li><a href="#">Ayuda y FAQ's</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+
+            <div class="site-footer__col">
+                <h4 class="site-footer__heading">Guia de Compra</h4>
+                <ul class="site-footer__links">
+                    <li><a href="#">Pago</a></li>
+                    <li><a href="#">Envio</a></li>
+                    <li><a href="#">Crear una cuenta</a></li>
+                    <li><a href="#">Proteccion del Comprador</a></li>
+                </ul>
+            </div>
+
+            <div class="site-footer__col site-footer__col--visual">
+                <h4 class="site-footer__heading">Medios de Pago</h4>
+                <div class="site-footer__payments">
+                    <img src="../theme/Doro_theme_oficial/assets/images/payment.png" alt="Medios de pago">
+                </div>
+                <img class="site-footer__figure" src="../theme/Doro_theme_oficial/assets/images/imagen_footer.webp" alt="">
+            </div>
+
+            <div class="site-footer__col site-footer__col--newsletter">
+                <h4 class="site-footer__heading">Registrate y recibe novedades unicas.</h4>
+                <form class="site-footer__newsletter" action="#" method="post">
+                    <label class="screen-reader-text" for="footer-newsletter-email">Direccion de Correo electronico</label>
+                    <input id="footer-newsletter-email" type="email" name="email" placeholder="Direccion de Correo electronico" required>
+                    <button type="submit">Suscribirse</button>
+                </form>
+
+                <h4 class="site-footer__heading site-footer__heading--social">Siguenos</h4>
+                <div class="site-footer__social">
+                    <a href="#" aria-label="Instagram">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                    </a>
+                    <a href="#" aria-label="Facebook">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h2.5l.5-3H14V9z"/></svg>
+                    </a>
+                    <a href="#" aria-label="YouTube">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.3 3.5-6.3 3.5z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="site-footer__domains">
+        <div class="site-footer__domains-inner">
+            <h4 class="site-footer__domains-title">Nuestras tiendas</h4>
+            <ul class="site-footer__domains-list">
+                <li><a href="https://doroshopping.com" target="_blank" rel="noopener noreferrer">doroshopping.com</a></li>
+                <li><a href="https://doroshopping.es" target="_blank" rel="noopener noreferrer">doroshopping.es</a></li>
+                <li><a href="https://doroshopping.fr" target="_blank" rel="noopener noreferrer">doroshopping.fr</a></li>
+                <li><a href="https://doroshopping.de" target="_blank" rel="noopener noreferrer">doroshopping.de</a></li>
+                <li><a href="https://doroshopping.uk" target="_blank" rel="noopener noreferrer">doroshopping.uk</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="site-footer__bottom">
+        <div class="site-footer__bottom-inner">
+            <p class="site-footer__copy">DOROSHOPPING &copy; 2026 &ndash; All Rights Reserved</p>
+            <nav class="site-footer__legal" aria-label="Enlaces legales">
+                <a href="#">Refund policy</a>
+                <span aria-hidden="true">|</span>
+                <a href="#">Privacy policy</a>
+                <span aria-hidden="true">|</span>
+                <a href="#">Terms of service</a>
+            </nav>
+        </div>
+    </div>
+</footer>
+
+<button type="button" class="site-fab-cart" id="site-fab-cart" aria-label="Ver carrito">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span class="site-fab-cart__count" data-cart-count>0</span>
+</button>
+<div class="cart-modal" id="cart-modal" hidden>
+    <div class="cart-modal__backdrop" data-cart-close></div>
+    <div class="cart-modal__dialog" role="dialog" tabindex="-1">
+        <header class="cart-modal__header">
+            <h2 class="cart-modal__title">Tu Carrito</h2>
+            <button type="button" class="cart-modal__close" data-cart-close aria-label="Cerrar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+        </header>
+        <div class="cart-modal__body">
+            <div class="cart-modal__items" data-cart-items></div>
+            <div class="cart-modal__summary">
+                <p class="cart-modal__subtotal">Subtotal: <span data-cart-subtotal>-</span></p>
+                <a href="#" class="cart-modal__checkout" data-cart-checkout>CHECKOUT</a>
+            </div>
+        </div>
+        <div class="cart-modal__recs">
+            <h3 class="cart-modal__recs-title">Productos que no puedes dejar pasar.</h3>
+            <div class="cart-modal__recs-grid" data-cart-recs></div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.doroshoppingCart = { ajaxUrl: '', nonce: '', checkoutUrl: '#', initialCount: 0, i18n: { empty: 'Tu carrito esta vacio.', remove: 'Eliminar', decrease: 'Menos', increase: 'Mas' } };
+window.doroshoppingSearch = { ajaxUrl: '', nonce: '', minChars: 2, i18n: { empty: 'No se encontraron productos.', loading: 'Buscando...', viewAll: 'Ver todos los resultados' } };
+</script>
+<script src="preview-data.js"></script>
+<script src="../theme/Doro_theme_oficial/assets/js/main.js"></script>
+</body>
+</html>
+
+
+

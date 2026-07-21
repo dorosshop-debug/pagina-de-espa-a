@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiko:wght@400;600;700&display=swap');
+@import 'base/variables.css';
+@import 'base/reset.css';
+@import 'base/typography.css';
+@import 'base/a11y.css';
+@import 'components/header.css';
+@import 'components/footer.css';
+@import 'components/cart-modal.css';
+@import 'components/live-search.css';
+@import 'pages/home.css';
+@import 'pages/shop.css';
+@import 'pages/product.css';
+@import 'pages/wishlist.css';
+@import 'pages/account.css';
+@import 'pages/category.css';
+@import 'pages/page.css';
+@import 'pages/cart-checkout.css';

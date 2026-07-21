@@ -1,0 +1,227 @@
+<?php
+/**
+ * WooCommerce helpers, hooks y compat Elementor
+ *
+ * @package Doroshopping
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+/**
+ * Columnas del loop de tienda.
+ *
+ * @return int
+ */
+function doroshopping_loop_columns() {
+    return 4;
+}
+add_filter( 'loop_shop_columns', 'doroshopping_loop_columns' );
+
+/**
+ * Productos por pagina.
+ *
+ * @param int $cols Default.
+ * @return int
+ */
+function doroshopping_products_per_page( $cols ) {
+    return 24;
+}
+add_filter( 'loop_shop_per_page', 'doroshopping_products_per_page', 20 );
+
+/**
+ * Wrapper de contenido WooCommerce (fallback cuando no hay template override).
+ */
+remove_action( 'woocommerce_before_main_content', 'woocommerce_output_content_wrapper', 10 );
+remove_action( 'woocommerce_after_main_content', 'woocommerce_output_content_wrapper_end', 10 );
+
+function doroshopping_wc_wrapper_start() {
+    echo '<main class="doro-shop"><div class="doro-shop__container">';
+}
+add_action( 'woocommerce_before_main_content', 'doroshopping_wc_wrapper_start', 10 );
+
+function doroshopping_wc_wrapper_end() {
+    echo '</div></main>';
+}
+add_action( 'woocommerce_after_main_content', 'doroshopping_wc_wrapper_end', 10 );
+
+/**
+ * Breadcrumb dentro del layout de tienda.
+ */
+remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
+add_action( 'doroshopping_shop_before_content', 'woocommerce_breadcrumb', 10 );
+
+/**
+ * Result count + ordering en barra superior.
+ */
+remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
+
+function doroshopping_shop_toolbar() {
+    echo '<div class="doro-shop__toolbar">';
+    woocommerce_result_count();
+    woocommerce_catalog_ordering();
+    echo '</div>';
+}
+add_action( 'woocommerce_before_shop_loop', 'doroshopping_shop_toolbar', 20 );
+
+/**
+ * Rating en el loop (despues del precio).
+ */
+remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_rating', 5 );
+add_action( 'woocommerce_after_shop_loop_item_title', 'doroshopping_loop_rating', 6 );
+
+function doroshopping_loop_rating() {
+    global $product;
+    if ( ! $product ) {
+        return;
+    }
+    echo doroshopping_get_star_rating_html( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        (float) $product->get_average_rating(),
+        (int) $product->get_review_count()
+    );
+}
+
+/**
+ * Reordenar precio antes del titulo en cards estilo AliExpress.
+ */
+remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price', 10 );
+remove_action( 'woocommerce_shop_loop_item_title', 'woocommerce_template_loop_product_title', 10 );
+
+add_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price', 5 );
+add_action( 'woocommerce_after_shop_loop_item_title', 'doroshopping_loop_product_title', 10 );
+
+function doroshopping_loop_product_title() {
+    echo '<h2 class="' . esc_attr( apply_filters( 'woocommerce_product_loop_title_classes', 'woocommerce-loop-product__title' ) ) . '">' . esc_html( get_the_title() ) . '</h2>';
+}
+
+/**
+ * Rating en ficha de producto con estrellas del tema.
+ */
+remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
+add_action( 'woocommerce_single_product_summary', 'doroshopping_single_rating', 8 );
+
+function doroshopping_single_rating() {
+    global $product;
+    if ( ! $product ) {
+        return;
+    }
+
+    $rating = (float) $product->get_average_rating();
+    $count  = (int) $product->get_review_count();
+    $sold   = (int) $product->get_total_sales();
+
+    echo '<div class="doro-product__rating-row">';
+    echo doroshopping_get_star_rating_html( $rating, $count ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+    if ( $count > 0 ) {
+        echo '<a class="doro-product__rating-count" href="#tab-reviews">' . esc_html( sprintf( _n( '%d valoracion', '%d valoraciones', $count, 'doroshopping' ), $count ) ) . '</a>';
+    }
+    if ( $sold > 0 ) {
+        /* translators: %s: number of sales */
+        echo '<span class="doro-product__sold">' . esc_html( sprintf( __( '%s+ vendidos', 'doroshopping' ), number_format_i18n( $sold ) ) ) . '</span>';
+    }
+    echo '</div>';
+}
+
+/**
+ * Abrir/cerrar contenedor de relacionados.
+ */
+function doroshopping_related_wrap_start() {
+    echo '<div id="doro-related" class="doro-product__related-wrap">';
+}
+function doroshopping_related_wrap_end() {
+    echo '</div>';
+}
+add_action( 'woocommerce_after_single_product_summary', 'doroshopping_related_wrap_start', 19 );
+add_action( 'woocommerce_after_single_product_summary', 'doroshopping_related_wrap_end', 21 );
+
+/**
+ * Envolver panel de reviews.
+ */
+function doroshopping_review_tab_panel_class( $class ) {
+    return $class;
+}
+
+/**
+ * Sidebar de filtros de tienda.
+ */
+function doroshopping_shop_sidebar() {
+    if ( ! is_active_sidebar( 'shop-filters' ) ) {
+        get_template_part( 'template-parts/shop/filters', 'fallback' );
+        return;
+    }
+    dynamic_sidebar( 'shop-filters' );
+}
+
+function doroshopping_register_shop_sidebar() {
+    register_sidebar(
+        array(
+            'name'          => __( 'Filtros de tienda', 'doroshopping' ),
+            'id'            => 'shop-filters',
+            'description'   => __( 'Widgets de filtros para la página de tienda. Si está vacío se usa el fallback del tema.', 'doroshopping' ),
+            'before_widget' => '<div id="%1$s" class="doro-shop__widget %2$s">',
+            'after_widget'  => '</div>',
+            'before_title'  => '<h3 class="doro-shop__widget-title">',
+            'after_title'   => '</h3>',
+        )
+    );
+}
+add_action( 'widgets_init', 'doroshopping_register_shop_sidebar' );
+
+/**
+ * Filtro por valoración mínima (?min_rating=3|4).
+ *
+ * @param WP_Query $q Query.
+ */
+function doroshopping_filter_by_min_rating( $q ) {
+    if ( is_admin() || ! $q->is_main_query() ) {
+        return;
+    }
+    if ( ! isset( $_GET['min_rating'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        return;
+    }
+    $min = absint( $_GET['min_rating'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    if ( $min < 1 || $min > 5 ) {
+        return;
+    }
+
+    $meta_query   = (array) $q->get( 'meta_query' );
+    $meta_query[] = array(
+        'key'     => '_wc_average_rating',
+        'value'   => $min,
+        'compare' => '>=',
+        'type'    => 'DECIMAL',
+    );
+    $q->set( 'meta_query', $meta_query );
+}
+add_action( 'woocommerce_product_query', 'doroshopping_filter_by_min_rating' );
+
+/**
+ * Lazy-load en miniaturas de producto WC.
+ *
+ * @param array $attr Attributes.
+ * @return array
+ */
+function doroshopping_product_image_lazy_attrs( $attr ) {
+    if ( empty( $attr['loading'] ) ) {
+        $attr['loading'] = 'lazy';
+    }
+    if ( empty( $attr['decoding'] ) ) {
+        $attr['decoding'] = 'async';
+    }
+    return $attr;
+}
+add_filter( 'wp_get_attachment_image_attributes', 'doroshopping_product_image_lazy_attrs' );
+
+/**
+ * Aviso cuando producto variable sin stock / no comprable.
+ */
+function doroshopping_out_of_stock_notice() {
+    global $product;
+    if ( ! $product || $product->is_in_stock() ) {
+        return;
+    }
+    echo '<p class="doro-product__oos" role="status">' . esc_html__( 'Este producto no está disponible actualmente.', 'doroshopping' ) . '</p>';
+}
+add_action( 'woocommerce_single_product_summary', 'doroshopping_out_of_stock_notice', 15 );
