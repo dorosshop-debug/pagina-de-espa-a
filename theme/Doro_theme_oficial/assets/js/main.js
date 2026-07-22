@@ -1066,13 +1066,18 @@ function initLiveSearch() {
 
 /**
  * Add to cart AJAX desde cards de home / botones .ajax_add_to_cart del tema.
+ * En WordPress deja que wc-add-to-cart.js gestione la sesión/cookies.
+ * Solo intercepta en preview estático.
  */
 function initAjaxAddToCart() {
-    var cfg = window.doroshoppingCart || {};
-
     document.addEventListener('click', function (e) {
-        var btn = e.target.closest('.home-product-card__cart-btn');
-        if (!btn || btn.tagName === 'A') return;
+        var btn = e.target.closest('.home-product-card__cart-btn.ajax_add_to_cart');
+        if (!btn) return;
+
+        // En WP real: WooCommerce (wc-add-to-cart.js) gestiona cookies/sesión.
+        if (!window.doroshoppingPreviewCart) {
+            return;
+        }
 
         e.preventDefault();
         e.stopPropagation();
@@ -1087,81 +1092,49 @@ function initAjaxAddToCart() {
         btn.classList.add('loading');
         btn.setAttribute('aria-busy', 'true');
 
-        function done(ok) {
-            btn.classList.remove('loading');
-            btn.removeAttribute('aria-busy');
-            if (ok) {
-                btn.classList.add('added');
-                setTimeout(function () { btn.classList.remove('added'); }, 1800);
-                document.body.dispatchEvent(new CustomEvent('added_to_cart', { detail: { product_id: productId } }));
-                if (typeof jQuery !== 'undefined') {
-                    jQuery(document.body).trigger('added_to_cart', [{}, '', jQuery(btn)]);
-                }
-            } else if (cfg.i18n && cfg.i18n.error) {
-                btn.setAttribute('title', cfg.i18n.error);
+        if (typeof window.doroshoppingPreviewCart.add === 'function') {
+            window.doroshoppingPreviewCart.add(productId, quantity);
+        } else if (typeof window.doroshoppingPreviewCart.handle === 'function') {
+            var nameEl = card && card.querySelector('.home-product-card__name');
+            var imgEl = card && card.querySelector('img');
+            var priceEl = card && card.querySelector('.home-product-card__price');
+            var unit = priceEl ? parseFloat(String(priceEl.textContent).replace(/[^\d.,]/g, '').replace(',', '.')) : 0;
+            window.doroshoppingPreviewCart.handle('doroshopping_add_to_cart', {
+                product: {
+                    id: productId,
+                    name: nameEl ? nameEl.textContent.trim() : 'Producto',
+                    unit: isNaN(unit) ? 0 : unit,
+                    image: imgEl ? imgEl.getAttribute('src') : '',
+                    permalink: 'product.html'
+                },
+                quantity: quantity
+            });
+        }
+
+        btn.classList.remove('loading');
+        btn.removeAttribute('aria-busy');
+        btn.classList.add('added');
+        setTimeout(function () { btn.classList.remove('added'); }, 1800);
+        document.body.dispatchEvent(new CustomEvent('added_to_cart', { detail: { product_id: productId } }));
+        if (typeof jQuery !== 'undefined') {
+            jQuery(document.body).trigger('added_to_cart', [{}, '', jQuery(btn)]);
+        }
+    }, true);
+
+    // Feedback visual cuando WC completa el add (WP).
+    if (typeof jQuery !== 'undefined') {
+        jQuery(document.body).on('adding_to_cart', function (ev, $button) {
+            if ($button && $button.length) {
+                $button.addClass('loading').attr('aria-busy', 'true');
             }
-        }
-
-        // Preview estático
-        if (window.doroshoppingPreviewCart) {
-            if (typeof window.doroshoppingPreviewCart.add === 'function') {
-                window.doroshoppingPreviewCart.add(productId, quantity);
-            } else if (typeof window.doroshoppingPreviewCart.handle === 'function') {
-                var nameEl = card && card.querySelector('.home-product-card__name');
-                var imgEl = card && card.querySelector('img');
-                var priceEl = card && card.querySelector('.home-product-card__price');
-                var unit = priceEl ? parseFloat(String(priceEl.textContent).replace(/[^\d.,]/g, '').replace(',', '.')) : 0;
-                window.doroshoppingPreviewCart.handle('doroshopping_add_to_cart', {
-                    product: {
-                        id: productId,
-                        name: nameEl ? nameEl.textContent.trim() : 'Producto',
-                        unit: isNaN(unit) ? 0 : unit,
-                        image: imgEl ? imgEl.getAttribute('src') : '',
-                        permalink: 'product.html'
-                    },
-                    quantity: quantity
-                });
+        });
+        jQuery(document.body).on('added_to_cart', function (ev, fragments, cartHash, $button) {
+            if ($button && $button.length) {
+                $button.removeClass('loading').removeAttr('aria-busy').addClass('added');
+                setTimeout(function () { $button.removeClass('added'); }, 1800);
             }
-            done(true);
-            return;
-        }
-
-        var endpoint = cfg.wcAjaxUrl
-            ? String(cfg.wcAjaxUrl).replace('%%endpoint%%', 'add_to_cart')
-            : '';
-
-        if (!endpoint) {
-            // Fallback admin-ajax WC
-            endpoint = (cfg.ajaxUrl || '/wp-admin/admin-ajax.php') + '?action=woocommerce_add_to_cart';
-        }
-
-        var body = new FormData();
-        body.append('product_id', productId);
-        body.append('quantity', quantity);
-
-        fetch(endpoint, {
-            method: 'POST',
-            credentials: 'same-origin',
-            body: body
-        })
-            .then(function (res) { return res.json(); })
-            .then(function (data) {
-                if (data && (data.error || data.success === false)) {
-                    done(false);
-                    if (data.product_url) window.location = data.product_url;
-                    return;
-                }
-                // Actualizar fragments WC si vienen
-                if (data && data.fragments && typeof jQuery !== 'undefined') {
-                    jQuery.each(data.fragments, function (key, value) {
-                        jQuery(key).replaceWith(value);
-                    });
-                    jQuery(document.body).trigger('wc_fragments_refreshed');
-                }
-                done(true);
-            })
-            .catch(function () { done(false); });
-    });
+        });
+    }
 }
 
 /**

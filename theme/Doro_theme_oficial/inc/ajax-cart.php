@@ -10,18 +10,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Asegura sesión/carrito WooCommerce en peticiones AJAX del tema.
+ *
+ * @return bool
+ */
+function doroshopping_ensure_wc_cart() {
+    if ( ! function_exists( 'WC' ) ) {
+        return false;
+    }
+
+    if ( is_null( WC()->cart ) && function_exists( 'wc_load_cart' ) ) {
+        wc_load_cart();
+    }
+
+    if ( WC()->session && ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie( true );
+    }
+
+    return (bool) WC()->cart;
+}
+
+/**
  * Serializa el carrito actual para el modal.
  *
  * @return array
  */
 function doroshopping_get_cart_payload() {
-    $items          = array();
-    $count          = 0;
-    $subtotal_html  = '';
-    $checkout_url   = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/' );
+    $items           = array();
+    $count           = 0;
+    $subtotal_html   = '';
+    $checkout_url    = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/' );
     $recommendations = array();
 
-    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+    if ( ! doroshopping_ensure_wc_cart() ) {
         return array(
             'items'           => $items,
             'count'           => 0,
@@ -49,14 +70,14 @@ function doroshopping_get_cart_payload() {
             : wc_placeholder_img_src( 'thumbnail' );
 
         $items[] = array(
-            'key'       => $cart_item_key,
-            'product_id'=> $product_id,
-            'name'      => $product->get_name(),
-            'quantity'  => $quantity,
-            'price_html'=> WC()->cart->get_product_price( $product ),
-            'image'     => $image_url,
-            'permalink' => get_permalink( $product_id ),
-            'max_qty'   => $product->get_max_purchase_quantity() > 0 ? $product->get_max_purchase_quantity() : 99,
+            'key'        => $cart_item_key,
+            'product_id' => $product_id,
+            'name'       => $product->get_name(),
+            'quantity'   => $quantity,
+            'price_html' => WC()->cart->get_product_price( $product ),
+            'image'      => $image_url,
+            'permalink'  => get_permalink( $product_id ),
+            'max_qty'    => $product->get_max_purchase_quantity() > 0 ? $product->get_max_purchase_quantity() : 99,
         );
     }
 
@@ -64,23 +85,23 @@ function doroshopping_get_cart_payload() {
 
     $recs = wc_get_products(
         array(
-            'limit'    => 2,
-            'status'   => 'publish',
-            'orderby'  => 'popularity',
-            'exclude'  => array_column( $items, 'product_id' ),
+            'limit'   => 2,
+            'status'  => 'publish',
+            'orderby' => 'popularity',
+            'exclude' => array_column( $items, 'product_id' ),
         )
     );
 
     foreach ( $recs as $rec ) {
         $thumb_id = $rec->get_image_id();
         $recommendations[] = array(
-            'id'        => $rec->get_id(),
-            'name'      => $rec->get_name(),
-            'price_html'=> $rec->get_price_html(),
-            'image'     => $thumb_id
+            'id'         => $rec->get_id(),
+            'name'       => $rec->get_name(),
+            'price_html' => $rec->get_price_html(),
+            'image'      => $thumb_id
                 ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' )
                 : wc_placeholder_img_src( 'thumbnail' ),
-            'permalink' => $rec->get_permalink(),
+            'permalink'  => $rec->get_permalink(),
         );
     }
 
@@ -99,6 +120,7 @@ function doroshopping_get_cart_payload() {
  */
 function doroshopping_ajax_get_cart() {
     check_ajax_referer( 'doroshopping_cart', 'nonce' );
+    doroshopping_ensure_wc_cart();
     wp_send_json_success( doroshopping_get_cart_payload() );
 }
 add_action( 'wp_ajax_doroshopping_get_cart', 'doroshopping_ajax_get_cart' );
@@ -110,7 +132,7 @@ add_action( 'wp_ajax_nopriv_doroshopping_get_cart', 'doroshopping_ajax_get_cart'
 function doroshopping_ajax_update_cart_item() {
     check_ajax_referer( 'doroshopping_cart', 'nonce' );
 
-    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+    if ( ! doroshopping_ensure_wc_cart() ) {
         wp_send_json_error( array( 'message' => __( 'Carrito no disponible.', 'doroshopping' ) ), 400 );
     }
 
@@ -139,7 +161,7 @@ add_action( 'wp_ajax_nopriv_doroshopping_update_cart_item', 'doroshopping_ajax_u
 function doroshopping_ajax_remove_cart_item() {
     check_ajax_referer( 'doroshopping_cart', 'nonce' );
 
-    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+    if ( ! doroshopping_ensure_wc_cart() ) {
         wp_send_json_error( array( 'message' => __( 'Carrito no disponible.', 'doroshopping' ) ), 400 );
     }
 

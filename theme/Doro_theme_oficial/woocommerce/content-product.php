@@ -32,16 +32,17 @@ $image_html  = $product->get_image(
             <?php echo $image_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
         </a>
         <?php if ( $purchasable ) : ?>
-            <button
-                type="button"
+            <a
+                href="<?php echo esc_url( $product->add_to_cart_url() ); ?>"
                 class="home-product-card__cart-btn ajax_add_to_cart add_to_cart_button"
                 data-product_id="<?php echo esc_attr( (string) $product_id ); ?>"
                 data-product_sku="<?php echo esc_attr( $product->get_sku() ); ?>"
                 data-quantity="1"
                 aria-label="<?php echo esc_attr( sprintf( __( 'Añadir %s al carrito', 'doroshopping' ), $product->get_name() ) ); ?>"
+                rel="nofollow"
             >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-            </button>
+            </a>
         <?php else : ?>
             <a
                 href="<?php echo esc_url( $product->get_permalink() ); ?>"
