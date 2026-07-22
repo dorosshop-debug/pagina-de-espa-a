@@ -179,3 +179,60 @@ function doroshopping_ajax_remove_cart_item() {
 }
 add_action( 'wp_ajax_doroshopping_remove_cart_item', 'doroshopping_ajax_remove_cart_item' );
 add_action( 'wp_ajax_nopriv_doroshopping_remove_cart_item', 'doroshopping_ajax_remove_cart_item' );
+
+/**
+ * Añadir producto al carrito (AJAX del tema, con sesión persistente).
+ */
+function doroshopping_ajax_add_to_cart() {
+    check_ajax_referer( 'doroshopping_cart', 'nonce' );
+
+    if ( ! doroshopping_ensure_wc_cart( true ) ) {
+        wp_send_json_error( array( 'message' => __( 'Carrito no disponible.', 'doroshopping' ) ), 400 );
+    }
+
+    $product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+    $quantity   = isset( $_POST['quantity'] ) ? max( 1, absint( $_POST['quantity'] ) ) : 1;
+
+    if ( $product_id <= 0 ) {
+        wp_send_json_error( array( 'message' => __( 'Producto invalido.', 'doroshopping' ) ), 400 );
+    }
+
+    $product = wc_get_product( $product_id );
+    if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+        wp_send_json_error( array( 'message' => __( 'Este producto no se puede añadir.', 'doroshopping' ) ), 400 );
+    }
+
+    $added = WC()->cart->add_to_cart( $product_id, $quantity );
+    if ( ! $added ) {
+        wp_send_json_error( array( 'message' => __( 'No se pudo añadir al carrito.', 'doroshopping' ) ), 400 );
+    }
+
+    if ( WC()->session ) {
+        WC()->session->set_customer_session_cookie( true );
+    }
+
+    WC()->cart->calculate_totals();
+
+    // Fragments al estilo WooCommerce (contadores del tema incluidos).
+    ob_start();
+    woocommerce_mini_cart();
+    $mini_cart = ob_get_clean();
+
+    $fragments = apply_filters(
+        'woocommerce_add_to_cart_fragments',
+        array(
+            'div.widget_shopping_cart_content' => '<div class="widget_shopping_cart_content">' . $mini_cart . '</div>',
+        )
+    );
+
+    wp_send_json_success(
+        array(
+            'fragments' => $fragments,
+            'cart_hash' => WC()->cart->get_cart_hash(),
+            'count'     => WC()->cart->get_cart_contents_count(),
+        )
+    );
+}
+add_action( 'wp_ajax_doroshopping_add_to_cart', 'doroshopping_ajax_add_to_cart' );
+add_action( 'wp_ajax_nopriv_doroshopping_add_to_cart', 'doroshopping_ajax_add_to_cart' );
+

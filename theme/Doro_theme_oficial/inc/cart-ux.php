@@ -27,14 +27,12 @@ add_filter( 'woocommerce_add_to_cart_redirect', 'doroshopping_buy_now_redirect' 
  * Habilitar AJAX add to cart en loop / home.
  */
 function doroshopping_enable_ajax_add_to_cart() {
-    if ( ! current_user_can( 'manage_woocommerce' ) && ! doing_action( 'after_switch_theme' ) ) {
-        return;
-    }
     if ( 'yes' !== get_option( 'woocommerce_enable_ajax_add_to_cart' ) ) {
         update_option( 'woocommerce_enable_ajax_add_to_cart', 'yes' );
     }
 }
 add_action( 'after_switch_theme', 'doroshopping_enable_ajax_add_to_cart' );
+add_action( 'admin_init', 'doroshopping_enable_ajax_add_to_cart' );
 
 /**
  * En productos simples WC pone add-to-cart solo en el botón "Añadir".

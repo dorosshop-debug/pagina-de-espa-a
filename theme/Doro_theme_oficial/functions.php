@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'DOROSHOPPING_VERSION', '1.3.9' );
+define( 'DOROSHOPPING_VERSION', '1.3.10' );
 define( 'DOROSHOPPING_DIR', get_template_directory() );
 define( 'DOROSHOPPING_URI', get_template_directory_uri() );
 

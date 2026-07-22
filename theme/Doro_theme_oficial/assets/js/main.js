@@ -1067,19 +1067,112 @@ function initLiveSearch() {
 }
 
 /**
- * Add to cart AJAX desde cards de home / botones .ajax_add_to_cart del tema.
- * En WordPress deja que wc-add-to-cart.js gestione la sesión/cookies.
- * Solo intercepta en preview estático.
+ * Add to cart AJAX desde cards (home / tienda / categoria).
+ * Usa el endpoint nativo de WooCommerce y actualiza fragments.
+ * No llama get_cart despues (evita pisar la sesion).
  */
 function initAjaxAddToCart() {
+    var cfg = window.doroshoppingCart || {};
+
+    function finish(btn, ok) {
+        btn.classList.remove('loading');
+        btn.removeAttribute('aria-busy');
+        if (ok) {
+            btn.classList.add('added');
+            setTimeout(function () { btn.classList.remove('added'); }, 1800);
+        }
+    }
+
+    function applyFragments(fragments) {
+        if (!fragments || typeof jQuery === 'undefined') return;
+        jQuery.each(fragments, function (key, value) {
+            jQuery(key).replaceWith(value);
+        });
+        jQuery(document.body).trigger('wc_fragments_refreshed');
+    }
+
+    function addViaWoo(productId, quantity, btn) {
+        // Preferir endpoint del tema (sesión controlada) si hay nonce.
+        if (cfg.ajaxUrl && cfg.nonce) {
+            var body = new FormData();
+            body.append('action', 'doroshopping_add_to_cart');
+            body.append('nonce', cfg.nonce);
+            body.append('product_id', productId);
+            body.append('quantity', quantity);
+
+            fetch(cfg.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
+                .then(function (res) { return res.json(); })
+                .then(function (json) {
+                    if (!json || !json.success) {
+                        finish(btn, false);
+                        return;
+                    }
+                    var data = json.data || {};
+                    applyFragments(data.fragments || {});
+                    if (typeof data.count !== 'undefined') {
+                        document.querySelectorAll('[data-cart-count], .site-header__cart-count, .site-fab-cart__count').forEach(function (el) {
+                            el.textContent = String(data.count);
+                        });
+                    }
+                    finish(btn, true);
+                    if (typeof jQuery !== 'undefined') {
+                        jQuery(document.body).trigger('added_to_cart', [data.fragments || {}, data.cart_hash || '', jQuery(btn)]);
+                    } else {
+                        document.body.dispatchEvent(new CustomEvent('added_to_cart', { detail: { product_id: productId } }));
+                    }
+                })
+                .catch(function () { finish(btn, false); });
+            return;
+        }
+
+        var endpoint = '';
+        if (typeof wc_add_to_cart_params !== 'undefined' && wc_add_to_cart_params.wc_ajax_url) {
+            endpoint = String(wc_add_to_cart_params.wc_ajax_url).replace('%%endpoint%%', 'add_to_cart');
+        } else if (cfg.wcAjaxUrl) {
+            endpoint = String(cfg.wcAjaxUrl).replace('%%endpoint%%', 'add_to_cart');
+        }
+
+        if (!endpoint) {
+            finish(btn, false);
+            return;
+        }
+
+        var data = {
+            product_id: productId,
+            quantity: quantity
+        };
+
+        if (typeof jQuery !== 'undefined') {
+            jQuery.ajax({
+                type: 'POST',
+                url: endpoint,
+                data: data,
+                dataType: 'json',
+                xhrFields: { withCredentials: true }
+            }).done(function (response) {
+                if (!response) {
+                    finish(btn, false);
+                    return;
+                }
+                if (response.error && response.product_url) {
+                    window.location = response.product_url;
+                    return;
+                }
+                applyFragments(response.fragments || {});
+                finish(btn, true);
+                jQuery(document.body).trigger('added_to_cart', [response.fragments, response.cart_hash, jQuery(btn)]);
+            }).fail(function () {
+                finish(btn, false);
+            });
+            return;
+        }
+
+        finish(btn, false);
+    }
+
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('.home-product-card__cart-btn.ajax_add_to_cart');
         if (!btn) return;
-
-        // En WP real: WooCommerce (wc-add-to-cart.js) gestiona cookies/sesión.
-        if (!window.doroshoppingPreviewCart) {
-            return;
-        }
 
         e.preventDefault();
         e.stopPropagation();
@@ -1094,49 +1187,32 @@ function initAjaxAddToCart() {
         btn.classList.add('loading');
         btn.setAttribute('aria-busy', 'true');
 
-        if (typeof window.doroshoppingPreviewCart.add === 'function') {
-            window.doroshoppingPreviewCart.add(productId, quantity);
-        } else if (typeof window.doroshoppingPreviewCart.handle === 'function') {
-            var nameEl = card && card.querySelector('.home-product-card__name');
-            var imgEl = card && card.querySelector('img');
-            var priceEl = card && card.querySelector('.home-product-card__price');
-            var unit = priceEl ? parseFloat(String(priceEl.textContent).replace(/[^\d.,]/g, '').replace(',', '.')) : 0;
-            window.doroshoppingPreviewCart.handle('doroshopping_add_to_cart', {
-                product: {
-                    id: productId,
-                    name: nameEl ? nameEl.textContent.trim() : 'Producto',
-                    unit: isNaN(unit) ? 0 : unit,
-                    image: imgEl ? imgEl.getAttribute('src') : '',
-                    permalink: 'product.html'
-                },
-                quantity: quantity
-            });
+        if (window.doroshoppingPreviewCart) {
+            if (typeof window.doroshoppingPreviewCart.add === 'function') {
+                window.doroshoppingPreviewCart.add(productId, quantity);
+            } else if (typeof window.doroshoppingPreviewCart.handle === 'function') {
+                var nameEl = card && card.querySelector('.home-product-card__name');
+                var imgEl = card && card.querySelector('img');
+                var priceEl = card && card.querySelector('.home-product-card__price');
+                var unit = priceEl ? parseFloat(String(priceEl.textContent).replace(/[^\d.,]/g, '').replace(',', '.')) : 0;
+                window.doroshoppingPreviewCart.handle('doroshopping_add_to_cart', {
+                    product: {
+                        id: productId,
+                        name: nameEl ? nameEl.textContent.trim() : 'Producto',
+                        unit: isNaN(unit) ? 0 : unit,
+                        image: imgEl ? imgEl.getAttribute('src') : '',
+                        permalink: 'product.html'
+                    },
+                    quantity: quantity
+                });
+            }
+            finish(btn, true);
+            document.body.dispatchEvent(new CustomEvent('added_to_cart', { detail: { product_id: productId } }));
+            return;
         }
 
-        btn.classList.remove('loading');
-        btn.removeAttribute('aria-busy');
-        btn.classList.add('added');
-        setTimeout(function () { btn.classList.remove('added'); }, 1800);
-        document.body.dispatchEvent(new CustomEvent('added_to_cart', { detail: { product_id: productId } }));
-        if (typeof jQuery !== 'undefined') {
-            jQuery(document.body).trigger('added_to_cart', [{}, '', jQuery(btn)]);
-        }
+        addViaWoo(productId, quantity, btn);
     }, true);
-
-    // Feedback visual cuando WC completa el add (WP).
-    if (typeof jQuery !== 'undefined') {
-        jQuery(document.body).on('adding_to_cart', function (ev, $button) {
-            if ($button && $button.length) {
-                $button.addClass('loading').attr('aria-busy', 'true');
-            }
-        });
-        jQuery(document.body).on('added_to_cart', function (ev, fragments, cartHash, $button) {
-            if ($button && $button.length) {
-                $button.removeClass('loading').removeAttr('aria-busy').addClass('added');
-                setTimeout(function () { $button.removeClass('added'); }, 1800);
-            }
-        });
-    }
 }
 
 /**
