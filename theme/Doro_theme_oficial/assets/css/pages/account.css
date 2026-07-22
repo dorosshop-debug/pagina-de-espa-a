@@ -1,12 +1,43 @@
+/* Mi cuenta — DoroTheme */
+
+.woocommerce-account .doro-page {
+    background: #f5f5f5;
+}
+
+.woocommerce-account .doro-page__article {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+}
+
+.woocommerce-account .doro-page__header .doro-page__title {
+    text-align: left;
+    margin: 0 0 var(--spacing-lg);
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+}
+
+.woocommerce-account .doro-account-page__title {
+    display: none;
+}
+
+.woocommerce-account .doro-page__content.entry-content > .woocommerce {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+}
+
 .doro-account-page {
     width: 100%;
-    padding: var(--spacing-2xl) 0;
+    max-width: var(--container-max, 1400px);
+    margin: 0 auto;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    box-sizing: border-box;
 }
 
 .doro-account-page--auth {
     max-width: 960px;
-    margin: 0 auto;
-    padding: var(--spacing-2xl) var(--spacing-lg);
 }
 
 .doro-account-page__title {
@@ -15,10 +46,24 @@
     font-size: clamp(24px, 3vw, 32px);
 }
 
-.woocommerce-account .woocommerce,
+/* Contenedor WC */
+.woocommerce-account .woocommerce {
+    display: block;
+    width: 100%;
+    max-width: var(--container-max, 1400px);
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-lg) var(--spacing-2xl);
+    box-sizing: border-box;
+}
+
+.woocommerce-account .woocommerce > .woocommerce-notices-wrapper {
+    margin-bottom: var(--spacing-md);
+}
+
+/* Layout logueado */
 .doro-account {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
     gap: var(--spacing-xl);
     align-items: start;
 }
@@ -29,6 +74,7 @@
     border: 1px solid var(--color-grey-border);
     border-radius: var(--radius-md);
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
 
 .woocommerce-MyAccount-navigation ul,
@@ -38,15 +84,25 @@
     padding: 0;
 }
 
+.woocommerce-MyAccount-navigation li,
+.doro-account__nav li {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
 .woocommerce-MyAccount-navigation li a,
 .doro-account__nav a {
     display: block;
     padding: 14px 18px;
     border-bottom: 1px solid var(--color-grey-border);
+    border-left: 3px solid transparent;
     color: var(--color-dark);
     font-size: var(--font-size-sm);
     font-weight: 600;
-    transition: background var(--transition), color var(--transition);
+    text-decoration: none;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
 }
 
 .woocommerce-MyAccount-navigation li:last-child a,
@@ -60,6 +116,7 @@
 .doro-account__nav a:hover {
     background: #fff7ef;
     color: var(--color-orange);
+    border-left-color: var(--color-orange);
 }
 
 .woocommerce-MyAccount-content,
@@ -68,14 +125,177 @@
     border: 1px solid var(--color-grey-border);
     border-radius: var(--radius-md);
     padding: var(--spacing-xl);
+    min-width: 0;
+    box-shadow: var(--shadow-sm);
 }
 
+.woocommerce-MyAccount-content > p,
+.doro-account__content > p {
+    margin: 0 0 var(--spacing-md);
+    color: var(--color-grey-text);
+    line-height: 1.55;
+}
+
+.woocommerce-MyAccount-content a {
+    color: var(--color-orange);
+    font-weight: 600;
+}
+
+/* Dashboard */
+.doro-account-dash__hero {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-grey-border);
+}
+
+.doro-account-dash__eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-orange);
+}
+
+.doro-account-dash__title {
+    margin: 0 0 8px;
+    font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-account-dash__text {
+    margin: 0;
+    color: var(--color-grey-text);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+    max-width: 52ch;
+}
+
+.doro-account-dash__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-md);
+}
+
+.doro-account-dash__card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    background: #fafafa;
+    text-decoration: none !important;
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.doro-account-dash__card:hover {
+    border-color: var(--color-orange);
+    background: #fff7ef;
+    box-shadow: var(--shadow-sm);
+}
+
+.doro-account-dash__card-label {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-account-dash__card-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-grey-text);
+    font-weight: 400;
+}
+
+.doro-account-dash__card--muted {
+    background: var(--color-white);
+}
+
+/* Tablas / formularios cuenta */
+.woocommerce-MyAccount-content .woocommerce-orders-table,
+.woocommerce-MyAccount-content table.shop_table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.woocommerce-MyAccount-content table.shop_table th,
+.woocommerce-MyAccount-content table.shop_table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--color-grey-border);
+    text-align: left;
+    font-size: var(--font-size-sm);
+}
+
+.woocommerce-MyAccount-content table.shop_table th {
+    background: #fafafa;
+    font-weight: 700;
+}
+
+.woocommerce-MyAccount-content .button,
+.woocommerce-MyAccount-content .woocommerce-Button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--color-orange);
+    color: #fff !important;
+    font-weight: 700;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address,
+.woocommerce-MyAccount-content .u-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address {
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    background: #fafafa;
+}
+
+.woocommerce-MyAccount-content fieldset,
+.woocommerce-MyAccount-content .woocommerce-form-row {
+    margin-bottom: var(--spacing-md);
+}
+
+.woocommerce-MyAccount-content input.input-text,
+.woocommerce-MyAccount-content select,
+.woocommerce-MyAccount-content textarea {
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+/* Login / registro */
 .doro-auth {
+    width: 100%;
     max-width: 880px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-xl);
+}
+
+.doro-auth:not(:has(.doro-auth__card ~ .doro-auth__card)) {
+    grid-template-columns: 1fr;
+    max-width: 440px;
 }
 
 .doro-auth__card {
@@ -84,6 +304,8 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
     box-shadow: var(--shadow-sm);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .doro-auth__card h2 {
@@ -119,6 +341,7 @@
 .woocommerce-form-login input.input-text,
 .woocommerce-form-register input.input-text {
     width: 100%;
+    max-width: 100%;
     height: 44px;
     padding: 0 14px;
     border: 1px solid var(--color-grey-border);
@@ -126,6 +349,7 @@
     font-family: inherit;
     font-size: var(--font-size-base);
     background: var(--color-white);
+    box-sizing: border-box;
 }
 
 .doro-auth__form input:focus,
@@ -175,10 +399,60 @@
     font-weight: 600 !important;
 }
 
-@media (max-width: 860px) {
-    .woocommerce-account .woocommerce,
-    .doro-account,
+.woocommerce-account:not(.logged-in) .woocommerce {
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .doro-account {
+        grid-template-columns: 1fr;
+    }
+
+    .woocommerce-MyAccount-navigation ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .woocommerce-MyAccount-navigation li a {
+        border-bottom: 1px solid var(--color-grey-border);
+        border-left: none;
+        border-top: 3px solid transparent;
+        text-align: center;
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+
+    .woocommerce-MyAccount-navigation li.is-active a,
+    .woocommerce-MyAccount-navigation li a:hover {
+        border-left-color: transparent;
+        border-top-color: var(--color-orange);
+    }
+
+    .doro-account-dash__grid,
+    .woocommerce-MyAccount-content .woocommerce-Address,
+    .woocommerce-MyAccount-content .u-columns,
     .doro-auth {
         grid-template-columns: 1fr;
+    }
+
+    .doro-auth:not(:has(.doro-auth__card ~ .doro-auth__card)) {
+        max-width: 100%;
+    }
+
+    .woocommerce-account .woocommerce,
+    .doro-account-page {
+        padding-left: var(--spacing-md);
+        padding-right: var(--spacing-md);
+    }
+}
+
+@media (max-width: 560px) {
+    .woocommerce-MyAccount-navigation ul {
+        grid-template-columns: 1fr;
+    }
+
+    .woocommerce-MyAccount-content,
+    .doro-account__content {
+        padding: var(--spacing-md);
     }
 }

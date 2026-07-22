@@ -247,7 +247,7 @@ function doroshopping_install_admin_notice() {
     $customizer = esc_url( admin_url( 'customize.php' ) );
     $wc_ok      = class_exists( 'WooCommerce' );
 
-    echo '<div class="notice notice-success is-dismissible"><p><strong>Doro_theme_oficial ' . esc_html( DOROSHOPPING_VERSION ) . '</strong> — ';
+    echo '<div class="notice notice-success is-dismissible"><p><strong>DoroTheme ' . esc_html( DOROSHOPPING_VERSION ) . '</strong> — ';
     if ( ! $wc_ok ) {
         echo esc_html__( 'Instala y activa WooCommerce para la tienda. El tema creará las páginas legales y la lista de deseos al activarse.', 'doroshopping' );
     } else {

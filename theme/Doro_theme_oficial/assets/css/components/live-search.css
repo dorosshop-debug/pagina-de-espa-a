@@ -30,17 +30,12 @@
     outline: none;
 }
 
-/* Slot busqueda visual (Google Vision). Oculto hasta activar en Customizer / plugin. */
 .site-header__visual-search {
     position: absolute;
     right: 46px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 2;
-}
-
-.site-header__visual-search[hidden] {
-    display: none !important;
 }
 
 .site-header__visual-search-btn {
@@ -65,10 +60,6 @@
 .site-header__visual-search-btn svg {
     width: 18px;
     height: 18px;
-}
-
-.site-header__search:has(.site-header__visual-search:not([hidden])) .site-header__search-input {
-    padding-right: 88px;
 }
 
 .site-header__search-submit {

@@ -18,7 +18,7 @@ function doroshopping_customize_register( $wp_customize ) {
     $wp_customize->add_panel(
         'doroshopping_panel',
         array(
-            'title'    => __( 'Doro_theme_oficial', 'doroshopping' ),
+            'title'    => __( 'DoroTheme', 'doroshopping' ),
             'priority' => 30,
         )
     );
@@ -98,41 +98,12 @@ function doroshopping_customize_register( $wp_customize ) {
         );
     }
 
-    /* ---- Busqueda visual (preparado para Google Vision) ---- */
-    $wp_customize->add_section(
-        'doroshopping_search',
-        array(
-            'title'       => __( 'Busqueda', 'doroshopping' ),
-            'description' => __( 'El icono de camara queda listo en el header. Activalo cuando instales un plugin compatible con Google Vision.', 'doroshopping' ),
-            'panel'       => 'doroshopping_panel',
-        )
-    );
-
-    $wp_customize->add_setting(
-        'doroshopping_visual_search_enabled',
-        array(
-            'default'           => true,
-            'sanitize_callback' => function ( $value ) {
-                return (bool) $value;
-            },
-        )
-    );
-    $wp_customize->add_control(
-        'doroshopping_visual_search_enabled',
-        array(
-            'label'       => __( 'Mostrar icono "Buscar por imagen"', 'doroshopping' ),
-            'description' => __( 'Muestra el boton de camara junto a la lupa. Conectalo luego al plugin de Google Vision.', 'doroshopping' ),
-            'section'     => 'doroshopping_search',
-            'type'        => 'checkbox',
-        )
-    );
-
     /* ---- Home imagenes ---- */
     $wp_customize->add_section(
         'doroshopping_home_images',
         array(
             'title'       => __( 'Home: banners e imagenes', 'doroshopping' ),
-            'description' => __( 'Puedes reemplazar estas imagenes tambien desde Elementor si usas Theme Builder en la home.', 'doroshopping' ),
+            'description' => __( 'Hero, banner de la seccion 3 y productos flotantes. Los flotantes se configuran mas abajo (imagen + enlace).', 'doroshopping' ),
             'panel'       => 'doroshopping_panel',
         )
     );
@@ -242,6 +213,45 @@ function doroshopping_customize_register( $wp_customize ) {
             )
         )
     );
+
+    for ( $f = 1; $f <= 3; $f++ ) {
+        $wp_customize->add_setting(
+            'doroshopping_promo_float_' . $f . '_image',
+            array(
+                'default'           => 0,
+                'sanitize_callback' => 'absint',
+            )
+        );
+        $wp_customize->add_control(
+            new WP_Customize_Media_Control(
+                $wp_customize,
+                'doroshopping_promo_float_' . $f . '_image',
+                array(
+                    'label'       => sprintf( __( 'Producto flotante %d - imagen', 'doroshopping' ), $f ),
+                    'description' => ( 1 === $f )
+                        ? __( 'Seccion 3 del home (banner gadgets). En movil solo se muestra el flotante 1.', 'doroshopping' )
+                        : '',
+                    'section'     => 'doroshopping_home_images',
+                    'mime_type'   => 'image',
+                )
+            )
+        );
+        $wp_customize->add_setting(
+            'doroshopping_promo_float_' . $f . '_url',
+            array(
+                'default'           => '',
+                'sanitize_callback' => 'esc_url_raw',
+            )
+        );
+        $wp_customize->add_control(
+            'doroshopping_promo_float_' . $f . '_url',
+            array(
+                'label'   => sprintf( __( 'Producto flotante %d - enlace', 'doroshopping' ), $f ),
+                'section' => 'doroshopping_home_images',
+                'type'    => 'url',
+            )
+        );
+    }
 
     /* ---- Home categorias / grids ---- */
     $wp_customize->add_section(

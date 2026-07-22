@@ -700,29 +700,30 @@
 
 @media (max-width: 480px) {
     .home-products__grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 
     .home-promo {
-        min-height: 240px;
+        min-height: 200px;
     }
 
     .home-promo__image {
-        min-height: 240px;
+        min-height: 200px;
     }
 
     .home-promo__content {
-        left: var(--spacing-md);
-        max-width: calc(100% - 110px);
+        left: var(--spacing-sm);
+        max-width: calc(100% - 96px);
     }
 
     .home-promo__title {
-        font-size: 15px;
+        font-size: 14px;
         line-height: 1.35;
     }
 
     .home-promo__float--1 {
         right: 3%;
-        width: 84px;
+        width: 72px;
     }
 }

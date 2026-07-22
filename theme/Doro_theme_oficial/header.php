@@ -63,7 +63,7 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                 <?php if ( class_exists( 'WooCommerce' ) ) : ?>
                     <input type="hidden" name="post_type" value="product">
                 <?php endif; ?>
-                <!-- Slot preparado para busqueda visual (Google Vision / plugin). -->
+                <!-- Icono busqueda visual (listo para plugin / Google Vision). -->
                 <div class="site-header__visual-search" data-visual-search>
                     <button
                         type="button"

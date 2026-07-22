@@ -11,6 +11,8 @@ function doroshoppingBoot() {
     initAjaxAddToCart();
     initProductBuybox();
     initProductVariationsLayout();
+    initProductDescriptionClamp();
+    initProductGalleryThumbs();
     initVisualSearchSlot();
     initWishlist();
     initAddressModal();
@@ -1375,23 +1377,178 @@ function initProductVariationsLayout() {
 }
 
 /**
- * Slot de busqueda visual (preparado para Google Vision).
- * El icono es visible; al elegir imagen emite `doroshopping:visual-search` (sin backend aun).
+ * Descripcion del producto: colapsar con boton "Leer mas".
+ */
+function initProductDescriptionClamp() {
+    var panels = Array.prototype.slice.call(document.querySelectorAll(
+        '.woocommerce-Tabs-panel--description, #tab-description'
+    ));
+
+    if (!panels.length) {
+        document.querySelectorAll('.doro-product__below .woocommerce-Tabs-panel').forEach(function (panel) {
+            var heading = panel.querySelector('h2');
+            if (heading && /descripci[oó]n/i.test(heading.textContent || '')) {
+                panels.push(panel);
+            }
+        });
+    }
+
+    panels.forEach(function (panel) {
+        if (panel.getAttribute('data-desc-clamp') === '1') return;
+        panel.setAttribute('data-desc-clamp', '1');
+
+        var wrap = document.createElement('div');
+        wrap.className = 'doro-desc-clamp is-collapsed';
+
+        var inner = document.createElement('div');
+        inner.className = 'doro-desc-clamp__inner';
+
+        while (panel.firstChild) {
+            inner.appendChild(panel.firstChild);
+        }
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'doro-desc-clamp__toggle';
+        btn.textContent = 'Leer más';
+        btn.setAttribute('aria-expanded', 'false');
+
+        wrap.appendChild(inner);
+        wrap.appendChild(btn);
+        panel.appendChild(wrap);
+
+        requestAnimationFrame(function () {
+            var needsClamp = inner.scrollHeight > 300;
+            if (!needsClamp) {
+                wrap.classList.remove('is-collapsed');
+                btn.hidden = true;
+                return;
+            }
+
+            btn.addEventListener('click', function () {
+                var collapsed = wrap.classList.toggle('is-collapsed');
+                // toggle returns true if class was added (= collapsed)
+                btn.textContent = collapsed ? 'Leer más' : 'Leer menos';
+                btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            });
+        });
+    });
+}
+
+/**
+ * Carrusel vertical de miniaturas (izquierda, max 5 visibles).
+ */
+function initProductGalleryThumbs() {
+    var gallery = document.querySelector('.doro-product__gallery .woocommerce-product-gallery');
+    if (!gallery || gallery.getAttribute('data-thumbs-ready') === '1') return;
+
+    function setup() {
+        var thumbs = gallery.querySelector('.flex-control-thumbs, ol.flex-control-nav.flex-control-thumbs');
+        if (!thumbs || thumbs.closest('.doro-gallery-thumbs')) {
+            if (thumbs) gallery.setAttribute('data-thumbs-ready', '1');
+            return false;
+        }
+
+        var items = thumbs.querySelectorAll('li');
+        var wrap = document.createElement('div');
+        wrap.className = 'doro-gallery-thumbs';
+
+        var btnPrev = document.createElement('button');
+        btnPrev.type = 'button';
+        btnPrev.className = 'doro-gallery-thumbs__btn doro-gallery-thumbs__btn--prev';
+        btnPrev.setAttribute('aria-label', 'Miniaturas anteriores');
+        btnPrev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>';
+
+        var btnNext = document.createElement('button');
+        btnNext.type = 'button';
+        btnNext.className = 'doro-gallery-thumbs__btn doro-gallery-thumbs__btn--next';
+        btnNext.setAttribute('aria-label', 'Miniaturas siguientes');
+        btnNext.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+        thumbs.parentNode.insertBefore(wrap, thumbs);
+        wrap.appendChild(btnPrev);
+        wrap.appendChild(thumbs);
+        wrap.appendChild(btnNext);
+
+        function isHorizontal() {
+            return window.matchMedia('(max-width: 768px)').matches;
+        }
+
+        function step() {
+            if (isHorizontal()) {
+                return Math.max(thumbs.clientWidth * 0.8, 64);
+            }
+            return Math.max(thumbs.clientHeight * 0.8, 88);
+        }
+
+        function updateButtons() {
+            if (items.length <= 5) {
+                btnPrev.hidden = true;
+                btnNext.hidden = true;
+                return;
+            }
+            btnPrev.hidden = false;
+            btnNext.hidden = false;
+            if (isHorizontal()) {
+                btnPrev.disabled = thumbs.scrollLeft <= 2;
+                btnNext.disabled = thumbs.scrollLeft + thumbs.clientWidth >= thumbs.scrollWidth - 2;
+            } else {
+                btnPrev.disabled = thumbs.scrollTop <= 2;
+                btnNext.disabled = thumbs.scrollTop + thumbs.clientHeight >= thumbs.scrollHeight - 2;
+            }
+        }
+
+        btnPrev.addEventListener('click', function () {
+            if (isHorizontal()) {
+                thumbs.scrollBy({ left: -step(), behavior: 'smooth' });
+            } else {
+                thumbs.scrollBy({ top: -step(), behavior: 'smooth' });
+            }
+        });
+
+        btnNext.addEventListener('click', function () {
+            if (isHorizontal()) {
+                thumbs.scrollBy({ left: step(), behavior: 'smooth' });
+            } else {
+                thumbs.scrollBy({ top: step(), behavior: 'smooth' });
+            }
+        });
+
+        thumbs.addEventListener('scroll', updateButtons, { passive: true });
+        window.addEventListener('resize', updateButtons);
+        updateButtons();
+        gallery.setAttribute('data-thumbs-ready', '1');
+        return true;
+    }
+
+    if (setup()) return;
+
+    // FlexSlider crea thumbs un poco despues.
+    var tries = 0;
+    var timer = setInterval(function () {
+        tries += 1;
+        if (setup() || tries > 20) {
+            clearInterval(timer);
+        }
+    }, 200);
+}
+
+/**
+ * Icono de camara en el buscador (siempre visible).
+ * Emite `doroshopping:visual-search` al elegir imagen (sin backend aun).
  */
 function initVisualSearchSlot() {
     var wraps = Array.prototype.slice.call(document.querySelectorAll('[data-visual-search]'));
     if (!wraps.length) return;
 
     wraps.forEach(function (wrap) {
-        wrap.removeAttribute('hidden');
-
         var trigger = wrap.querySelector('[data-visual-search-trigger]');
         var input = wrap.querySelector('[data-visual-search-input]');
         if (!trigger || !input) return;
 
         trigger.addEventListener('click', function (e) {
             e.preventDefault();
-            // Placeholder visible: sin accion hasta conectar Google Vision.
+            input.click();
         });
 
         input.addEventListener('change', function () {

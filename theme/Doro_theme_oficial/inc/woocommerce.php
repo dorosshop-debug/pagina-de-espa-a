@@ -125,11 +125,31 @@ add_action( 'woocommerce_after_single_product_summary', 'doroshopping_related_wr
  * @return array
  */
 function doroshopping_related_products_args( $args ) {
-    $args['posts_per_page'] = 8;
-    $args['columns']        = 4;
+    $args['posts_per_page'] = 10;
+    $args['columns']        = 5;
     return $args;
 }
 add_filter( 'woocommerce_output_related_products_args', 'doroshopping_related_products_args' );
+
+/**
+ * Upsells también en 5 columnas.
+ *
+ * @param int $columns Columns.
+ * @return int
+ */
+function doroshopping_upsell_columns( $columns ) {
+    return 5;
+}
+add_filter( 'woocommerce_upsells_columns', 'doroshopping_upsell_columns' );
+
+/**
+ * @param int $limit Limit.
+ * @return int
+ */
+function doroshopping_upsell_limit( $limit ) {
+    return 10;
+}
+add_filter( 'woocommerce_upsells_total', 'doroshopping_upsell_limit' );
 
 /**
  * Sección extra de productos debajo de relacionados (upsells / recientes).
@@ -142,7 +162,7 @@ function doroshopping_more_products_section() {
     $ids = wc_get_products(
         array(
             'status'  => 'publish',
-            'limit'   => 8,
+            'limit'   => 10,
             'orderby' => 'rand',
             'return'  => 'ids',
             'exclude' => array( get_the_ID() ),

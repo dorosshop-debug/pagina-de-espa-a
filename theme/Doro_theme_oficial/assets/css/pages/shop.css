@@ -259,6 +259,7 @@
     .doro-shop ul.products,
     .woocommerce ul.products {
         grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 
     .doro-shop__sidebar {

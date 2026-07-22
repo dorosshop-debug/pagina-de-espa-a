@@ -9,12 +9,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'DOROSHOPPING_VERSION', '1.3.12' );
+define( 'DOROSHOPPING_VERSION', '1.4.6' );
 define( 'DOROSHOPPING_DIR', get_template_directory() );
 define( 'DOROSHOPPING_URI', get_template_directory_uri() );
 
 require_once DOROSHOPPING_DIR . '/inc/setup.php';
 require_once DOROSHOPPING_DIR . '/inc/helpers.php';
+require_once DOROSHOPPING_DIR . '/inc/security.php';
 require_once DOROSHOPPING_DIR . '/inc/pages.php';
 require_once DOROSHOPPING_DIR . '/inc/mega-menu.php';
 require_once DOROSHOPPING_DIR . '/inc/customizer.php';

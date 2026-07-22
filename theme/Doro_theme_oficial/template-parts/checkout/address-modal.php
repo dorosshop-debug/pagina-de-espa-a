@@ -1,6 +1,7 @@
 <?php
 /**
- * Modal añadir dirección (campos de facturación WC).
+ * Modal añadir dirección (solo facturación / entrega).
+ * Sin envío aparte ni notas del pedido (evita el layout en 2 columnas).
  *
  * @package Doroshopping
  */
@@ -9,7 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$checkout = WC()->checkout();
+if ( ! function_exists( 'WC' ) || ! WC()->checkout() ) {
+    return;
+}
 ?>
 
 <div class="doro-modal" id="doro-address-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="doro-address-modal-title">
@@ -23,13 +26,8 @@ $checkout = WC()->checkout();
         </header>
 
         <div class="doro-modal__body" id="customer_details">
-            <div class="col2-set">
-                <div class="col-1">
-                    <?php do_action( 'woocommerce_checkout_billing' ); ?>
-                </div>
-                <div class="col-2">
-                    <?php do_action( 'woocommerce_checkout_shipping' ); ?>
-                </div>
+            <div class="doro-modal__fields">
+                <?php do_action( 'woocommerce_checkout_billing' ); ?>
             </div>
         </div>
 

@@ -1,23 +1,17 @@
 <?php
 /**
- * My Account page
+ * My Account page (logueado)
  *
  * @package Doroshopping
  */
 
 defined( 'ABSPATH' ) || exit;
-
-/**
- * My Account navigation.
- */
-do_action( 'woocommerce_account_navigation' );
 ?>
 
-<div class="woocommerce-MyAccount-content">
-    <?php
-    /**
-     * My Account content.
-     */
-    do_action( 'woocommerce_account_content' );
-    ?>
+<div class="doro-account">
+    <?php do_action( 'woocommerce_account_navigation' ); ?>
+
+    <div class="woocommerce-MyAccount-content doro-account__content">
+        <?php do_action( 'woocommerce_account_content' ); ?>
+    </div>
 </div>
