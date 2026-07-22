@@ -903,11 +903,13 @@ function initCartModal() {
     }
 
     document.body.addEventListener('added_to_cart', function () {
-        refreshCart();
+        // No refrescar al instante: una petición get_cart sin cookie puede
+        // pisar la sesión recién creada por add_to_cart y vaciar el carrito.
+        // El contador ya lo actualizan los fragments de WooCommerce.
     });
 
     document.body.addEventListener('removed_from_cart', function () {
-        refreshCart();
+        setTimeout(function () { refreshCart(); }, 300);
     });
 
     if (typeof cfg.initialCount !== 'undefined') {

@@ -55,6 +55,26 @@ $cat_2 = absint( get_theme_mod( 'doroshopping_home_block_2_cat', 0 ) );
 $products_left  = function_exists( 'doroshopping_get_products_by_category' ) ? doroshopping_get_products_by_category( $cat_1, 6 ) : array();
 $products_right = function_exists( 'doroshopping_get_products_by_category' ) ? doroshopping_get_products_by_category( $cat_2, 6 ) : array();
 
+/**
+ * URL de archivo de categoría WC (o #).
+ *
+ * @param int $term_id Term ID.
+ * @return string
+ */
+$doroshopping_tile_url = static function ( $term_id ) {
+    $term_id = absint( $term_id );
+    if ( $term_id <= 0 || ! taxonomy_exists( 'product_cat' ) ) {
+        return '#';
+    }
+    $link = get_term_link( $term_id, 'product_cat' );
+    return is_wp_error( $link ) ? '#' : $link;
+};
+
+$tile_1 = absint( get_theme_mod( 'doroshopping_home_tile_1_cat', 0 ) );
+$tile_2 = absint( get_theme_mod( 'doroshopping_home_tile_2_cat', 0 ) );
+$tile_3 = absint( get_theme_mod( 'doroshopping_home_tile_3_cat', 0 ) );
+$tile_4 = absint( get_theme_mod( 'doroshopping_home_tile_4_cat', 0 ) );
+
 $block_left = array(
     'title'      => get_theme_mod( 'doroshopping_home_block_1_title', __( 'Tecnologia para tu hogar', 'doroshopping' ) ),
     'products'   => ! empty( $products_left ) ? doroshopping_map_wc_products_for_carousel( $products_left ) : $fallback_left,
@@ -62,13 +82,13 @@ $block_left = array(
         array(
             'image' => $cat_uri . '/auriculares.png',
             'label' => __( 'Microfonos y auriculares', 'doroshopping' ),
-            'url'   => '#',
+            'url'   => $doroshopping_tile_url( $tile_1 ),
             'file'  => 'auriculares.png',
         ),
         array(
             'image' => $cat_uri . '/videjuegos.png',
             'label' => __( 'Gaming', 'doroshopping' ),
-            'url'   => '#',
+            'url'   => $doroshopping_tile_url( $tile_2 ),
             'file'  => 'videjuegos.png',
         ),
     ),
@@ -81,13 +101,13 @@ $block_right = array(
         array(
             'image' => $cat_uri . '/deportes.png',
             'label' => __( 'Deportes', 'doroshopping' ),
-            'url'   => '#',
+            'url'   => $doroshopping_tile_url( $tile_3 ),
             'file'  => 'deportes.png',
         ),
         array(
             'image' => $cat_uri . '/hogar.png',
             'label' => __( 'Hogar y Gadgets', 'doroshopping' ),
-            'url'   => '#',
+            'url'   => $doroshopping_tile_url( $tile_4 ),
             'file'  => 'hogar.png',
         ),
     ),

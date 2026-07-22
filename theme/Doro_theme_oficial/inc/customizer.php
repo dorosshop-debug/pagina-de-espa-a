@@ -319,6 +319,32 @@ function doroshopping_customize_register( $wp_customize ) {
         )
     );
 
+    $tile_defs = array(
+        'doroshopping_home_tile_1_cat' => __( 'Tile 1 (Microfonos y auriculares)', 'doroshopping' ),
+        'doroshopping_home_tile_2_cat' => __( 'Tile 2 (Gaming)', 'doroshopping' ),
+        'doroshopping_home_tile_3_cat' => __( 'Tile 3 (Deportes)', 'doroshopping' ),
+        'doroshopping_home_tile_4_cat' => __( 'Tile 4 (Hogar y Gadgets)', 'doroshopping' ),
+    );
+    foreach ( $tile_defs as $setting_id => $label ) {
+        $wp_customize->add_setting(
+            $setting_id,
+            array(
+                'default'           => 0,
+                'sanitize_callback' => 'absint',
+            )
+        );
+        $wp_customize->add_control(
+            $setting_id,
+            array(
+                'label'       => $label,
+                'description' => __( 'Categoria de WooCommerce al hacer clic en la imagen.', 'doroshopping' ),
+                'section'     => 'doroshopping_home_grids',
+                'type'        => 'select',
+                'choices'     => $cat_choices,
+            )
+        );
+    }
+
     $wp_customize->add_setting(
         'doroshopping_home_featured_title',
         array(

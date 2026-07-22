@@ -83,3 +83,34 @@ function doroshopping_cart_count_fragments( $fragments ) {
     return $fragments;
 }
 add_filter( 'woocommerce_add_to_cart_fragments', 'doroshopping_cart_count_fragments' );
+
+/**
+ * Persistir cookie de sesión justo al añadir (evita perder el carrito al navegar).
+ */
+function doroshopping_persist_cart_session() {
+    if ( function_exists( 'WC' ) && WC()->session && ! WC()->session->has_session() ) {
+        WC()->session->set_customer_session_cookie( true );
+    }
+}
+add_action( 'woocommerce_add_to_cart', 'doroshopping_persist_cart_session', 5 );
+
+/**
+ * No cachear carrito/checkout (páginas con sesión).
+ */
+function doroshopping_nocache_cart_checkout() {
+    if ( ! function_exists( 'is_cart' ) ) {
+        return;
+    }
+    if ( is_cart() || is_checkout() || ( function_exists( 'is_account_page' ) && is_account_page() ) ) {
+        if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+            define( 'DONOTCACHEPAGE', true );
+        }
+        if ( ! defined( 'DONOTCACHEOBJECT' ) ) {
+            define( 'DONOTCACHEOBJECT', true );
+        }
+        if ( function_exists( 'nocache_headers' ) ) {
+            nocache_headers();
+        }
+    }
+}
+add_action( 'template_redirect', 'doroshopping_nocache_cart_checkout', 1 );
