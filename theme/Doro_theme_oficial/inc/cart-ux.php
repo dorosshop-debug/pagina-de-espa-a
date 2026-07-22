@@ -64,7 +64,8 @@ function doroshopping_buy_now_button() {
         return;
     }
     echo '<button type="submit" name="doroshopping_buy_now" value="1" class="doro-buybox__buy-now">';
-    echo esc_html__( 'Comprar ahora', 'doroshopping' );
+    echo '<span>' . esc_html__( 'Ir a la compra', 'doroshopping' ) . '</span>';
+    echo '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
     echo '</button>';
 }
 add_action( 'woocommerce_after_add_to_cart_button', 'doroshopping_buy_now_button', 5 );

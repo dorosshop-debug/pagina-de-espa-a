@@ -1,6 +1,9 @@
 <?php
 /**
- * Buy box lateral (estilo AliExpress)
+ * Buy box lateral — envío (BigBuy/WC), confianza y compra.
+ *
+ * Los datos de envío se rellenan vía filtros/hooks para plugins (p. ej. BigBuy).
+ * Sin plugin activo se muestran placeholders listos para hidratar.
  *
  * @package Doroshopping
  */
@@ -12,29 +15,160 @@ global $product;
 if ( ! $product ) {
     return;
 }
+
+$destination = apply_filters(
+    'doroshopping_shipping_destination_label',
+    __( 'España', 'doroshopping' ),
+    $product
+);
+
+/**
+ * Estimación de envío. Plugins (BigBuy / WC shipping) pueden completar:
+ * carrier, eta, cost_html, cost_raw, note, destination.
+ *
+ * @var array{
+ *   destination?: string,
+ *   carrier?: string,
+ *   eta?: string,
+ *   cost_html?: string,
+ *   note?: string,
+ *   ready?: bool
+ * }
+ */
+$shipping = apply_filters(
+    'doroshopping_product_shipping_estimate',
+    array(
+        'destination' => $destination,
+        'carrier'     => '',
+        'eta'         => '',
+        'cost_html'   => '',
+        'note'        => __( 'Coste estimado según destino. El importe final puede variar ligeramente en checkout.', 'doroshopping' ),
+        'ready'       => false,
+    ),
+    $product
+);
+
+$carrier   = isset( $shipping['carrier'] ) ? (string) $shipping['carrier'] : '';
+$eta       = isset( $shipping['eta'] ) ? (string) $shipping['eta'] : '';
+$cost_html = isset( $shipping['cost_html'] ) ? (string) $shipping['cost_html'] : '';
+$note      = isset( $shipping['note'] ) ? (string) $shipping['note'] : '';
+$dest      = ! empty( $shipping['destination'] ) ? (string) $shipping['destination'] : $destination;
+$ready     = ! empty( $shipping['ready'] ) || ( $carrier || $eta || $cost_html );
+
+$stock_qty  = $product->managing_stock() ? $product->get_stock_quantity() : null;
+$stock_text = '';
+if ( null !== $stock_qty && $stock_qty > 0 ) {
+    /* translators: %d: stock quantity */
+    $stock_text = sprintf( _n( 'Solo quedan %d disponible', 'Solo quedan %d disponibles', $stock_qty, 'doroshopping' ), $stock_qty );
+} elseif ( ! $product->is_in_stock() ) {
+    $stock_text = __( 'Agotado', 'doroshopping' );
+}
+
+$currency_label = apply_filters( 'doroshopping_buybox_currency_label', 'Euro (€)', $product );
 ?>
 
-<div class="doro-buybox">
-    <div class="doro-buybox__badge"><?php esc_html_e( 'Envío Doro', 'doroshopping' ); ?></div>
+<div class="doro-buybox" data-doro-buybox data-product-id="<?php echo esc_attr( (string) $product->get_id() ); ?>">
+    <?php
+    /**
+     * Antes del bloque de envío (plugins BigBuy / shipping).
+     *
+     * @param WC_Product $product Producto.
+     * @param array      $shipping Estimación filtrada.
+     */
+    do_action( 'doroshopping_buybox_before_shipping', $product, $shipping );
+    ?>
 
-    <ul class="doro-buybox__perks">
+    <section
+        class="doro-buybox__ship-card"
+        data-doro-shipping
+        data-shipping-ready="<?php echo $ready ? '1' : '0'; ?>"
+        aria-label="<?php esc_attr_e( 'Información de envío', 'doroshopping' ); ?>"
+    >
+        <header class="doro-buybox__ship-head">
+            <span class="doro-buybox__ship-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="18.5" cy="18.5" r="1.5"/></svg>
+            </span>
+            <div>
+                <h3 class="doro-buybox__ship-title"><?php esc_html_e( 'Información de envío', 'doroshopping' ); ?></h3>
+                <p class="doro-buybox__ship-dest">
+                    <?php esc_html_e( 'Destino:', 'doroshopping' ); ?>
+                    <strong data-shipping-destination><?php echo esc_html( $dest ); ?></strong>
+                </p>
+            </div>
+        </header>
+
+        <dl class="doro-buybox__ship-rows">
+            <div class="doro-buybox__ship-row">
+                <dt><?php esc_html_e( 'Transportista', 'doroshopping' ); ?></dt>
+                <dd data-shipping-carrier><?php echo $carrier ? esc_html( $carrier ) : '&mdash;'; ?></dd>
+            </div>
+            <div class="doro-buybox__ship-row">
+                <dt><?php esc_html_e( 'Tiempo estimado', 'doroshopping' ); ?></dt>
+                <dd data-shipping-eta><?php echo $eta ? esc_html( $eta ) : '&mdash;'; ?></dd>
+            </div>
+            <div class="doro-buybox__ship-row">
+                <dt><?php esc_html_e( 'Coste estimado', 'doroshopping' ); ?></dt>
+                <dd data-shipping-cost><?php echo $cost_html ? wp_kses_post( $cost_html ) : '&mdash;'; ?></dd>
+            </div>
+        </dl>
+
+        <?php if ( $note ) : ?>
+            <p class="doro-buybox__ship-note" data-shipping-note><?php echo esc_html( $note ); ?></p>
+        <?php endif; ?>
+
+        <?php
+        /**
+         * Tras filas de envío — ideal para inyectar HTML/JS de BigBuy.
+         *
+         * @param WC_Product $product Producto.
+         * @param array      $shipping Estimación.
+         */
+        do_action( 'doroshopping_buybox_shipping', $product, $shipping );
+        ?>
+    </section>
+
+    <ul class="doro-buybox__trust">
         <li>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>
-            <?php esc_html_e( 'Envío gratis en pedidos seleccionados', 'doroshopping' ); ?>
+            <span class="doro-buybox__trust-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <div>
+                <strong><?php esc_html_e( 'Seguridad y Privacidad', 'doroshopping' ); ?></strong>
+                <span><?php esc_html_e( 'Pago 100% Seguro', 'doroshopping' ); ?></span>
+                <span><?php esc_html_e( 'Privacidad segura', 'doroshopping' ); ?></span>
+            </div>
         </li>
         <li>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>
-            <?php esc_html_e( 'Entrega rápida disponible', 'doroshopping' ); ?>
+            <span class="doro-buybox__trust-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+            </span>
+            <div>
+                <strong><?php esc_html_e( 'Devoluciones GRATIS', 'doroshopping' ); ?></strong>
+                <span><?php esc_html_e( 'Devoluciones gratis en 30 días', 'doroshopping' ); ?></span>
+                <span><?php esc_html_e( 'Reembolso por artículos dañados', 'doroshopping' ); ?></span>
+            </div>
         </li>
         <li>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12l4 4L19 6"/></svg>
-            <?php esc_html_e( 'Devoluciones fáciles', 'doroshopping' ); ?>
+            <span class="doro-buybox__trust-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+            </span>
+            <div>
+                <strong><?php esc_html_e( 'Servicio Profesional', 'doroshopping' ); ?></strong>
+                <span><?php esc_html_e( 'Garantía Oficial', 'doroshopping' ); ?></span>
+                <span><?php esc_html_e( 'Soporte al Cliente', 'doroshopping' ); ?></span>
+            </div>
         </li>
     </ul>
 
-    <div class="doro-buybox__shipping">
-        <p class="doro-buybox__shipping-title"><?php esc_html_e( 'Envío', 'doroshopping' ); ?></p>
-        <p class="doro-buybox__shipping-text"><?php esc_html_e( 'Entrega estimada en 3-7 días laborables según tu ubicación.', 'doroshopping' ); ?></p>
+    <?php if ( $stock_text ) : ?>
+        <p class="doro-buybox__stock" data-buybox-stock role="status"><?php echo esc_html( $stock_text ); ?></p>
+    <?php endif; ?>
+
+    <div class="doro-buybox__currency" data-buybox-currency>
+        <label class="screen-reader-text" for="doro-buybox-currency"><?php esc_html_e( 'Moneda', 'doroshopping' ); ?></label>
+        <select id="doro-buybox-currency" name="doro_currency" disabled title="<?php esc_attr_e( 'La moneda se sincronizará con el selector del header', 'doroshopping' ); ?>">
+            <option selected><?php echo esc_html( $currency_label ); ?></option>
+        </select>
     </div>
 
     <div class="doro-buybox__actions" data-doro-buybox-actions>

@@ -41,7 +41,7 @@
 
 .doro-product__top {
     display: grid;
-    grid-template-columns: minmax(260px, 1.05fr) minmax(280px, 1.2fr) minmax(260px, 0.85fr);
+    grid-template-columns: minmax(340px, 1.45fr) minmax(240px, 0.95fr) minmax(290px, 0.9fr);
     gap: var(--spacing-lg);
     align-items: start;
     margin-bottom: var(--spacing-xl);
@@ -75,13 +75,15 @@
 .doro-product__gallery .flex-viewport {
     border-radius: var(--radius-sm);
     background: #fafafa;
+    min-height: 520px;
 }
 
 .doro-product__gallery .woocommerce-product-gallery__image img,
 .doro-product__gallery img {
     width: 100%;
     height: auto;
-    max-height: 480px;
+    max-height: 640px;
+    min-height: 420px;
     object-fit: contain;
     margin: 0 auto;
 }
@@ -92,7 +94,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    width: 64px;
+    width: 72px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -100,8 +102,8 @@
 }
 
 .doro-product__gallery .flex-control-thumbs li {
-    width: 64px;
-    height: 64px;
+    width: 72px;
+    height: 72px;
     margin: 0;
     border: 1px solid var(--color-grey-border);
     border-radius: var(--radius-sm);
@@ -206,134 +208,275 @@
 .doro-buybox {
     background: var(--color-white);
     border: 1px solid var(--color-grey-border);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-lg);
+    border-radius: 10px;
+    padding: 14px;
     position: relative;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
 }
 
-.doro-buybox__badge {
-    display: inline-block;
-    background: #fff3e0;
-    color: #e65100;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 999px;
-    margin-bottom: var(--spacing-md);
+.doro-buybox__ship-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 14px;
 }
 
-.doro-buybox__perks {
-    list-style: none;
-    margin: 0 0 var(--spacing-md);
-    padding: 0;
-}
-
-.doro-buybox__perks li {
+.doro-buybox__ship-head {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    font-size: var(--font-size-sm);
-    color: var(--color-dark);
-    margin-bottom: 8px;
-    line-height: 1.35;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #eef8f0;
 }
 
-.doro-buybox__perks svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
+.doro-buybox__ship-icon {
+    width: 28px;
+    height: 28px;
     color: #2e7d32;
+    flex-shrink: 0;
     margin-top: 2px;
 }
 
-.doro-buybox__shipping {
-    background: #fafafa;
-    border-radius: var(--radius-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+.doro-buybox__ship-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
-.doro-buybox__shipping-title {
-    margin: 0 0 4px;
-    font-size: var(--font-size-sm);
-    font-weight: 700;
-}
-
-.doro-buybox__shipping-text {
+.doro-buybox__ship-title {
     margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-dark);
+    line-height: 1.2;
+}
+
+.doro-buybox__ship-dest {
+    margin: 4px 0 0;
     font-size: 12px;
-    color: var(--color-grey-text);
+    color: #6b7280;
+}
+
+.doro-buybox__ship-dest strong {
+    color: var(--color-dark);
+    font-weight: 600;
+}
+
+.doro-buybox__ship-rows {
+    margin: 0;
+    padding: 0 14px;
+}
+
+.doro-buybox__ship-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.doro-buybox__ship-row:last-child {
+    border-bottom: none;
+}
+
+.doro-buybox__ship-row dt {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.doro-buybox__ship-row dd {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-dark);
+    text-align: right;
+}
+
+.doro-buybox__ship-note {
+    margin: 0;
+    padding: 10px 12px;
+    border-top: 1px solid #e5e7eb;
+    background: #fafafa;
+    font-size: 11px;
     line-height: 1.4;
+    color: #6b7280;
+}
+
+.doro-buybox__trust {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.doro-buybox__trust li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.doro-buybox__trust-icon {
+    width: 28px;
+    height: 28px;
+    color: #2e7d32;
+    flex-shrink: 0;
+}
+
+.doro-buybox__trust-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.doro-buybox__trust strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 2px;
+}
+
+.doro-buybox__trust span {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.35;
+}
+
+.doro-buybox__stock {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-buybox__currency {
+    margin-bottom: 10px;
+}
+
+.doro-buybox__currency select {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid #222;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    background: #fff;
+    color: var(--color-dark);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23222' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
 }
 
 .doro-buybox__actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
 }
 
 .doro-buybox__actions form.cart {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 8px;
     margin: 0;
+    align-items: stretch;
 }
 
-.doro-buybox__actions .quantity {
-    order: 1;
+.doro-buybox__actions form.cart .quantity {
+    grid-column: 1;
     margin: 0;
-}
-
-.doro-buybox__buy-now {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 100%;
-    height: 48px;
-    background: #e53935;
-    color: var(--color-white);
+}
+
+.doro-buybox__actions form.cart .quantity .qty {
+    width: 100%;
+    height: 46px;
+    border: 1.5px solid #222;
+    border-radius: 6px;
+    text-align: center;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.doro-buybox__actions form.cart .single_add_to_cart_button {
+    grid-column: 2;
+    width: 100%;
+    height: 46px;
+    background: var(--color-orange);
+    color: #fff;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: 6px;
     font-weight: 700;
-    font-size: var(--font-size-base);
+    font-size: 15px;
     font-family: inherit;
     cursor: pointer;
-    order: 2;
     transition: opacity var(--transition);
 }
 
-.doro-buybox__actions .single_add_to_cart_button {
-    order: 3;
-    width: 100%;
-    height: 48px;
-    background: var(--color-white);
-    color: var(--color-dark);
-    border: 1px solid var(--color-dark);
-    border-radius: var(--radius-md);
-    font-weight: 700;
-    font-size: var(--font-size-base);
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition);
-}
-
-.doro-buybox__actions .quantity .qty {
-    width: 100%;
-    height: 42px;
-    border: 1px solid var(--color-grey-border);
-    border-radius: var(--radius-sm);
-    text-align: center;
-    font-family: inherit;
-}
-
-.doro-buybox__actions .single_add_to_cart_button:hover {
-    background: var(--color-dark);
-    color: var(--color-white);
-}
-
-.doro-buybox__buy-now:hover {
+.doro-buybox__actions form.cart .single_add_to_cart_button:hover {
     opacity: 0.92;
-    color: var(--color-white);
+    color: #fff;
+    background: var(--color-orange);
+}
+
+.doro-buybox__actions form.cart .doro-buybox__buy-now {
+    grid-column: 1 / -1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 46px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity var(--transition);
+}
+
+.doro-buybox__buy-now svg {
+    width: 16px;
+    height: 16px;
+}
+
+.doro-buybox__actions form.cart .doro-buybox__buy-now:hover {
+    opacity: 0.9;
+    color: #fff;
+}
+
+.doro-buybox__actions form.cart .variations,
+.doro-buybox__actions form.cart .woocommerce-variation-add-to-cart,
+.doro-buybox__actions form.cart .single_variation_wrap {
+    grid-column: 1 / -1;
+}
+
+.doro-buybox__actions form.variations_form .woocommerce-variation-add-to-cart {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 8px;
+}
+
+.doro-buybox__actions form.variations_form .woocommerce-variation-add-to-cart .quantity {
+    grid-column: 1;
+}
+
+.doro-buybox__actions form.variations_form .woocommerce-variation-add-to-cart .single_add_to_cart_button {
+    grid-column: 2;
+}
+
+.doro-buybox__actions form.variations_form .woocommerce-variation-add-to-cart .doro-buybox__buy-now {
+    grid-column: 1 / -1;
 }
 
 .doro-buybox__secondary {
@@ -394,6 +537,17 @@
 
 .doro-buybox__meta a:hover {
     color: var(--color-orange);
+}
+
+.doro-product__more-wrap {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--color-grey-border);
+}
+
+.doro-product__more-title {
+    font-size: var(--font-size-xl);
+    margin: 0 0 var(--spacing-lg);
 }
 
 /* Tabs / reviews / related */

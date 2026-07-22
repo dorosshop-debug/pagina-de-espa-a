@@ -1,29 +1,66 @@
 ﻿var previewProducts = [
-    { price: '23.99', name: 'Auriculares Bluetooth TWS Pro', image: 'Producto1.jpg', rating: 4.5, reviews: 12 },
+    { price: '23.99', oldPrice: '39.99', name: 'Auriculares Bluetooth TWS Pro', image: 'Producto1.jpg', rating: 4.5, reviews: 12 },
     { price: '45.50', name: 'Monitor LED 24 pulgadas Full HD', image: 'Producto2.png', rating: 0, reviews: 0 },
-    { price: '12.99', name: 'Cable USB-C rapido carga 2m', image: 'Producto3.jpg', rating: 3, reviews: 4 },
-    { price: '89.00', name: 'Teclado mecanico RGB Gaming', image: 'Producto4.jpg', rating: 5, reviews: 28 },
+    { price: '12.99', oldPrice: '19.99', name: 'Cable USB-C rapido carga 2m', image: 'Producto3.jpg', rating: 3, reviews: 4 },
+    { price: '89.00', oldPrice: '129.00', name: 'Teclado mecanico RGB Gaming', image: 'Producto4.jpg', rating: 5, reviews: 28 },
     { price: '34.75', name: 'Raton inalambrico ergonomico', image: 'Producto5.jpg', rating: 2.5, reviews: 3 },
-    { price: '156.00', name: 'Tablet 10 pulgadas 64GB', image: 'Producto6.jpg', rating: 0, reviews: 0 },
+    { price: '156.00', oldPrice: '199.00', name: 'Tablet 10 pulgadas 64GB', image: 'Producto6.jpg', rating: 0, reviews: 0 },
     { price: '28.50', name: 'Altavoz portatil resistente agua', image: 'Producto7.jpg', rating: 4, reviews: 9 },
-    { price: '67.99', name: 'Smartwatch deportivo GPS', image: 'Producto8.jpg', rating: 3.5, reviews: 7 },
+    { price: '67.99', oldPrice: '89.99', name: 'Smartwatch deportivo GPS', image: 'Producto8.jpg', rating: 3.5, reviews: 7 },
     { price: '19.99', name: 'Funda protectora smartphone', image: 'Producto1.jpg', rating: 0, reviews: 0 },
-    { price: '299.00', name: 'Portatil 15.6 8GB RAM SSD', image: 'Producto2.png', rating: 4, reviews: 15 },
+    { price: '299.00', oldPrice: '349.00', name: 'Portatil 15.6 8GB RAM SSD', image: 'Producto2.png', rating: 4, reviews: 15 },
     { price: '8.50', name: 'Soporte movil para coche', image: 'Producto3.jpg', rating: 1, reviews: 1 },
     { price: '42.00', name: 'Camara de seguridad WiFi', image: 'Producto4.jpg', rating: 0, reviews: 0 },
-    { price: '55.25', name: 'Impresora etiquetas termica', image: 'Producto5.jpg', rating: 4.5, reviews: 6 },
+    { price: '55.25', oldPrice: '69.00', name: 'Impresora etiquetas termica', image: 'Producto5.jpg', rating: 4.5, reviews: 6 },
     { price: '14.99', name: 'Lampara LED escritorio USB', image: 'Producto6.jpg', rating: 0, reviews: 0 },
-    { price: '78.00', name: 'Aspiradora robot compacta', image: 'Producto7.jpg', rating: 5, reviews: 21 },
+    { price: '78.00', oldPrice: '99.00', name: 'Aspiradora robot compacta', image: 'Producto7.jpg', rating: 5, reviews: 21 },
     { price: '31.50', name: 'Microfono condensador USB', image: 'Producto8.jpg', rating: 3, reviews: 2 },
     { price: '22.00', name: 'Hub USB 7 puertos', image: 'Producto1.jpg', rating: 0, reviews: 0 },
-    { price: '95.99', name: 'Router WiFi 6 doble banda', image: 'Producto2.png', rating: 4, reviews: 11 },
+    { price: '95.99', oldPrice: '119.00', name: 'Router WiFi 6 doble banda', image: 'Producto2.png', rating: 4, reviews: 11 },
     { price: '18.75', name: 'Organizador cables escritorio', image: 'Producto3.jpg', rating: 2, reviews: 1 },
     { price: '49.00', name: 'Mochila antirrobo portatil', image: 'Producto4.jpg', rating: 0, reviews: 0 },
-    { price: '37.50', name: 'Ventilador de pie silencioso', image: 'Producto5.jpg', rating: 3.5, reviews: 5 },
+    { price: '37.50', oldPrice: '49.90', name: 'Ventilador de pie silencioso', image: 'Producto5.jpg', rating: 3.5, reviews: 5 },
     { price: '63.00', name: 'Proyector mini HD portatil', image: 'Producto6.jpg', rating: 4, reviews: 8 },
     { price: '11.99', name: 'Protector pantalla cristal templado', image: 'Producto7.jpg', rating: 0, reviews: 0 },
-    { price: '72.50', name: 'Auriculares gaming 7.1 surround', image: 'Producto8.jpg', rating: 5, reviews: 33 }
+    { price: '72.50', oldPrice: '99.00', name: 'Auriculares gaming 7.1 surround', image: 'Producto8.jpg', rating: 5, reviews: 33 }
 ];
+
+function previewSaleSaveHtml(product) {
+    if (!product || !product.oldPrice) return '';
+    var oldP = parseFloat(product.oldPrice);
+    var neo = parseFloat(product.price);
+    if (!(oldP > neo)) return '';
+    var saved = (oldP - neo).toFixed(2);
+    return '<div class="product-sale-save"><span class="product-sale-save__amount">↓ Ahorras EUR ' + saved + '</span></div>';
+}
+
+function previewPriceHtml(product) {
+    if (!product) return '';
+    if (product.oldPrice) {
+        return 'EUR ' + product.price + ' <del>EUR ' + product.oldPrice + '</del>';
+    }
+    return 'EUR ' + product.price;
+}
+
+function previewHomeProductCardHtml(product, index, productsPath) {
+    var cartSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+    var wishSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    return (
+        '<div class="home-product-card__image-wrap">' +
+            '<a href="product.html" class="home-product-card__image-link">' +
+                '<img src="' + productsPath + product.image + '" alt="' + product.name + '">' +
+            '</a>' +
+            '<button type="button" class="home-product-card__cart-btn ajax_add_to_cart add_to_cart_button" data-product_id="' + index + '" data-quantity="1" aria-label="Anadir al carrito">' + cartSvg + '</button>' +
+            '<button type="button" class="home-product-card__wish-btn" data-wishlist-toggle data-product-id="' + index + '" aria-pressed="false" aria-label="Anadir a lista de deseos">' + wishSvg + '</button>' +
+        '</div>' +
+        '<div class="home-product-card__info">' +
+            previewSaleSaveHtml(product) +
+            '<p class="home-product-card__price">' + previewPriceHtml(product) + '</p>' +
+            (typeof previewStarRatingHtml === 'function' ? previewStarRatingHtml(product.rating, product.reviews) : '') +
+            '<h3 class="home-product-card__name"><a href="product.html">' + product.name + '</a></h3>' +
+        '</div>'
+    );
+}
 
 function previewStarRatingHtml(rating, reviews) {
     var html = '<div class="product-rating" role="img" aria-label="' + (reviews > 0 ? 'Valoracion ' + rating + ' de 5' : 'Sin valoraciones') + '">';
@@ -47,27 +84,13 @@ function previewStarRatingHtml(rating, reviews) {
     var grid = document.getElementById('products-grid');
     if (!grid) return;
 
-    var cartSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
-    var wishSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
     var productsPath = '../theme/Doro_theme_oficial/assets/images/products/';
 
     previewProducts.forEach(function (product, index) {
         var card = document.createElement('article');
         card.className = 'home-product-card';
         card.setAttribute('data-product-id', String(index));
-        card.innerHTML =
-            '<div class="home-product-card__image-wrap">' +
-                '<a href="product.html" class="home-product-card__image-link">' +
-                    '<img src="' + productsPath + product.image + '" alt="' + product.name + '">' +
-                '</a>' +
-                '<button type="button" class="home-product-card__cart-btn" aria-label="Anadir al carrito">' + cartSvg + '</button>' +
-                '<button type="button" class="home-product-card__wish-btn" data-wishlist-toggle data-product-id="' + index + '" aria-pressed="false" aria-label="Anadir a lista de deseos">' + wishSvg + '</button>' +
-            '</div>' +
-            '<div class="home-product-card__info">' +
-                '<p class="home-product-card__price">' + product.price + ' EUR</p>' +
-                previewStarRatingHtml(product.rating, product.reviews) +
-                '<h3 class="home-product-card__name"><a href="product.html">' + product.name + '</a></h3>' +
-            '</div>';
+        card.innerHTML = previewHomeProductCardHtml(product, index, productsPath);
         grid.appendChild(card);
     });
 })();
@@ -128,7 +151,25 @@ function previewStarRatingHtml(rating, reviews) {
     }
 
     window.doroshoppingPreviewCart = {
+        add: function (productId, quantity) {
+            var idx = parseInt(productId, 10);
+            var p = (!isNaN(idx) && previewProducts[idx]) ? previewProducts[idx] : previewProducts[0];
+            return this.handle('doroshopping_add_to_cart', {
+                product: {
+                    id: isNaN(idx) ? productId : idx,
+                    name: p ? p.name : 'Producto',
+                    unit: p ? parseFloat(p.price) || 0 : 0,
+                    image: p ? productsPath + p.image : productsPath + 'Producto1.jpg',
+                    permalink: 'product.html'
+                },
+                quantity: quantity || 1
+            });
+        },
         handle: function (action, data) {
+            if (action === 'doroshopping_get_cart') {
+                return payload();
+            }
+
             if (action === 'doroshopping_update_cart_item') {
                 var qtyItem = state.items.find(function (item) { return item.key === data.key; });
                 if (qtyItem) {

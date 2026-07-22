@@ -122,25 +122,16 @@ var previewCategories = {
     }
 
     var productsGrid = document.querySelector('[data-category-products]');
-    if (!productsGrid || typeof previewProducts === 'undefined') return;
-
-    var wishSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    if (!productsGrid || typeof previewProducts === 'undefined' || typeof previewHomeProductCardHtml !== 'function') return;
 
     productsGrid.innerHTML = '';
     data.products.forEach(function (index) {
         var product = previewProducts[index];
         if (!product) return;
         var li = document.createElement('li');
-        li.className = 'product doro-product-card';
-        li.innerHTML =
-            '<div class="doro-product-card__media">' +
-                '<a href="product.html"><img src="' + productsPath + product.image + '" alt="' + product.name + '"></a>' +
-                '<button type="button" class="doro-product-card__wish-btn" data-wishlist-toggle data-product-id="' + index + '" aria-pressed="false" aria-label="Anadir a lista de deseos">' + wishSvg + '</button>' +
-            '</div>' +
-            '<div class="doro-product-card__body">' +
-                '<span class="price">' + product.price + ' EUR</span>' +
-                '<h2 class="woocommerce-loop-product__title"><a href="product.html">' + product.name + '</a></h2>' +
-            '</div>';
+        li.className = 'product home-product-card';
+        li.setAttribute('data-product-id', String(index));
+        li.innerHTML = previewHomeProductCardHtml(product, index, productsPath);
         productsGrid.appendChild(li);
     });
 })();

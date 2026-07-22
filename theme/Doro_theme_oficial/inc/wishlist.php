@@ -76,8 +76,10 @@ function doroshopping_get_wishlist_url() {
         return get_permalink( $pages[0]->ID );
     }
 
-    $by_slug = get_page_by_path( 'lista-de-deseos' );
-    if ( $by_slug ) {
+    $by_slug = function_exists( 'doroshopping_get_page_by_slug' )
+        ? doroshopping_get_page_by_slug( 'lista-de-deseos' )
+        : null;
+    if ( $by_slug instanceof WP_Post ) {
         return get_permalink( $by_slug );
     }
 

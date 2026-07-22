@@ -1,7 +1,7 @@
 <?php
 /**
  * Plantilla de archivo de categoría de producto (product_cat).
- * Layout tipo AliExpress: título + subcategorías circulares + productos.
+ * Layout: título + subcategorías + filtros + productos (cards Home).
  *
  * @package Doroshopping
  */
@@ -40,6 +40,9 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
     <div class="doro-category__title-bar">
         <div class="doro-category__title-inner">
             <h1 class="doro-category__title"><?php echo esc_html( $term->name ); ?></h1>
+            <?php if ( ! empty( $term->description ) ) : ?>
+                <p class="doro-category__intro"><?php echo esc_html( wp_strip_all_tags( $term->description ) ); ?></p>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -72,31 +75,43 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
             </section>
         <?php endif; ?>
 
-        <section class="doro-category__shop">
-            <div class="doro-category__shop-header">
-                <h2 class="doro-category__shop-title"><?php esc_html_e( 'Más formas de comprar', 'doroshopping' ); ?></h2>
-                <span class="doro-category__chip"><?php esc_html_e( 'Para ti', 'doroshopping' ); ?></span>
-            </div>
+        <div class="doro-category__layout">
+            <aside class="doro-category__filters" aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">
+                <div class="doro-category__filters-card">
+                    <h2 class="doro-category__filters-title"><?php esc_html_e( 'Filtros', 'doroshopping' ); ?></h2>
+                    <?php
+                    if ( ! is_active_sidebar( 'shop-filters' ) ) {
+                        get_template_part( 'template-parts/shop/filters', 'fallback' );
+                    } else {
+                        dynamic_sidebar( 'shop-filters' );
+                    }
+                    ?>
+                </div>
+            </aside>
 
-            <?php
-            remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
-            remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
-            ?>
+            <section class="doro-category__shop">
+                <div class="doro-category__shop-header">
+                    <h2 class="doro-category__shop-title"><?php esc_html_e( 'Más formas de comprar', 'doroshopping' ); ?></h2>
+                    <span class="doro-category__chip"><?php esc_html_e( 'Para ti', 'doroshopping' ); ?></span>
+                </div>
 
-            <?php if ( woocommerce_product_loop() ) : ?>
-                <?php woocommerce_product_loop_start(); ?>
-                <?php if ( wc_get_loop_prop( 'total' ) ) : ?>
-                    <?php while ( have_posts() ) : ?>
-                        <?php the_post(); ?>
-                        <?php wc_get_template_part( 'content', 'product' ); ?>
-                    <?php endwhile; ?>
+                <?php do_action( 'woocommerce_before_shop_loop' ); ?>
+
+                <?php if ( woocommerce_product_loop() ) : ?>
+                    <?php woocommerce_product_loop_start(); ?>
+                    <?php if ( wc_get_loop_prop( 'total' ) ) : ?>
+                        <?php while ( have_posts() ) : ?>
+                            <?php the_post(); ?>
+                            <?php wc_get_template_part( 'content', 'product' ); ?>
+                        <?php endwhile; ?>
+                    <?php endif; ?>
+                    <?php woocommerce_product_loop_end(); ?>
+                    <?php do_action( 'woocommerce_after_shop_loop' ); ?>
+                <?php else : ?>
+                    <p class="doro-category__empty"><?php esc_html_e( 'No hay productos en esta categoría todavía.', 'doroshopping' ); ?></p>
                 <?php endif; ?>
-                <?php woocommerce_product_loop_end(); ?>
-                <?php do_action( 'woocommerce_after_shop_loop' ); ?>
-            <?php else : ?>
-                <p class="doro-category__empty"><?php esc_html_e( 'No hay productos en esta categoría todavía.', 'doroshopping' ); ?></p>
-            <?php endif; ?>
-        </section>
+            </section>
+        </div>
     </div>
 </main>
 

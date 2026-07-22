@@ -66,7 +66,37 @@ function doroshopping_essential_pages() {
             'title'   => __( 'Métodos de pago', 'doroshopping' ),
             'content' => '<p>' . __( 'Formas de pago aceptadas, seguridad de las transacciones y consejos para comprar con tranquilidad.', 'doroshopping' ) . '</p>' . $placeholder,
         ),
+        'lista-de-deseos'           => array(
+            'title'    => __( 'Lista de deseos', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-wishlist.php',
+        ),
     );
+}
+
+/**
+ * Obtener página publicada por slug.
+ *
+ * @param string $slug Slug.
+ * @return WP_Post|null
+ */
+function doroshopping_get_page_by_slug( $slug ) {
+    $slug = sanitize_title( $slug );
+    if ( '' === $slug ) {
+        return null;
+    }
+
+    $pages = get_posts(
+        array(
+            'name'           => $slug,
+            'post_type'      => 'page',
+            'post_status'    => 'publish',
+            'posts_per_page' => 1,
+            'no_found_rows'  => true,
+        )
+    );
+
+    return ! empty( $pages[0] ) && $pages[0] instanceof WP_Post ? $pages[0] : null;
 }
 
 /**
@@ -81,8 +111,8 @@ function doroshopping_get_page_url( $slug ) {
         return '#';
     }
 
-    $page = get_page_by_path( $slug );
-    if ( $page instanceof WP_Post && 'publish' === $page->post_status ) {
+    $page = doroshopping_get_page_by_slug( $slug );
+    if ( $page instanceof WP_Post ) {
         return get_permalink( $page );
     }
 
@@ -102,9 +132,10 @@ function doroshopping_create_essential_pages() {
     $created = false;
 
     foreach ( doroshopping_essential_pages() as $slug => $data ) {
-        $existing = get_page_by_path( $slug );
+        $existing = doroshopping_get_page_by_slug( $slug );
         if ( $existing instanceof WP_Post ) {
             doroshopping_maybe_assign_wc_page( $existing->ID, $data );
+            doroshopping_maybe_assign_page_template( $existing->ID, $data );
             continue;
         }
 
@@ -112,7 +143,7 @@ function doroshopping_create_essential_pages() {
             array(
                 'post_title'   => $data['title'],
                 'post_name'    => $slug,
-                'post_content' => $data['content'],
+                'post_content' => isset( $data['content'] ) ? $data['content'] : '',
                 'post_status'  => 'publish',
                 'post_type'    => 'page',
                 'post_author'  => get_current_user_id() ? get_current_user_id() : 1,
@@ -126,6 +157,7 @@ function doroshopping_create_essential_pages() {
 
         $created = true;
         doroshopping_maybe_assign_wc_page( (int) $page_id, $data );
+        doroshopping_maybe_assign_page_template( (int) $page_id, $data );
     }
 
     if ( $created || ! get_option( 'doroshopping_essential_pages_ready' ) ) {
@@ -153,6 +185,27 @@ function doroshopping_maybe_assign_wc_page( $page_id, $data ) {
     }
 
     update_option( $option, (int) $page_id );
+}
+
+/**
+ * Asignar plantilla de página del tema si corresponde.
+ *
+ * @param int   $page_id ID.
+ * @param array $data    Definición.
+ * @return void
+ */
+function doroshopping_maybe_assign_page_template( $page_id, $data ) {
+    if ( empty( $data['template'] ) ) {
+        return;
+    }
+
+    $template = sanitize_file_name( $data['template'] );
+    $current  = (string) get_page_template_slug( $page_id );
+    if ( $current === $template ) {
+        return;
+    }
+
+    update_post_meta( (int) $page_id, '_wp_page_template', $template );
 }
 
 /**

@@ -18,6 +18,19 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
 <footer class="site-footer">
     <div class="site-footer__edge" aria-hidden="true"></div>
 
+    <div class="site-footer__domains">
+        <div class="site-footer__domains-inner">
+            <h4 class="site-footer__domains-title"><?php esc_html_e( 'Nuestras tiendas', 'doroshopping' ); ?></h4>
+            <ul class="site-footer__domains-list">
+                <li><a href="https://doroshopping.com" target="_blank" rel="noopener noreferrer">doroshopping.com</a></li>
+                <li><a href="https://doroshopping.es" target="_blank" rel="noopener noreferrer">doroshopping.es</a></li>
+                <li><a href="https://doroshopping.fr" target="_blank" rel="noopener noreferrer">doroshopping.fr</a></li>
+                <li><a href="https://doroshopping.de" target="_blank" rel="noopener noreferrer">doroshopping.de</a></li>
+                <li><a href="https://doroshopping.uk" target="_blank" rel="noopener noreferrer">doroshopping.uk</a></li>
+            </ul>
+        </div>
+    </div>
+
     <div class="site-footer__main">
         <div class="site-footer__grid">
             <div class="site-footer__col site-footer__col--brand">
@@ -74,7 +87,7 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
 
             <div class="site-footer__col site-footer__col--newsletter">
                 <h4 class="site-footer__heading"><?php esc_html_e( 'Registrate y recibe novedades unicas.', 'doroshopping' ); ?></h4>
-                <form class="site-footer__newsletter" action="#" method="post">
+                <form class="site-footer__newsletter" action="<?php echo esc_url( apply_filters( 'doroshopping_newsletter_action', '#' ) ); ?>" method="post">
                     <label class="screen-reader-text" for="footer-newsletter-email"><?php esc_html_e( 'Direccion de Correo electronico', 'doroshopping' ); ?></label>
                     <input id="footer-newsletter-email" type="email" name="email" placeholder="<?php esc_attr_e( 'Direccion de Correo electronico', 'doroshopping' ); ?>" required>
                     <button type="submit"><?php esc_html_e( 'Suscribirse', 'doroshopping' ); ?></button>
@@ -98,19 +111,6 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                     </a>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="site-footer__domains">
-        <div class="site-footer__domains-inner">
-            <h4 class="site-footer__domains-title"><?php esc_html_e( 'Nuestras tiendas', 'doroshopping' ); ?></h4>
-            <ul class="site-footer__domains-list">
-                <li><a href="https://doroshopping.com" target="_blank" rel="noopener noreferrer">doroshopping.com</a></li>
-                <li><a href="https://doroshopping.es" target="_blank" rel="noopener noreferrer">doroshopping.es</a></li>
-                <li><a href="https://doroshopping.fr" target="_blank" rel="noopener noreferrer">doroshopping.fr</a></li>
-                <li><a href="https://doroshopping.de" target="_blank" rel="noopener noreferrer">doroshopping.de</a></li>
-                <li><a href="https://doroshopping.uk" target="_blank" rel="noopener noreferrer">doroshopping.uk</a></li>
-            </ul>
         </div>
     </div>
 

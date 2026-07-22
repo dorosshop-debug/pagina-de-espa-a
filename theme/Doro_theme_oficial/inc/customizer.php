@@ -370,6 +370,49 @@ function doroshopping_customize_register( $wp_customize ) {
         )
     );
 
+    /* ---- Tienda: anuncio sidebar ---- */
+    $wp_customize->add_section(
+        'doroshopping_shop',
+        array(
+            'title'       => __( 'Tienda', 'doroshopping' ),
+            'description' => __( 'Imagen vertical bajo los filtros de la tienda (ADS / promo).', 'doroshopping' ),
+            'panel'       => 'doroshopping_panel',
+        )
+    );
+    $wp_customize->add_setting(
+        'doroshopping_shop_sidebar_ad',
+        array(
+            'default'           => 0,
+            'sanitize_callback' => 'absint',
+        )
+    );
+    $wp_customize->add_control(
+        new WP_Customize_Media_Control(
+            $wp_customize,
+            'doroshopping_shop_sidebar_ad',
+            array(
+                'label'     => __( 'Imagen promo / ADS (vertical)', 'doroshopping' ),
+                'section'   => 'doroshopping_shop',
+                'mime_type' => 'image',
+            )
+        )
+    );
+    $wp_customize->add_setting(
+        'doroshopping_shop_sidebar_ad_link',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'esc_url_raw',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_shop_sidebar_ad_link',
+        array(
+            'label'   => __( 'Enlace del anuncio (opcional)', 'doroshopping' ),
+            'section' => 'doroshopping_shop',
+            'type'    => 'url',
+        )
+    );
+
     /* ---- Redes footer ---- */
     $wp_customize->add_section(
         'doroshopping_social',

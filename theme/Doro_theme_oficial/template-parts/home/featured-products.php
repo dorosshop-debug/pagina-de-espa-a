@@ -74,6 +74,7 @@ $products = function_exists( 'doroshopping_get_products_by_category' )
                         </button>
                     </div>
                     <div class="home-product-card__info">
+                        <?php echo doroshopping_get_sale_savings_html( $product ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                         <p class="home-product-card__price"><?php echo wp_kses_post( $product->get_price_html() ); ?></p>
                         <?php echo doroshopping_get_star_rating_html( $rating, $count ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                         <h3 class="home-product-card__name">

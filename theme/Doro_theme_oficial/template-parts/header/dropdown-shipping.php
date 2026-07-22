@@ -26,10 +26,13 @@
             </select>
 
             <label for="shipping-provincia"><?php esc_html_e( 'Provincia / Estado', 'doroshopping' ); ?></label>
-            <input id="shipping-provincia" type="text" name="provincia" placeholder="<?php esc_attr_e( 'Provincia / Estado', 'doroshopping' ); ?>">
+            <input id="shipping-provincia" type="text" name="provincia" placeholder="<?php esc_attr_e( 'Provincia / Estado', 'doroshopping' ); ?>" autocomplete="address-level1">
 
             <label for="shipping-ciudad"><?php esc_html_e( 'Ciudad', 'doroshopping' ); ?></label>
-            <input id="shipping-ciudad" type="text" name="ciudad" placeholder="<?php esc_attr_e( 'Ciudad', 'doroshopping' ); ?>">
+            <input id="shipping-ciudad" type="text" name="ciudad" placeholder="<?php esc_attr_e( 'Ciudad', 'doroshopping' ); ?>" autocomplete="address-level2">
+
+            <label for="shipping-cp"><?php esc_html_e( 'Codigo postal', 'doroshopping' ); ?></label>
+            <input id="shipping-cp" type="text" name="codigo_postal" inputmode="numeric" placeholder="<?php esc_attr_e( 'Codigo postal', 'doroshopping' ); ?>" autocomplete="postal-code">
 
             <button type="submit" class="header-dropdown__submit header-dropdown__submit--solid"><?php esc_html_e( 'Guardar Direccion', 'doroshopping' ); ?></button>
         </form>

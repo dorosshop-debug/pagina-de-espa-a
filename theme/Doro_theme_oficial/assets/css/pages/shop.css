@@ -44,23 +44,68 @@
 }
 
 .doro-shop__sidebar {
-    background: var(--color-white);
-    border: 1px solid var(--color-grey-border);
+    background: linear-gradient(180deg, #fff8f1 0%, #ffffff 48px);
+    border: 1px solid #f0e0d0;
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     position: sticky;
     top: 16px;
 }
 
-.doro-shop__widget + .doro-shop__widget {
+.doro-shop__ad {
     margin-top: var(--spacing-lg);
     padding-top: var(--spacing-lg);
-    border-top: 1px solid var(--color-grey-border);
+    border-top: 1px solid #f0e0d0;
+}
+
+.doro-shop__ad-link {
+    display: block;
+}
+
+.doro-shop__ad-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 280px;
+    max-height: 520px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background: #fff3e6;
+}
+
+.doro-shop__ad-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 320px;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    border: 1px dashed #f0b27a;
+    background: linear-gradient(180deg, #fff6ec 0%, #ffe8d4 100%);
+    text-align: center;
+    color: #9a5b2e;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+}
+
+.doro-shop__ad-placeholder small {
+    font-weight: 500;
+    font-size: 11px;
+    color: #b07a4f;
 }
 
 .doro-shop__widget-title {
     font-size: var(--font-size-base);
     margin: 0 0 var(--spacing-sm);
+    color: #c45c12;
+}
+
+.doro-shop__widget + .doro-shop__widget {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid #f0e0d0;
 }
 
 .doro-shop__filter-list {
@@ -142,8 +187,27 @@
     padding: 0;
 }
 
+/* Cards de tienda usan .home-product-card (mismo diseño Home) */
+.doro-shop ul.products li.product.home-product-card,
+.woocommerce ul.products li.product.home-product-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin: 0 !important;
+    width: auto !important;
+    float: none !important;
+    padding: 0 !important;
+    list-style: none;
+}
+
+.doro-shop ul.products li.product .button,
+.woocommerce ul.products li.product.home-product-card .button {
+    display: none;
+}
+
 .doro-product-card,
-.woocommerce ul.products li.product {
+.woocommerce ul.products li.product:not(.home-product-card) {
     background: var(--color-white);
     border: 1px solid var(--color-grey-border);
     border-radius: var(--radius-md);

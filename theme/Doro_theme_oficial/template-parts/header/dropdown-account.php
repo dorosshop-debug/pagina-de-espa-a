@@ -15,12 +15,22 @@ $edit_url    = ( function_exists( 'wc_get_endpoint_url' ) && $account_url )
 $payment_url = ( function_exists( 'wc_get_endpoint_url' ) && $account_url )
     ? wc_get_endpoint_url( 'payment-methods', '', $account_url )
     : doroshopping_get_page_url( 'metodos-de-pago' );
+$google_url  = apply_filters( 'doroshopping_google_login_url', $account_url );
 ?>
 
 <div class="header-dropdown header-dropdown--account" id="dropdown-account" hidden>
     <a href="<?php echo esc_url( $account_url ); ?>" class="header-dropdown__login-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <?php esc_html_e( 'Acceder a tu cuenta', 'doroshopping' ); ?>
+    </a>
+    <a href="<?php echo esc_url( $google_url ); ?>" class="header-dropdown__google-btn" data-google-login>
+        <svg class="header-dropdown__google-icon" viewBox="0 0 24 24" aria-hidden="true" width="18" height="18">
+            <path fill="#EA4335" d="M12 10.2v3.6h5.1c-.2 1.2-.9 2.3-1.9 3l3.1 2.4c1.8-1.7 2.9-4.1 2.9-7 0-.7-.1-1.3-.2-1.9H12z"/>
+            <path fill="#34A853" d="M6.6 14.3l-.7.5-2.4 1.9C5.1 19.5 8.3 21.5 12 21.5c2.4 0 4.4-.8 5.9-2.1l-3.1-2.4c-.8.6-1.9.9-2.8.9-2.2 0-4-1.5-4.7-3.5z"/>
+            <path fill="#4A90E2" d="M3.5 7.3C2.9 8.5 2.5 9.9 2.5 11.5s.4 3 1 4.2c0 .1 3.1-2.4 3.1-2.4-.2-.5-.3-1.1-.3-1.7 0-.6.1-1.2.3-1.7L3.5 7.3z"/>
+            <path fill="#FBBC05" d="M12 5.1c1.3 0 2.5.5 3.4 1.3l2.6-2.6C16.4 2.3 14.4 1.5 12 1.5 8.3 1.5 5.1 3.5 3.5 7.3l3.1 2.4C7.9 6.6 9.8 5.1 12 5.1z"/>
+        </svg>
+        <?php esc_html_e( 'Iniciar sesion con Google', 'doroshopping' ); ?>
     </a>
     <a href="<?php echo esc_url( $account_url ); ?>" class="header-dropdown__register"><?php esc_html_e( 'Registrate', 'doroshopping' ); ?></a>
 

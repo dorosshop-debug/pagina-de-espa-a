@@ -55,10 +55,11 @@ function doroshopping_enqueue_assets() {
 
     if ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() || is_product_category() || is_product_tag() ) ) {
         wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
+        wp_enqueue_style( 'doroshopping-home', $uri . '/css/pages/home.css', $style_deps, $ver ); // cards estilo home
     }
 
     if ( function_exists( 'is_product_category' ) && is_product_category() ) {
-        wp_enqueue_style( 'doroshopping-category', $uri . '/css/pages/category.css', $style_deps, $ver );
+        wp_enqueue_style( 'doroshopping-category', $uri . '/css/pages/category.css', array( 'doroshopping-shop', 'doroshopping-home' ), $ver );
     }
 
     if ( function_exists( 'is_product' ) && is_product() ) {

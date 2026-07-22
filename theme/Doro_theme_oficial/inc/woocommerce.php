@@ -137,6 +137,61 @@ add_action( 'woocommerce_after_single_product_summary', 'doroshopping_related_wr
 add_action( 'woocommerce_after_single_product_summary', 'doroshopping_related_wrap_end', 21 );
 
 /**
+ * Más productos relacionados.
+ *
+ * @param array $args Args.
+ * @return array
+ */
+function doroshopping_related_products_args( $args ) {
+    $args['posts_per_page'] = 8;
+    $args['columns']        = 4;
+    return $args;
+}
+add_filter( 'woocommerce_output_related_products_args', 'doroshopping_related_products_args' );
+
+/**
+ * Sección extra de productos debajo de relacionados (upsells / recientes).
+ */
+function doroshopping_more_products_section() {
+    if ( ! is_product() ) {
+        return;
+    }
+
+    $ids = wc_get_products(
+        array(
+            'status'  => 'publish',
+            'limit'   => 8,
+            'orderby' => 'rand',
+            'return'  => 'ids',
+            'exclude' => array( get_the_ID() ),
+        )
+    );
+
+    if ( empty( $ids ) ) {
+        return;
+    }
+    ?>
+    <section id="doro-more-products" class="doro-product__more-wrap">
+        <h2 class="doro-product__more-title"><?php esc_html_e( 'Más productos para ti', 'doroshopping' ); ?></h2>
+        <?php
+        woocommerce_product_loop_start();
+        foreach ( $ids as $product_id ) {
+            $post_object = get_post( $product_id );
+            if ( ! $post_object ) {
+                continue;
+            }
+            setup_postdata( $GLOBALS['post'] = $post_object ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+            wc_get_template_part( 'content', 'product' );
+        }
+        woocommerce_product_loop_end();
+        wp_reset_postdata();
+        ?>
+    </section>
+    <?php
+}
+add_action( 'woocommerce_after_single_product_summary', 'doroshopping_more_products_section', 25 );
+
+/**
  * Envolver panel de reviews.
  */
 function doroshopping_review_tab_panel_class( $class ) {
@@ -149,9 +204,13 @@ function doroshopping_review_tab_panel_class( $class ) {
 function doroshopping_shop_sidebar() {
     if ( ! is_active_sidebar( 'shop-filters' ) ) {
         get_template_part( 'template-parts/shop/filters', 'fallback' );
-        return;
+    } else {
+        dynamic_sidebar( 'shop-filters' );
     }
-    dynamic_sidebar( 'shop-filters' );
+    // Ads vertical solo en la página de tienda.
+    if ( function_exists( 'is_shop' ) && is_shop() ) {
+        get_template_part( 'template-parts/shop/promo', 'ad' );
+    }
 }
 
 function doroshopping_register_shop_sidebar() {

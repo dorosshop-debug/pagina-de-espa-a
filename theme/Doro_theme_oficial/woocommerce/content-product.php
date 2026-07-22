@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying product content within loops
+ * Product card en loops (tienda / categoría) — mismo diseño que Home.
  *
  * @package Doroshopping
  */
@@ -12,62 +12,62 @@ global $product;
 if ( empty( $product ) || ! $product->is_visible() ) {
     return;
 }
-?>
-<li <?php wc_product_class( 'doro-product-card', $product ); ?>>
-    <?php
-    /**
-     * Hook: woocommerce_before_shop_loop_item.
-     */
-    do_action( 'woocommerce_before_shop_loop_item' );
-    ?>
 
-    <div class="doro-product-card__media">
-        <?php
-        /**
-         * Hook: woocommerce_before_shop_loop_item_title.
-         *
-         * @hooked woocommerce_show_product_loop_sale_flash - 10
-         * @hooked woocommerce_template_loop_product_thumbnail - 10
-         */
-        do_action( 'woocommerce_before_shop_loop_item_title' );
-        ?>
+$product_id  = $product->get_id();
+$rating      = (float) $product->get_average_rating();
+$count       = (int) $product->get_review_count();
+$purchasable = $product->is_purchasable() && $product->is_in_stock() && $product->is_type( 'simple' );
+$image_html  = $product->get_image(
+    'woocommerce_thumbnail',
+    array(
+        'loading'  => 'lazy',
+        'decoding' => 'async',
+        'alt'      => $product->get_name(),
+    )
+);
+?>
+<li <?php wc_product_class( 'home-product-card product', $product ); ?> data-product-id="<?php echo esc_attr( (string) $product_id ); ?>">
+    <div class="home-product-card__image-wrap">
+        <a href="<?php echo esc_url( $product->get_permalink() ); ?>" class="home-product-card__image-link">
+            <?php echo $image_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+        </a>
+        <?php if ( $purchasable ) : ?>
+            <button
+                type="button"
+                class="home-product-card__cart-btn ajax_add_to_cart add_to_cart_button"
+                data-product_id="<?php echo esc_attr( (string) $product_id ); ?>"
+                data-product_sku="<?php echo esc_attr( $product->get_sku() ); ?>"
+                data-quantity="1"
+                aria-label="<?php echo esc_attr( sprintf( __( 'Añadir %s al carrito', 'doroshopping' ), $product->get_name() ) ); ?>"
+            >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </button>
+        <?php else : ?>
+            <a
+                href="<?php echo esc_url( $product->get_permalink() ); ?>"
+                class="home-product-card__cart-btn"
+                aria-label="<?php echo esc_attr( sprintf( __( 'Ver %s', 'doroshopping' ), $product->get_name() ) ); ?>"
+            >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </a>
+        <?php endif; ?>
         <button
             type="button"
-            class="doro-product-card__wish-btn"
+            class="home-product-card__wish-btn"
             data-wishlist-toggle
-            data-product-id="<?php echo esc_attr( (string) $product->get_id() ); ?>"
+            data-product-id="<?php echo esc_attr( (string) $product_id ); ?>"
             aria-pressed="false"
             aria-label="<?php esc_attr_e( 'Anadir a lista de deseos', 'doroshopping' ); ?>"
         >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
         </button>
     </div>
-
-    <div class="doro-product-card__body">
-        <?php
-        /**
-         * Hook: woocommerce_shop_loop_item_title.
-         */
-        do_action( 'woocommerce_shop_loop_item_title' );
-
-        /**
-         * Hook: woocommerce_after_shop_loop_item_title.
-         *
-         * @hooked woocommerce_template_loop_price - 5
-         * @hooked doroshopping_loop_rating - 6
-         * @hooked doroshopping_loop_product_title - 10
-         */
-        do_action( 'woocommerce_after_shop_loop_item_title' );
-        ?>
+    <div class="home-product-card__info">
+        <?php echo doroshopping_get_sale_savings_html( $product ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+        <p class="home-product-card__price"><?php echo wp_kses_post( $product->get_price_html() ); ?></p>
+        <?php echo doroshopping_get_star_rating_html( $rating, $count ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+        <h2 class="home-product-card__name woocommerce-loop-product__title">
+            <a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $product->get_name() ); ?></a>
+        </h2>
     </div>
-
-    <?php
-    /**
-     * Hook: woocommerce_after_shop_loop_item.
-     *
-     * @hooked woocommerce_template_loop_product_link_close - 5
-     * @hooked woocommerce_template_loop_add_to_cart - 10
-     */
-    do_action( 'woocommerce_after_shop_loop_item' );
-    ?>
 </li>
