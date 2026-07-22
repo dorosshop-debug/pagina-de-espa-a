@@ -37,17 +37,18 @@ function doroshopping_enqueue_assets() {
     }
 
     $components = array(
-        'doroshopping-header'      => '/css/components/header.css',
-        'doroshopping-footer'      => '/css/components/footer.css',
-        'doroshopping-cart-modal'  => '/css/components/cart-modal.css',
-        'doroshopping-live-search' => '/css/components/live-search.css',
+        'doroshopping-header'       => '/css/components/header.css',
+        'doroshopping-footer'       => '/css/components/footer.css',
+        'doroshopping-cart-modal'   => '/css/components/cart-modal.css',
+        'doroshopping-live-search'  => '/css/components/live-search.css',
+        'doroshopping-product-card' => '/css/components/product-card.css',
     );
 
     foreach ( $components as $handle => $path ) {
         wp_enqueue_style( $handle, $uri . $path, array( 'doroshopping-a11y' ), $ver );
     }
 
-    $style_deps = array( 'doroshopping-header', 'doroshopping-footer', 'doroshopping-cart-modal', 'doroshopping-live-search' );
+    $style_deps = array( 'doroshopping-header', 'doroshopping-footer', 'doroshopping-cart-modal', 'doroshopping-live-search', 'doroshopping-product-card' );
 
     if ( is_front_page() || is_home() ) {
         wp_enqueue_style( 'doroshopping-home', $uri . '/css/pages/home.css', $style_deps, $ver );
@@ -55,31 +56,30 @@ function doroshopping_enqueue_assets() {
 
     if ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() || is_product_category() || is_product_tag() ) ) {
         wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
-        wp_enqueue_style( 'doroshopping-home', $uri . '/css/pages/home.css', $style_deps, $ver ); // cards estilo home
     }
 
     if ( function_exists( 'is_product_category' ) && is_product_category() ) {
-        wp_enqueue_style( 'doroshopping-category', $uri . '/css/pages/category.css', array( 'doroshopping-shop', 'doroshopping-home' ), $ver );
+        wp_enqueue_style( 'doroshopping-category', $uri . '/css/pages/category.css', array( 'doroshopping-shop' ), $ver );
     }
 
     if ( function_exists( 'is_product' ) && is_product() ) {
         wp_enqueue_style( 'doroshopping-product', $uri . '/css/pages/product.css', $style_deps, $ver );
-        wp_enqueue_style( 'doroshopping-home', $uri . '/css/pages/home.css', $style_deps, $ver ); // cards relacionados
     }
 
     if ( ( function_exists( 'is_cart' ) && is_cart() ) || ( function_exists( 'is_checkout' ) && is_checkout() ) ) {
         wp_enqueue_style( 'doroshopping-cart-checkout', $uri . '/css/pages/cart-checkout.css', $style_deps, $ver );
-    }
-
-    if ( function_exists( 'is_cart' ) && is_cart() ) {
         wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
     }
 
     if ( function_exists( 'doroshopping_is_wishlist_page' ) && doroshopping_is_wishlist_page() ) {
         wp_enqueue_style( 'doroshopping-wishlist', $uri . '/css/pages/wishlist.css', $style_deps, $ver );
+        wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
     }
 
-    if ( is_404() || is_search() || ( is_page() && ! is_front_page() && ! ( function_exists( 'is_cart' ) && is_cart() ) && ! ( function_exists( 'is_checkout' ) && is_checkout() ) && ! ( function_exists( 'is_account_page' ) && is_account_page() ) && ! ( function_exists( 'doroshopping_is_wishlist_page' ) && doroshopping_is_wishlist_page() ) ) ) {
+    if ( is_search() ) {
+        wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
+        wp_enqueue_style( 'doroshopping-page', $uri . '/css/pages/page.css', $style_deps, $ver );
+    } elseif ( is_404() || ( is_page() && ! is_front_page() && ! ( function_exists( 'is_cart' ) && is_cart() ) && ! ( function_exists( 'is_checkout' ) && is_checkout() ) && ! ( function_exists( 'is_account_page' ) && is_account_page() ) && ! ( function_exists( 'doroshopping_is_wishlist_page' ) && doroshopping_is_wishlist_page() ) ) ) {
         wp_enqueue_style( 'doroshopping-page', $uri . '/css/pages/page.css', $style_deps, $ver );
     }
 
@@ -164,7 +164,7 @@ function doroshopping_enqueue_assets() {
             'pageUrl' => function_exists( 'doroshopping_get_wishlist_url' ) ? doroshopping_get_wishlist_url() : home_url( '/lista-de-deseos/' ),
             'ids'     => function_exists( 'doroshopping_get_wishlist_ids' ) ? doroshopping_get_wishlist_ids() : array(),
             'i18n'    => array(
-                'added'   => __( 'Anadido a la lista de deseos.', 'doroshopping' ),
+                'added'   => __( 'Añadido a la lista de deseos.', 'doroshopping' ),
                 'removed' => __( 'Eliminado de la lista de deseos.', 'doroshopping' ),
             ),
         )

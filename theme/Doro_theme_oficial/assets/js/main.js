@@ -903,9 +903,11 @@ function initCartModal() {
     }
 
     document.body.addEventListener('added_to_cart', function () {
-        // No refrescar al instante: una petición get_cart sin cookie puede
-        // pisar la sesión recién creada por add_to_cart y vaciar el carrito.
-        // El contador ya lo actualizan los fragments de WooCommerce.
+        // Preview: contadores ya se sincronizan desde localStorage en preview-data.js.
+        // WP: fragments de WooCommerce actualizan el contador; no llamar get_cart aqui.
+        if (window.doroshoppingPreviewCart && !modal.hidden) {
+            setTimeout(function () { refreshCart(); }, 50);
+        }
     });
 
     document.body.addEventListener('removed_from_cart', function () {

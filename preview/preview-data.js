@@ -97,8 +97,27 @@ function previewStarRatingHtml(rating, reviews) {
 
 (function () {
     var productsPath = '../theme/Doro_theme_oficial/assets/images/products/';
+    var STORAGE_KEY = 'doroshopping_preview_cart_v1';
+
+    function loadItems() {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return [];
+            var parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveItems(items) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(items || []));
+        } catch (e) { /* ignore */ }
+    }
+
     var state = {
-        items: [],
+        items: loadItems(),
         recommendations: [
             {
                 id: 2,
@@ -144,10 +163,19 @@ function previewStarRatingHtml(rating, reviews) {
             }),
             count: count,
             subtotal_html: formatEuro(subtotal),
-            checkout_url: '#',
+            checkout_url: 'checkout.html',
             recommendations: state.recommendations,
             empty_message: 'Tu carrito esta vacio.'
         };
+    }
+
+    function syncDomCounts(count) {
+        document.querySelectorAll('[data-cart-count], .site-header__cart-count, .site-fab-cart__count').forEach(function (el) {
+            el.textContent = String(count || 0);
+        });
+        if (window.doroshoppingCart) {
+            window.doroshoppingCart.initialCount = count || 0;
+        }
     }
 
     window.doroshoppingPreviewCart = {
@@ -192,7 +220,7 @@ function previewStarRatingHtml(rating, reviews) {
                     existing.quantity += parseInt(data.quantity, 10) || 1;
                 } else {
                     state.items.push({
-                        key: 'item-' + Date.now(),
+                        key: 'item-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
                         product_id: data.product.id || Date.now(),
                         name: data.product.name || 'Producto',
                         quantity: parseInt(data.quantity, 10) || 1,
@@ -204,13 +232,27 @@ function previewStarRatingHtml(rating, reviews) {
                 }
             }
 
-            return payload();
+            saveItems(state.items);
+            var out = payload();
+            syncDomCounts(out.count);
+            return out;
+        },
+        getCount: function () {
+            return payload().count;
         }
     };
 
+    // Contadores al cargar cualquier pagina preview.
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function () {
+            syncDomCounts(payload().count);
+        });
+    } else {
+        syncDomCounts(payload().count);
+    }
+
     window.doroshoppingPreviewSearch = function (term) {
         var q = String(term || '').toLowerCase();
-        var productsPath = '../theme/Doro_theme_oficial/assets/images/products/';
         var matched = previewProducts.filter(function (p) {
             return p.name.toLowerCase().indexOf(q) !== -1;
         }).slice(0, 8).map(function (p, i) {

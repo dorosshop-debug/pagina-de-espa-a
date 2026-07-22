@@ -187,121 +187,13 @@
     padding: 0;
 }
 
-/* Cards de tienda usan .home-product-card (mismo diseño Home) */
-.doro-shop ul.products li.product.home-product-card,
-.woocommerce ul.products li.product.home-product-card {
-    background: var(--color-white);
-    border: 1px solid var(--color-grey-border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
+/* Cards: ver components/product-card.css (.home-product-card) */
+.doro-shop ul.products li.product,
+.woocommerce ul.products li.product {
     margin: 0 !important;
     width: auto !important;
     float: none !important;
     padding: 0 !important;
-    list-style: none;
-}
-
-.doro-shop ul.products li.product .button,
-.woocommerce ul.products li.product.home-product-card .button {
-    display: none;
-}
-
-.doro-product-card,
-.woocommerce ul.products li.product:not(.home-product-card) {
-    background: var(--color-white);
-    border: 1px solid var(--color-grey-border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    margin: 0 !important;
-    width: auto !important;
-    float: none !important;
-    padding: 0 !important;
-    transition: box-shadow var(--transition);
-}
-
-.doro-product-card:hover,
-.woocommerce ul.products li.product:hover {
-    box-shadow: var(--shadow-md);
-}
-
-.doro-product-card__media {
-    position: relative;
-    aspect-ratio: 1;
-    background: var(--color-grey-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--spacing-md);
-}
-
-.doro-product-card__wish-btn {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 34px;
-    height: 34px;
-    border: 1px solid var(--color-grey-border);
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--color-dark);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 3;
-    transition: color var(--transition), border-color var(--transition);
-}
-
-.doro-product-card__wish-btn svg {
-    width: 16px;
-    height: 16px;
-}
-
-.doro-product-card__wish-btn:hover,
-.doro-product-card__wish-btn.is-active {
-    color: var(--color-orange);
-    border-color: var(--color-orange);
-}
-
-.doro-product-card__wish-btn.is-active svg path {
-    fill: var(--color-orange);
-    stroke: var(--color-orange);
-}
-
-.doro-product-card__media img,
-.woocommerce ul.products li.product img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    margin: 0;
-}
-
-.doro-product-card__body {
-    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
-}
-
-.doro-product-card .price,
-.woocommerce ul.products li.product .price {
-    display: block;
-    color: var(--color-orange);
-    font-size: var(--font-size-lg);
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.doro-product-card .woocommerce-loop-product__title,
-.woocommerce ul.products li.product .woocommerce-loop-product__title {
-    font-size: var(--font-size-sm);
-    font-weight: 400;
-    color: var(--color-grey-text);
-    line-height: 1.35;
-    margin: 0;
-    padding: 0;
-}
-
-.doro-product-card .button,
-.woocommerce ul.products li.product .button {
-    display: none;
 }
 
 .woocommerce-pagination {

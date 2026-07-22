@@ -223,3 +223,37 @@ function doroshopping_maybe_create_essential_pages_admin() {
     doroshopping_create_essential_pages();
 }
 add_action( 'admin_init', 'doroshopping_maybe_create_essential_pages_admin' );
+
+/**
+ * Aviso de instalación tras activar el tema.
+ *
+ * @return void
+ */
+function doroshopping_install_admin_notice() {
+    if ( ! current_user_can( 'switch_themes' ) ) {
+        return;
+    }
+
+    if ( isset( $_GET['doroshopping_dismiss_notice'] ) && '1' === $_GET['doroshopping_dismiss_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        update_option( 'doroshopping_install_notice_dismissed', DOROSHOPPING_VERSION, false );
+        return;
+    }
+
+    if ( get_option( 'doroshopping_install_notice_dismissed' ) === DOROSHOPPING_VERSION ) {
+        return;
+    }
+
+    $dismiss = esc_url( add_query_arg( 'doroshopping_dismiss_notice', '1' ) );
+    $customizer = esc_url( admin_url( 'customize.php' ) );
+    $wc_ok      = class_exists( 'WooCommerce' );
+
+    echo '<div class="notice notice-success is-dismissible"><p><strong>Doro_theme_oficial ' . esc_html( DOROSHOPPING_VERSION ) . '</strong> — ';
+    if ( ! $wc_ok ) {
+        echo esc_html__( 'Instala y activa WooCommerce para la tienda. El tema creará las páginas legales y la lista de deseos al activarse.', 'doroshopping' );
+    } else {
+        echo esc_html__( 'Tema listo. Revisa Carrito/Checkout (shortcodes clásicos), edita las páginas legales y personaliza logos e imágenes en Apariencia → Personalizar.', 'doroshopping' );
+        echo ' <a href="' . $customizer . '">' . esc_html__( 'Abrir Personalizar', 'doroshopping' ) . '</a>.';
+    }
+    echo ' <a href="' . $dismiss . '">' . esc_html__( 'Ocultar aviso', 'doroshopping' ) . '</a>.</p></div>';
+}
+add_action( 'admin_notices', 'doroshopping_install_admin_notice' );

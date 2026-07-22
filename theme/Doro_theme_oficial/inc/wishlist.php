@@ -167,7 +167,7 @@ function doroshopping_ajax_toggle_wishlist() {
             'count'   => count( $ids ),
             'ids'     => $ids,
             'message' => $added
-                ? __( 'Anadido a la lista de deseos.', 'doroshopping' )
+                ? __( 'Añadido a la lista de deseos.', 'doroshopping' )
                 : __( 'Eliminado de la lista de deseos.', 'doroshopping' ),
         )
     );

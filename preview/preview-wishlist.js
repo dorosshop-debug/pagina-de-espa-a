@@ -1,10 +1,10 @@
 ﻿/**
- * Preview: lista de deseos con productos mock (localStorage).
+ * Preview: lista de deseos con cards estilo Home.
  */
 (function () {
     var grid = document.getElementById('wishlist-grid');
     var empty = document.getElementById('wishlist-empty');
-    if (!grid || typeof previewProducts === 'undefined') return;
+    if (!grid || typeof previewProducts === 'undefined' || typeof previewHomeProductCardHtml !== 'function') return;
 
     var KEY = 'doroshopping_wishlist_preview';
     var productsPath = '../theme/Doro_theme_oficial/assets/images/products/';
@@ -23,7 +23,6 @@
         localStorage.setItem(KEY, JSON.stringify(ids));
     }
 
-    // Seed demo products if empty (first visit)
     var ids = readIds();
     if (!ids.length) {
         ids = [0, 3, 7];
@@ -34,11 +33,7 @@
         var current = readIds();
         grid.innerHTML = '';
 
-        var items = current.map(function (i) {
-            return previewProducts[i];
-        }).filter(Boolean);
-
-        if (!items.length) {
+        if (!current.length) {
             grid.hidden = true;
             if (empty) empty.hidden = false;
             return;
@@ -46,35 +41,24 @@
 
         grid.hidden = false;
         if (empty) empty.hidden = true;
+        grid.className = 'products columns-4 doro-wishlist__grid';
 
-        items.forEach(function (product, idx) {
-            var realIndex = current[idx];
+        current.forEach(function (index) {
+            var product = previewProducts[index];
+            if (!product) return;
             var li = document.createElement('li');
-            li.className = 'doro-wishlist__item';
-            li.innerHTML =
-                '<a class="doro-wishlist__media" href="product.html">' +
-                    '<img src="' + productsPath + product.image + '" alt="' + product.name + '">' +
-                '</a>' +
-                '<div class="doro-wishlist__body">' +
-                    '<p class="doro-wishlist__price">EUR ' + product.price + '</p>' +
-                    '<h2 class="doro-wishlist__name"><a href="product.html">' + product.name + '</a></h2>' +
-                    '<div class="doro-wishlist__actions">' +
-                        '<a href="product.html" class="doro-wishlist__cart-btn">Ver producto</a>' +
-                        '<button type="button" class="doro-wishlist__remove" data-wish-index="' + realIndex + '">Eliminar</button>' +
-                    '</div>' +
-                '</div>';
+            li.className = 'product home-product-card';
+            li.setAttribute('data-product-id', String(index));
+            li.innerHTML = previewHomeProductCardHtml(product, index, productsPath);
+            // Marcar wishlist activo
+            var wish = li.querySelector('[data-wishlist-toggle]');
+            if (wish) {
+                wish.classList.add('is-active');
+                wish.setAttribute('aria-pressed', 'true');
+            }
             grid.appendChild(li);
         });
     }
-
-    grid.addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-wish-index]');
-        if (!btn) return;
-        var index = parseInt(btn.getAttribute('data-wish-index'), 10);
-        var next = readIds().filter(function (id) { return id !== index; });
-        writeIds(next);
-        render();
-    });
 
     render();
 })();

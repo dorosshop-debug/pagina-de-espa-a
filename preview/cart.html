@@ -436,19 +436,18 @@ window.doroshoppingCart = { ajaxUrl: '', nonce: '', checkoutUrl: '#', initialCou
 window.doroshoppingSearch = { ajaxUrl: '', nonce: '', minChars: 2, i18n: { empty: 'No se encontraron productos.', loading: 'Buscando...', viewAll: 'Ver todos los resultados' } };
 </script>
 <script src="preview-data.js"></script>
+<script src="preview-cart-page.js"></script>
 <script src="../theme/Doro_theme_oficial/assets/js/main.js"></script>
 <script>
 (function () {
     var grid = document.getElementById('cart-recs-grid');
-    if (!grid || typeof previewProducts === 'undefined') return;
+    if (!grid || typeof previewProducts === 'undefined' || typeof previewHomeProductCardHtml !== 'function') return;
     var path = '../theme/Doro_theme_oficial/assets/images/products/';
     previewProducts.slice(0, 6).forEach(function (p, i) {
         var li = document.createElement('li');
-        li.className = 'product doro-product-card';
-        li.innerHTML =
-            '<div class="doro-product-card__media"><a href="product.html"><img src="' + path + p.image + '" alt="' + p.name + '"></a></div>' +
-            '<div class="doro-product-card__body"><span class="price">' + p.price + ' EUR</span>' +
-            '<h2 class="woocommerce-loop-product__title"><a href="product.html">' + p.name + '</a></h2></div>';
+        li.className = 'product home-product-card';
+        li.setAttribute('data-product-id', String(i));
+        li.innerHTML = previewHomeProductCardHtml(p, i, path);
         grid.appendChild(li);
     });
 })();

@@ -133,26 +133,25 @@ class Products_Grid_Widget extends \Elementor\Widget_Base {
                 </div>
             <?php endif; ?>
             <div class="home-products__grid" style="grid-template-columns: repeat(<?php echo esc_attr( (string) $columns ); ?>, 1fr);">
-                <?php foreach ( $products as $product ) : ?>
-                    <?php
-                    $rating = (float) $product->get_average_rating();
-                    $count  = (int) $product->get_review_count();
-                    ?>
-                    <article class="home-product-card">
-                        <a href="<?php echo esc_url( $product->get_permalink() ); ?>" class="home-product-card__image-wrap">
-                            <?php echo wp_kses_post( $product->get_image() ); ?>
-                        </a>
-                        <div class="home-product-card__info">
-                            <p class="home-product-card__price"><?php echo wp_kses_post( $product->get_price_html() ); ?></p>
-                            <?php
-                            if ( function_exists( 'doroshopping_get_star_rating_html' ) ) {
-                                echo doroshopping_get_star_rating_html( $rating, $count ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                            }
-                            ?>
-                            <h3 class="home-product-card__name"><?php echo esc_html( $product->get_name() ); ?></h3>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
+                <?php
+                foreach ( $products as $product ) {
+                    $post_object = get_post( $product->get_id() );
+                    if ( ! $post_object ) {
+                        continue;
+                    }
+                    setup_postdata( $GLOBALS['post'] = $post_object ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+                    echo '<div class="doro-elementor-grid__item">';
+                    // Reutilizar markup de tienda (sin <li>).
+                    ob_start();
+                    wc_get_template_part( 'content', 'product' );
+                    $card = ob_get_clean();
+                    $card = preg_replace( '/^<li\b[^>]*>/', '<article class="home-product-card product" data-product-id="' . esc_attr( (string) $product->get_id() ) . '">', $card, 1 );
+                    $card = preg_replace( '/<\/li>\s*$/', '</article>', $card, 1 );
+                    echo $card; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    echo '</div>';
+                }
+                wp_reset_postdata();
+                ?>
             </div>
         </section>
         <?php

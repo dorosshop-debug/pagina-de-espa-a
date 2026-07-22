@@ -53,45 +53,18 @@ if ( class_exists( 'WooCommerce' ) && ! empty( $wishlist_ids ) ) {
                 </a>
             </div>
         <?php else : ?>
-            <ul class="doro-wishlist__grid" data-wishlist-grid>
-                <?php foreach ( $products as $product ) : ?>
-                    <li class="doro-wishlist__item" data-product-id="<?php echo esc_attr( (string) $product->get_id() ); ?>">
-                        <a class="doro-wishlist__media" href="<?php echo esc_url( $product->get_permalink() ); ?>">
-                            <?php echo $product->get_image( 'woocommerce_thumbnail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-                        </a>
-                        <div class="doro-wishlist__body">
-                            <p class="doro-wishlist__price"><?php echo wp_kses_post( $product->get_price_html() ); ?></p>
-                            <h2 class="doro-wishlist__name">
-                                <a href="<?php echo esc_url( $product->get_permalink() ); ?>"><?php echo esc_html( $product->get_name() ); ?></a>
-                            </h2>
-                            <div class="doro-wishlist__actions">
-                                <?php
-                                echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                                    'woocommerce_loop_add_to_cart_link',
-                                    sprintf(
-                                        '<a href="%s" data-quantity="1" class="button doro-wishlist__cart-btn %s" data-product_id="%s" data-product_sku="%s" aria-label="%s" rel="nofollow">%s</a>',
-                                        esc_url( $product->add_to_cart_url() ),
-                                        esc_attr( implode( ' ', array_filter( array( 'product_type_' . $product->get_type(), $product->is_purchasable() && $product->is_in_stock() ? 'add_to_cart_button' : '', $product->supports( 'ajax_add_to_cart' ) && $product->is_purchasable() && $product->is_in_stock() ? 'ajax_add_to_cart' : '' ) ) ) ),
-                                        esc_attr( (string) $product->get_id() ),
-                                        esc_attr( $product->get_sku() ),
-                                        esc_attr( $product->add_to_cart_description() ),
-                                        esc_html( $product->add_to_cart_text() )
-                                    ),
-                                    $product
-                                );
-                                ?>
-                                <button
-                                    type="button"
-                                    class="doro-wishlist__remove"
-                                    data-wishlist-remove="<?php echo esc_attr( (string) $product->get_id() ); ?>"
-                                    aria-label="<?php esc_attr_e( 'Eliminar de la lista', 'doroshopping' ); ?>"
-                                >
-                                    <?php esc_html_e( 'Eliminar', 'doroshopping' ); ?>
-                                </button>
-                            </div>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
+            <ul class="products columns-4 doro-wishlist__grid" data-wishlist-grid>
+                <?php
+                foreach ( $products as $product ) {
+                    $post_object = get_post( $product->get_id() );
+                    if ( ! $post_object ) {
+                        continue;
+                    }
+                    setup_postdata( $GLOBALS['post'] = $post_object ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+                    wc_get_template_part( 'content', 'product' );
+                }
+                wp_reset_postdata();
+                ?>
             </ul>
         <?php endif; ?>
     </div>
