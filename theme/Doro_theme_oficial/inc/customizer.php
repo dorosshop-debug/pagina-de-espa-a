@@ -71,10 +71,11 @@ function doroshopping_customize_register( $wp_customize ) {
     );
 
     $images_brand = array(
-        'logo_header'  => __( 'Logo header (si no usas Logo del sitio)', 'doroshopping' ),
-        'logo_footer'  => __( 'Logo footer', 'doroshopping' ),
-        'payment_image'=> __( 'Imagen medios de pago', 'doroshopping' ),
-        'footer_figure'=> __( 'Figura decorativa footer', 'doroshopping' ),
+        'logo_header'    => __( 'Logo header (si no usas Logo del sitio)', 'doroshopping' ),
+        'logo_footer'    => __( 'Logo footer', 'doroshopping' ),
+        'register_image' => __( 'Imagen lateral pagina de registro', 'doroshopping' ),
+        'payment_image'  => __( 'Imagen medios de pago', 'doroshopping' ),
+        'footer_figure'  => __( 'Figura decorativa footer', 'doroshopping' ),
     );
 
     foreach ( $images_brand as $id => $label ) {

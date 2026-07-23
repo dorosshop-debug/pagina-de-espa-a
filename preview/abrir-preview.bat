@@ -13,6 +13,7 @@ if errorlevel 1 (
   start "" "%~dp0checkout.html"
   start "" "%~dp0wishlist.html"
   start "" "%~dp0account.html"
+  start "" "%~dp0thankyou.html"
   exit /b 0
 )
 
@@ -27,3 +28,4 @@ start "" "http://127.0.0.1:%PORT%/cart.html"
 start "" "http://127.0.0.1:%PORT%/checkout.html"
 start "" "http://127.0.0.1:%PORT%/wishlist.html"
 start "" "http://127.0.0.1:%PORT%/account.html"
+start "" "http://127.0.0.1:%PORT%/thankyou.html"

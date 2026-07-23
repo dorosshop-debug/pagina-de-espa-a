@@ -1,6 +1,7 @@
 function doroshoppingBoot() {
     initStickyHeader();
     initMegaMenu();
+    initAuthModal();
     initHeaderDropdowns();
     initLocaleFlagOptions();
     initHeroCarousel();
@@ -180,6 +181,68 @@ function initAddressModal() {
     }, true);
 
     updatePreview();
+}
+
+/**
+ * Modal de login (AliExpress style).
+ */
+function initAuthModal() {
+    var modal = document.getElementById('doro-auth-modal');
+    if (!modal) return;
+
+    function closeDropdowns() {
+        document.querySelectorAll('.site-header__dropdown-wrap.is-open').forEach(function (wrap) {
+            var btn = wrap.querySelector('.site-header__utility-btn');
+            var panel = wrap.querySelector('.header-dropdown');
+            if (panel) panel.hidden = true;
+            wrap.classList.remove('is-open');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function openModal() {
+        closeDropdowns();
+        modal.hidden = false;
+        modal.removeAttribute('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('doro-auth-modal-open');
+        var first = modal.querySelector('input:not([type="hidden"])');
+        if (first && typeof first.focus === 'function') {
+            setTimeout(function () { first.focus(); }, 40);
+        }
+    }
+
+    function closeModal() {
+        var active = document.activeElement;
+        if (active && modal.contains(active) && typeof active.blur === 'function') {
+            active.blur();
+        }
+        modal.setAttribute('aria-hidden', 'true');
+        modal.hidden = true;
+        document.body.classList.remove('doro-auth-modal-open');
+    }
+
+    // Capture: el dropdown usa stopPropagation y si no, el clic no llega al document.
+    document.addEventListener('click', function (e) {
+        var opener = e.target.closest('[data-auth-modal-open]');
+        if (opener) {
+            e.preventDefault();
+            e.stopPropagation();
+            openModal();
+            return;
+        }
+        if (modal.hidden) return;
+        if (e.target.closest('[data-auth-modal-close]') || e.target.classList.contains('doro-auth-modal__backdrop')) {
+            closeModal();
+        }
+    }, true);
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !modal.hidden) closeModal();
+    });
+
+    document.addEventListener('doroshopping:open-auth-modal', openModal);
+    window.doroshoppingOpenAuthModal = openModal;
 }
 
 function initHeaderDropdowns() {

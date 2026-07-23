@@ -167,6 +167,16 @@ function doroshopping_create_essential_pages() {
 add_action( 'after_switch_theme', 'doroshopping_create_essential_pages' );
 
 /**
+ * Regenerar permalinks al activar el tema (páginas nuevas / endpoints WC).
+ *
+ * @return void
+ */
+function doroshopping_flush_rewrites_on_switch() {
+    flush_rewrite_rules( false );
+}
+add_action( 'after_switch_theme', 'doroshopping_flush_rewrites_on_switch', 99 );
+
+/**
  * Asignar página a opción WooCommerce si está vacía.
  *
  * @param int   $page_id ID.
@@ -249,9 +259,9 @@ function doroshopping_install_admin_notice() {
 
     echo '<div class="notice notice-success is-dismissible"><p><strong>DoroTheme ' . esc_html( DOROSHOPPING_VERSION ) . '</strong> — ';
     if ( ! $wc_ok ) {
-        echo esc_html__( 'Instala y activa WooCommerce para la tienda. El tema creará las páginas legales y la lista de deseos al activarse.', 'doroshopping' );
+        echo esc_html__( 'Instala y activa WooCommerce. Al activar el tema se crean páginas legales, lista de deseos y se prepara Carrito/Checkout clásico.', 'doroshopping' );
     } else {
-        echo esc_html__( 'Tema listo. Revisa Carrito/Checkout (shortcodes clásicos), edita las páginas legales y personaliza logos e imágenes en Apariencia → Personalizar.', 'doroshopping' );
+        echo esc_html__( 'Instalación lista. Revisa: 1) Carrito/Checkout con shortcodes, 2) páginas legales, 3) menús primary/footer/categories, 4) logos en Personalizar, 5) registro de clientes en WooCommerce → Cuentas.', 'doroshopping' );
         echo ' <a href="' . $customizer . '">' . esc_html__( 'Abrir Personalizar', 'doroshopping' ) . '</a>.';
     }
     echo ' <a href="' . $dismiss . '">' . esc_html__( 'Ocultar aviso', 'doroshopping' ) . '</a>.</p></div>';

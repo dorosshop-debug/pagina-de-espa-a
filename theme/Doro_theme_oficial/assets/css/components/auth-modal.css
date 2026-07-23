@@ -1,0 +1,487 @@
+/* Auth: Google button, modal login, login/register pages */
+
+.doro-google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 16px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    background: #fff;
+    color: #3c4043;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    box-sizing: border-box;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.doro-google-btn:hover {
+    background: #f8f9fa;
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.15);
+    color: #3c4043;
+}
+
+.doro-google-btn__icon {
+    flex-shrink: 0;
+}
+
+.doro-auth-modal__divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+    color: #999;
+    font-size: 12px;
+}
+
+.doro-auth-modal__divider::before,
+.doro-auth-modal__divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e5e5e5;
+}
+
+/* Modal */
+body.doro-auth-modal-open {
+    overflow: hidden;
+}
+
+.doro-auth-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.doro-auth-modal[hidden] {
+    display: none !important;
+}
+
+.doro-auth-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.doro-auth-modal__dialog {
+    position: relative;
+    z-index: 1;
+    width: min(420px, 100%);
+    max-height: min(92vh, 720px);
+    overflow: auto;
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 28px 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+}
+
+.doro-auth-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #333;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doro-auth-modal__close:hover {
+    background: #f3f3f3;
+}
+
+.doro-auth-modal__brand {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.doro-auth-modal__brand img {
+    max-height: 40px;
+    width: auto;
+}
+
+.doro-auth-modal__title {
+    margin: 0 0 6px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.doro-auth-modal__subtitle {
+    margin: 0 0 18px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.doro-auth-modal__label {
+    display: block;
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.doro-auth-modal__input {
+    width: 100%;
+    height: 44px;
+    margin-bottom: 14px;
+    padding: 0 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.doro-auth-modal__input:focus {
+    outline: none;
+    border-color: var(--color-orange, #f8942d);
+}
+
+.doro-auth-modal__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+
+.doro-auth-modal__remember {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #555;
+}
+
+.doro-auth-modal__link,
+.doro-auth-modal__footer a,
+.doro-login-page__footer a,
+.doro-register-page__footer a {
+    color: var(--color-orange, #f8942d);
+    font-weight: 600;
+}
+
+.doro-auth-modal__submit,
+.doro-login-page__submit,
+.doro-register-page__submit {
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-orange, #f8942d);
+    color: #fff;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.doro-auth-modal__submit:hover,
+.doro-login-page__submit:hover,
+.doro-register-page__submit:hover {
+    opacity: 0.93;
+}
+
+.doro-auth-modal__footer {
+    margin: 18px 0 0;
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Login page (mi-cuenta) */
+.woocommerce-account:not(.logged-in) .doro-page__header {
+    display: none;
+}
+
+.doro-login-page {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0 40px;
+}
+
+.doro-login-page__card {
+    width: min(420px, 100%);
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.doro-login-page__brand {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.doro-login-page__brand img {
+    max-height: 40px;
+    width: auto;
+}
+
+.doro-login-page__title {
+    margin: 0 0 6px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.doro-login-page__lead {
+    margin: 0 0 18px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.doro-login-page__form .form-row {
+    margin-bottom: 14px;
+}
+
+.doro-login-page__form input.input-text {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.doro-login-page__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.doro-login-page__footer {
+    margin: 18px 0 0;
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Register full page — imagen izquierda / formulario derecha (AliExpress) */
+body.doro-register-view .doro-page {
+    padding: 0;
+    background: #fff;
+}
+
+body.doro-register-view .doro-page__container {
+    max-width: none;
+    padding: 0;
+    width: 100%;
+}
+
+body.doro-register-view .doro-page__article,
+body.doro-register-view .woocommerce {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+body.doro-register-view .site-footer {
+    display: none;
+}
+
+.doro-register-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+    min-height: calc(100vh - 72px);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    max-width: none;
+}
+
+.doro-register-page__visual {
+    position: relative;
+    overflow: hidden;
+    background: #1a1a1a;
+    min-height: 420px;
+}
+
+.doro-register-page__visual-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: absolute;
+    inset: 0;
+}
+
+.doro-register-page__visual-copy {
+    position: absolute;
+    left: 28px;
+    right: 28px;
+    bottom: 36px;
+    z-index: 1;
+    color: #fff;
+    font-size: clamp(22px, 2.4vw, 34px);
+    font-weight: 700;
+    line-height: 1.25;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+}
+
+.doro-register-page__visual-copy p {
+    margin: 0;
+}
+
+.doro-register-page__panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    padding: 40px 28px;
+}
+
+.doro-register-page__panel-inner {
+    width: min(400px, 100%);
+}
+
+.doro-register-page__brand {
+    margin-bottom: 18px;
+}
+
+.doro-register-page__brand img {
+    max-height: 36px;
+    width: auto;
+}
+
+.doro-register-page__title {
+    margin: 0 0 22px;
+    font-size: 28px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.doro-register-page__check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #2ecc71;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.doro-register-page__form .form-row {
+    margin-bottom: 14px;
+}
+
+.doro-register-page__form input.input-text {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.doro-register-page__form input.input-text:focus {
+    outline: none;
+    border-color: #111;
+}
+
+.doro-register-page__hint {
+    color: #666;
+    font-size: 13px;
+    margin: 0 0 14px;
+}
+
+.doro-register-page__submit {
+    width: 100%;
+    height: 48px;
+    border: 0;
+    border-radius: 6px;
+    background: #111;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.doro-register-page__login-btn {
+    width: 100%;
+    height: 48px;
+    margin-top: 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #f5f5f5;
+    color: #111;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.doro-register-page__login-btn:hover {
+    background: #eee;
+}
+
+.doro-register-page .doro-auth-modal__divider {
+    margin: 22px 0 16px;
+}
+
+.doro-register-page .doro-google-btn {
+    width: 100%;
+    justify-content: center;
+    height: 46px;
+    border-radius: 6px;
+    border: 1px solid #111;
+}
+
+.doro-register-page__legal {
+    margin: 18px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #888;
+    text-align: center;
+}
+
+.doro-register-page__legal a {
+    color: #555;
+    text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+    .doro-register-page {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    .doro-register-page__visual {
+        min-height: 220px;
+        max-height: 260px;
+    }
+
+    .doro-register-page__visual-copy {
+        font-size: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
+    }
+
+    .doro-register-page__panel {
+        padding: 28px 20px 40px;
+    }
+}

@@ -110,19 +110,24 @@
 }
 
 .site-header__utility-icon {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
     color: var(--color-orange);
 }
 
 .site-header__flag {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
     border: 1px solid var(--color-grey-border);
+}
+
+.site-header__menu-btn svg {
+    width: 24px;
+    height: 24px;
 }
 
 .site-header__utility-text {
@@ -395,10 +400,13 @@
     padding: 12px 16px;
     border: 2px solid var(--color-orange);
     border-radius: var(--radius-md);
+    background: transparent;
     color: var(--color-dark);
     font-weight: 700;
     font-size: var(--font-size-sm);
+    font-family: inherit;
     margin-bottom: var(--spacing-sm);
+    cursor: pointer;
     transition: background var(--transition), color var(--transition);
 }
 
@@ -407,42 +415,25 @@
     color: var(--color-white);
 }
 
-.header-dropdown__google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 11px 16px;
-    border: 1px solid #dadce0;
-    border-radius: var(--radius-md);
-    background: #fff;
-    color: #3c4043;
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-sm);
-    transition: background var(--transition), box-shadow var(--transition);
-}
-
-.header-dropdown__google-btn:hover {
-    background: #f8f9fa;
-    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.15);
-}
-
-.header-dropdown__google-icon {
-    flex-shrink: 0;
-}
-
-.header-dropdown__register {
-    display: block;
-    text-align: center;
-    font-weight: 700;
-    font-size: var(--font-size-sm);
+.header-dropdown .doro-google-btn {
     margin-bottom: var(--spacing-md);
-    color: var(--color-dark);
 }
 
-.header-dropdown__register:hover {
+.header-dropdown__user {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-grey-border);
+}
+
+.header-dropdown__user-name {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.header-dropdown__user-link {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
     color: var(--color-orange);
 }
 
@@ -578,6 +569,12 @@
     font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--color-dark);
+}
+
+.site-nav__categories-btn > svg:first-child {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
 }
 
 .site-nav__categories-btn:hover,

@@ -20,23 +20,25 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
 
     <div class="site-footer__domains">
         <div class="site-footer__domains-inner">
-            <h4 class="site-footer__domains-title"><?php esc_html_e( 'Nuestras tiendas', 'doroshopping' ); ?></h4>
-            <ul class="site-footer__domains-list">
-                <li><a href="https://doroshopping.com" target="_blank" rel="noopener noreferrer">doroshopping.com</a></li>
-                <li><a href="https://doroshopping.es" target="_blank" rel="noopener noreferrer">doroshopping.es</a></li>
-                <li><a href="https://doroshopping.fr" target="_blank" rel="noopener noreferrer">doroshopping.fr</a></li>
-                <li><a href="https://doroshopping.de" target="_blank" rel="noopener noreferrer">doroshopping.de</a></li>
-                <li><a href="https://doroshopping.uk" target="_blank" rel="noopener noreferrer">doroshopping.uk</a></li>
-            </ul>
+            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-footer__logo">
+                <img src="<?php echo esc_url( doroshopping_footer_logo_url() ); ?>" alt="<?php bloginfo( 'name' ); ?>">
+            </a>
+            <div class="site-footer__domains-content">
+                <h4 class="site-footer__domains-title"><?php esc_html_e( 'Nuestras tiendas', 'doroshopping' ); ?></h4>
+                <ul class="site-footer__domains-list">
+                    <li><a href="https://doroshopping.com" target="_blank" rel="noopener noreferrer">doroshopping.com</a></li>
+                    <li><a href="https://doroshopping.es" target="_blank" rel="noopener noreferrer">doroshopping.es</a></li>
+                    <li><a href="https://doroshopping.fr" target="_blank" rel="noopener noreferrer">doroshopping.fr</a></li>
+                    <li><a href="https://doroshopping.de" target="_blank" rel="noopener noreferrer">doroshopping.de</a></li>
+                    <li><a href="https://doroshopping.uk" target="_blank" rel="noopener noreferrer">doroshopping.uk</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
     <div class="site-footer__main">
         <div class="site-footer__grid">
             <div class="site-footer__col site-footer__col--brand">
-                <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="site-footer__logo">
-                    <img src="<?php echo esc_url( doroshopping_footer_logo_url() ); ?>" alt="<?php bloginfo( 'name' ); ?>">
-                </a>
                 <h4 class="site-footer__heading"><?php esc_html_e( 'Atencion al Cliente', 'doroshopping' ); ?></h4>
                 <?php if ( has_nav_menu( 'footer' ) ) : ?>
                     <?php
@@ -58,6 +60,11 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                         <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'contacto' ) ); ?>"><?php esc_html_e( 'Contacto', 'doroshopping' ); ?></a></li>
                     </ul>
                 <?php endif; ?>
+                <img
+                    class="site-footer__figure"
+                    src="<?php echo esc_url( function_exists( 'doroshopping_get_theme_image_url' ) ? doroshopping_get_theme_image_url( 'footer_figure', get_template_directory_uri() . '/assets/images/imagen_footer.webp' ) : get_template_directory_uri() . '/assets/images/imagen_footer.webp' ); ?>"
+                    alt=""
+                >
             </div>
 
             <div class="site-footer__col">
@@ -78,11 +85,6 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                         alt="<?php esc_attr_e( 'Medios de pago', 'doroshopping' ); ?>"
                     >
                 </div>
-                <img
-                    class="site-footer__figure"
-                    src="<?php echo esc_url( function_exists( 'doroshopping_get_theme_image_url' ) ? doroshopping_get_theme_image_url( 'footer_figure', get_template_directory_uri() . '/assets/images/imagen_footer.webp' ) : get_template_directory_uri() . '/assets/images/imagen_footer.webp' ); ?>"
-                    alt=""
-                >
             </div>
 
             <div class="site-footer__col site-footer__col--newsletter">
@@ -96,19 +98,29 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                 <h4 class="site-footer__heading site-footer__heading--social"><?php esc_html_e( 'Siguenos', 'doroshopping' ); ?></h4>
                 <div class="site-footer__social">
                     <?php
-                    $instagram = get_theme_mod( 'doroshopping_social_instagram', '' );
-                    $facebook  = get_theme_mod( 'doroshopping_social_facebook', '' );
-                    $youtube   = get_theme_mod( 'doroshopping_social_youtube', '' );
+                    $instagram = trim( (string) get_theme_mod( 'doroshopping_social_instagram', '' ) );
+                    $facebook  = trim( (string) get_theme_mod( 'doroshopping_social_facebook', '' ) );
+                    $youtube   = trim( (string) get_theme_mod( 'doroshopping_social_youtube', '' ) );
+                    $has_social = $instagram || $facebook || $youtube;
                     ?>
-                    <a href="<?php echo esc_url( $instagram ? $instagram : '#' ); ?>" aria-label="Instagram"<?php echo $instagram ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-                    </a>
-                    <a href="<?php echo esc_url( $facebook ? $facebook : '#' ); ?>" aria-label="Facebook"<?php echo $facebook ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h2.5l.5-3H14V9z"/></svg>
-                    </a>
-                    <a href="<?php echo esc_url( $youtube ? $youtube : '#' ); ?>" aria-label="YouTube"<?php echo $youtube ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.3 3.5-6.3 3.5z"/></svg>
-                    </a>
+                    <?php if ( $instagram ) : ?>
+                        <a href="<?php echo esc_url( $instagram ); ?>" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                        </a>
+                    <?php endif; ?>
+                    <?php if ( $facebook ) : ?>
+                        <a href="<?php echo esc_url( $facebook ); ?>" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 9h3V6h-3c-1.7 0-3 1.3-3 3v2H9v3h2v7h3v-7h2.5l.5-3H14V9z"/></svg>
+                        </a>
+                    <?php endif; ?>
+                    <?php if ( $youtube ) : ?>
+                        <a href="<?php echo esc_url( $youtube ); ?>" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.3 3.5-6.3 3.5z"/></svg>
+                        </a>
+                    <?php endif; ?>
+                    <?php if ( ! $has_social ) : ?>
+                        <p class="site-footer__social-hint"><?php esc_html_e( 'Configura las redes en Apariencia → Personalizar.', 'doroshopping' ); ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
