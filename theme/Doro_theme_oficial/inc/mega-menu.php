@@ -97,6 +97,20 @@ add_action( 'edited_product_cat', 'doroshopping_flush_mega_menu_cache' );
 add_action( 'created_product_cat', 'doroshopping_flush_mega_menu_cache' );
 add_action( 'delete_product_cat', 'doroshopping_flush_mega_menu_cache' );
 add_action( 'wp_update_nav_menu', 'doroshopping_flush_mega_menu_cache' );
+add_action( 'after_switch_theme', 'doroshopping_flush_mega_menu_cache' );
+
+/**
+ * Vaciar cache del mega menú al actualizar versión del tema.
+ */
+function doroshopping_maybe_flush_mega_menu_on_upgrade() {
+    $stored = get_option( 'doroshopping_mega_menu_cache_ver', '' );
+    if ( $stored === DOROSHOPPING_VERSION ) {
+        return;
+    }
+    doroshopping_flush_mega_menu_cache();
+    update_option( 'doroshopping_mega_menu_cache_ver', DOROSHOPPING_VERSION, false );
+}
+add_action( 'init', 'doroshopping_maybe_flush_mega_menu_on_upgrade', 5 );
 
 /**
  * Mega menú desde menú asignado a location "categories".
@@ -141,7 +155,7 @@ function doroshopping_mega_menu_from_nav() {
             $columns[] = array(
                 'heading' => $top->title,
                 'url'     => $top->url,
-                'image'   => $thumbs[0],
+                'image'   => doroshopping_mega_menu_item_image( $top, $thumbs[0] ),
                 'links'   => array(
                     array(
                         'label' => __( 'Ver categoría', 'doroshopping' ),
@@ -168,7 +182,7 @@ function doroshopping_mega_menu_from_nav() {
                 $columns[] = array(
                     'heading' => $child->title,
                     'url'     => $child->url,
-                    'image'   => $thumbs[ $ci % 2 ],
+                    'image'   => doroshopping_mega_menu_item_image( $child, $thumbs[ $ci % 2 ] ),
                     'links'   => $links,
                 );
             }
@@ -199,9 +213,9 @@ function doroshopping_mega_menu_from_product_cats() {
     $parents = get_terms(
         array(
             'taxonomy'   => 'product_cat',
-            'hide_empty' => true,
+            'hide_empty' => false,
             'parent'     => 0,
-            'number'     => 8,
+            'number'     => 12,
         )
     );
 
@@ -217,7 +231,7 @@ function doroshopping_mega_menu_from_product_cats() {
         $children = get_terms(
             array(
                 'taxonomy'   => 'product_cat',
-                'hide_empty' => true,
+                'hide_empty' => false,
                 'parent'     => $parent->term_id,
                 'number'     => 6,
             )
@@ -229,7 +243,7 @@ function doroshopping_mega_menu_from_product_cats() {
                 $grand = get_terms(
                     array(
                         'taxonomy'   => 'product_cat',
-                        'hide_empty' => true,
+                        'hide_empty' => false,
                         'parent'     => $child->term_id,
                         'number'     => 8,
                     )
@@ -251,7 +265,7 @@ function doroshopping_mega_menu_from_product_cats() {
                 $columns[] = array(
                     'heading' => $child->name,
                     'url'     => get_term_link( $child ),
-                    'image'   => $thumbs[ $ci % 2 ],
+                    'image'   => doroshopping_mega_menu_term_image( $child->term_id, $thumbs[ $ci % 2 ] ),
                     'links'   => $links,
                 );
             }
@@ -259,7 +273,7 @@ function doroshopping_mega_menu_from_product_cats() {
             $columns[] = array(
                 'heading' => $parent->name,
                 'url'     => get_term_link( $parent ),
-                'image'   => $thumbs[ $pi % 2 ],
+                'image'   => doroshopping_mega_menu_term_image( $parent->term_id, $thumbs[ $pi % 2 ] ),
                 'links'   => array(
                     array(
                         'label' => __( 'Ver categoría', 'doroshopping' ),
@@ -299,6 +313,81 @@ function doroshopping_mega_menu_term_url( $slug ) {
     }
 
     return function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+}
+
+/**
+ * Imagen de categoría de producto (miniatura WC) o fallback.
+ *
+ * @param int    $term_id Term ID.
+ * @param string $fallback Fallback URL.
+ * @return string
+ */
+function doroshopping_mega_menu_term_image( $term_id, $fallback = '' ) {
+    $term_id = absint( $term_id );
+    if ( ! $term_id ) {
+        return $fallback;
+    }
+
+    $thumb_id = absint( get_term_meta( $term_id, 'thumbnail_id', true ) );
+    if ( ! $thumb_id && function_exists( 'get_woocommerce_term_meta' ) ) {
+        // Compat tiendas antiguas.
+        $thumb_id = absint( get_woocommerce_term_meta( $term_id, 'thumbnail_id', true ) );
+    }
+
+    if ( $thumb_id ) {
+        // Miniaturas compactas para el mega menú (evitar full/large).
+        foreach ( array( 'woocommerce_thumbnail', 'medium', 'thumbnail', 'medium_large' ) as $size ) {
+            $url = wp_get_attachment_image_url( $thumb_id, $size );
+            if ( $url ) {
+                return $url;
+            }
+        }
+    }
+
+    return $fallback;
+}
+
+/**
+ * Imagen para un ítem del menú (prioriza miniatura de product_cat).
+ *
+ * @param object $item     WP menu item.
+ * @param string $fallback Fallback URL.
+ * @return string
+ */
+function doroshopping_mega_menu_item_image( $item, $fallback = '' ) {
+    if ( ! $item ) {
+        return $fallback;
+    }
+
+    // Enlace directo a categoría de producto.
+    if ( isset( $item->type, $item->object, $item->object_id )
+        && 'taxonomy' === $item->type
+        && 'product_cat' === $item->object
+    ) {
+        $img = doroshopping_mega_menu_term_image( (int) $item->object_id, '' );
+        if ( $img ) {
+            return $img;
+        }
+    }
+
+    // Intentar resolver por URL / slug si es enlace personalizado.
+    if ( ! empty( $item->url ) && taxonomy_exists( 'product_cat' ) ) {
+        $path = wp_parse_url( $item->url, PHP_URL_PATH );
+        if ( is_string( $path ) && '' !== $path ) {
+            $slug = basename( untrailingslashit( $path ) );
+            if ( $slug && 'product-category' !== $slug ) {
+                $term = get_term_by( 'slug', $slug, 'product_cat' );
+                if ( $term && ! is_wp_error( $term ) ) {
+                    $img = doroshopping_mega_menu_term_image( (int) $term->term_id, '' );
+                    if ( $img ) {
+                        return $img;
+                    }
+                }
+            }
+        }
+    }
+
+    return $fallback;
 }
 
 /**

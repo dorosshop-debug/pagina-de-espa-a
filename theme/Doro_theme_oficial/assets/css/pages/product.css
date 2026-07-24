@@ -60,133 +60,133 @@
     width: 100% !important;
     float: none !important;
     margin: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 12px;
     opacity: 1 !important;
     position: relative;
 }
 
-.doro-product__gallery .woocommerce-product-gallery__wrapper {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: auto !important;
+/* Galeria propia (sin FlexSlider): thumbs + escenario */
+.doro-product__gallery .woocommerce-product-gallery.doro-gallery {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
 }
 
-/* Tras FlexSlider el viewport queda order 0; forzar imagen a la derecha. */
-.doro-product__gallery .flex-viewport {
-    order: 2;
-    flex: 1 1 auto;
-    min-width: 0;
-    border-radius: var(--radius-sm);
-    background: #fafafa;
-    width: 100%;
-    min-height: 320px;
-    max-height: 432px; /* alto alineado a 5 thumbs */
-}
-
-.doro-product__gallery .woocommerce-product-gallery__image {
-    width: 100% !important;
-}
-
-.doro-product__gallery .woocommerce-product-gallery__image img,
-.doro-product__gallery .flex-viewport img,
-.doro-product__gallery .wp-post-image {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 432px;
-    min-height: 0 !important;
-    object-fit: contain;
-    margin: 0 auto;
-    display: block;
-}
-
-/*
- * Miniaturas a la IZQUIERDA, carrusel vertical (max 5 visibles).
- * 5 x 80px + 4 x 8px gap = 432px
- */
-.doro-product__gallery .flex-control-thumbs,
-.doro-product__gallery ol.flex-control-nav.flex-control-thumbs {
-    order: 1 !important;
-    display: flex !important;
+.doro-gallery__rail {
+    grid-column: 1;
+    display: flex;
     flex-direction: column;
-    flex: 0 0 80px;
+    gap: 6px;
+    max-height: 480px;
+    align-items: center;
+}
+
+.doro-gallery__thumbs {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
-    width: 80px !important;
-    max-width: 80px;
-    max-height: 432px;
-    margin: 0 !important;
-    padding: 0 !important;
-    list-style: none;
-    float: none !important;
+    width: 80px;
+    max-height: 360px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
-    scroll-snap-type: y mandatory;
-    -webkit-overflow-scrolling: touch;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-.doro-product__gallery .flex-control-thumbs::-webkit-scrollbar {
-    width: 4px;
-}
-
-.doro-product__gallery .flex-control-thumbs::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-
-.doro-product__gallery .flex-control-thumbs li {
-    width: 80px !important;
-    max-width: 80px !important;
-    height: 80px !important;
-    min-height: 80px !important;
-    flex: 0 0 80px !important;
-    margin: 0 !important;
-    float: none !important;
-    padding: 0 !important;
+.doro-gallery__thumb {
+    width: 80px;
+    height: 80px;
+    padding: 0;
     border: 1px solid var(--color-grey-border);
     border-radius: var(--radius-sm);
-    overflow: hidden;
     background: #fafafa;
-    box-sizing: border-box;
-    scroll-snap-align: start;
-}
-
-.doro-product__gallery .flex-control-thumbs li img {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: none !important;
-    object-fit: contain;
-    opacity: 0.75;
+    overflow: hidden;
     cursor: pointer;
-    display: block;
+    flex: 0 0 80px;
 }
 
-.doro-product__gallery .flex-control-thumbs li img.flex-active,
-.doro-product__gallery .flex-control-thumbs li img:hover {
-    opacity: 1;
+.doro-gallery__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    opacity: 0.75;
+}
+
+.doro-gallery__thumb.is-active,
+.doro-gallery__thumb:hover {
+    border-color: var(--color-orange);
     outline: 2px solid var(--color-orange);
     outline-offset: -2px;
 }
 
-.doro-product__gallery .woocommerce-product-gallery__trigger {
+.doro-gallery__thumb.is-active img,
+.doro-gallery__thumb:hover img {
+    opacity: 1;
+}
+
+.doro-gallery__stage {
+    grid-column: 2;
+    position: relative;
+    min-height: 360px;
+    height: min(56vw, 480px);
+    max-height: 480px;
+    border-radius: var(--radius-sm);
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.doro-gallery__stage-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    text-decoration: none;
+}
+
+.doro-gallery__stage-img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center center;
+    display: block;
+    margin: 0 auto;
+}
+
+.doro-gallery__zoom {
     position: absolute;
     top: 12px;
     right: 12px;
     z-index: 3;
+    pointer-events: none;
 }
 
-/* Controles del carrusel vertical de thumbs */
-.doro-gallery-thumbs {
-    order: 1;
-    flex: 0 0 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    max-height: 432px;
+/* Ocultar markup WC original; los datos siguen en DOM para Photoswipe */
+.doro-product__gallery .woocommerce-product-gallery.doro-gallery .woocommerce-product-gallery__wrapper {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: -1px !important;
+}
+
+.doro-product__gallery .woocommerce-product-gallery__trigger {
+    display: none;
 }
 
 .doro-gallery-thumbs__btn {
@@ -220,12 +220,15 @@
     height: 16px;
 }
 
-.doro-gallery-thumbs .flex-control-thumbs,
-.doro-gallery-thumbs ol.flex-control-nav.flex-control-thumbs {
-    order: unset !important;
-    flex: 1 1 auto;
-    max-height: none;
-    height: 100%;
+/* Moneda solo en el header (evitar duplicado YayCurrency en buybox) */
+.doro-buybox__currency,
+.doro-buybox .yay-currency,
+.doro-buybox .yay-currency-switcher,
+.doro-buybox [class*="yaycurrency"],
+.doro-buybox [class*="YayCurrency"],
+.doro-buybox .woocs_auto_switcher,
+.doro-product__buybox .yay-currency-switcher {
+    display: none !important;
 }
 
 .doro-product__summary {
@@ -849,36 +852,18 @@
         position: static;
     }
 
-    .doro-product__gallery .flex-viewport {
-        min-height: 260px;
-        max-height: 352px; /* 5 x 64 + 4 x 8 */
+    .doro-gallery__stage {
+        max-height: 400px;
+        height: min(50vw, 400px);
+        min-height: 300px;
     }
 
-    .doro-product__gallery .woocommerce-product-gallery__image img,
-    .doro-product__gallery .flex-viewport img,
-    .doro-product__gallery .wp-post-image {
-        max-height: 352px;
+    .doro-gallery__rail {
+        max-height: 400px;
     }
 
-    .doro-gallery-thumbs,
-    .doro-product__gallery .flex-control-thumbs,
-    .doro-product__gallery ol.flex-control-nav.flex-control-thumbs {
-        flex: 0 0 64px;
-        width: 64px !important;
-        max-width: 64px;
-        max-height: 352px;
-    }
-
-    .doro-gallery-thumbs__btn {
-        width: 64px;
-    }
-
-    .doro-product__gallery .flex-control-thumbs li {
-        width: 64px !important;
-        max-width: 64px !important;
-        height: 64px !important;
-        min-height: 64px !important;
-        flex: 0 0 64px !important;
+    .doro-gallery__thumbs {
+        max-height: 320px;
     }
 
     .doro-product__related-wrap ul.products,
@@ -899,35 +884,41 @@
         padding: var(--spacing-sm);
     }
 
-    .doro-product__gallery .woocommerce-product-gallery {
-        flex-direction: column;
-        gap: 10px;
+    .doro-product__gallery .woocommerce-product-gallery.doro-gallery {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
     }
 
-    .doro-product__gallery .woocommerce-product-gallery__wrapper {
-        width: 100% !important;
+    .doro-gallery__stage {
+        grid-column: 1;
+        grid-row: 1;
+        min-height: 260px;
+        height: min(78vw, 340px);
+        max-height: 340px;
     }
 
-    .doro-product__gallery .flex-viewport {
-        order: 1;
-        min-height: 220px;
-        max-height: 300px;
-    }
-
-    .doro-product__gallery .woocommerce-product-gallery__image img,
-    .doro-product__gallery .flex-viewport img,
-    .doro-product__gallery .wp-post-image {
-        max-height: 300px;
-    }
-
-    .doro-gallery-thumbs {
-        order: 2;
-        flex: 0 0 auto;
-        width: 100%;
-        max-width: none;
+    .doro-gallery__rail {
+        grid-column: 1;
+        grid-row: 2;
         max-height: none;
+        width: 100%;
         flex-direction: row;
         align-items: center;
+    }
+
+    .doro-gallery__thumbs {
+        flex-direction: row;
+        width: auto;
+        max-height: none;
+        flex: 1 1 auto;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .doro-gallery__thumb {
+        width: 64px;
+        height: 64px;
+        flex: 0 0 64px;
     }
 
     .doro-gallery-thumbs__btn {
@@ -936,38 +927,9 @@
         flex: 0 0 28px;
     }
 
-    .doro-gallery-thumbs__btn--prev svg {
-        transform: rotate(-90deg);
-    }
-
+    .doro-gallery-thumbs__btn--prev svg,
     .doro-gallery-thumbs__btn--next svg {
         transform: rotate(-90deg);
-    }
-
-    .doro-product__gallery .flex-control-thumbs,
-    .doro-product__gallery ol.flex-control-nav.flex-control-thumbs,
-    .doro-gallery-thumbs .flex-control-thumbs {
-        order: 2 !important;
-        flex-direction: row;
-        flex: 1 1 auto;
-        width: auto !important;
-        max-width: none;
-        max-height: none;
-        height: auto;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        gap: 8px;
-        padding-bottom: 4px !important;
-        scroll-snap-type: x mandatory;
-    }
-
-    .doro-product__gallery .flex-control-thumbs li {
-        width: 64px !important;
-        max-width: 64px !important;
-        height: 64px !important;
-        min-height: 64px !important;
-        flex: 0 0 64px !important;
     }
 
     .doro-product__summary .product_title {
@@ -996,22 +958,16 @@
 }
 
 @media (max-width: 480px) {
-    .doro-product__gallery .flex-viewport {
-        min-height: 180px;
-        max-height: 240px;
+    .doro-gallery__stage {
+        min-height: 220px;
+        height: min(86vw, 280px);
+        max-height: 280px;
     }
 
-    .doro-product__gallery .woocommerce-product-gallery__image img,
-    .doro-product__gallery .flex-viewport img,
-    .doro-product__gallery .wp-post-image {
-        max-height: 240px;
-    }
-
-    .doro-product__gallery .flex-control-thumbs li {
-        width: 56px !important;
-        max-width: 56px !important;
-        height: 56px !important;
-        flex: 0 0 56px !important;
+    .doro-gallery__thumb {
+        width: 56px;
+        height: 56px;
+        flex: 0 0 56px;
     }
 
     .doro-product__related-wrap ul.products,

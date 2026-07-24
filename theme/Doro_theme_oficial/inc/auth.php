@@ -3,7 +3,8 @@
  * Autenticacion: Google, modal de login y helpers.
  *
  * Listo para plugins (Nextend Social Login, WP Social Login, etc.)
- * via filtros doroshopping_google_login_url / doroshopping_google_login_enabled.
+ * via filtros doroshopping_google_login_url / doroshopping_google_login_enabled
+ * o Personalizar → DoroTheme → Google login URL.
  *
  * @package Doroshopping
  */
@@ -13,15 +14,78 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * URL de inicio / registro con Google.
+ * URL de Mi cuenta (segura).
  *
- * Los plugins sociales deben filtrar doroshopping_google_login_url
- * con la URL real del proveedor.
+ * @return string
+ */
+function doroshopping_get_account_url() {
+    if ( function_exists( 'doroshopping_get_wc_page_url' ) ) {
+        $url = doroshopping_get_wc_page_url( 'myaccount' );
+        if ( $url ) {
+            return $url;
+        }
+    }
+    if ( function_exists( 'wc_get_page_permalink' ) ) {
+        $url = wc_get_page_permalink( 'myaccount' );
+        if ( $url && ! ( function_exists( 'doroshopping_url_is_home' ) && doroshopping_url_is_home( $url ) ) ) {
+            return $url;
+        }
+    }
+    return wp_login_url();
+}
+
+/**
+ * Detectar URL Google de plugins conocidos.
+ *
+ * @return string
+ */
+function doroshopping_detect_google_login_url() {
+    // Nextend Social Login / Nextend Social Login Pro.
+    if ( class_exists( 'NextendSocialLogin', false ) ) {
+        if ( is_callable( array( 'NextendSocialLogin', 'getLoginUrl' ) ) ) {
+            $url = NextendSocialLogin::getLoginUrl( 'google' );
+            if ( is_string( $url ) && $url ) {
+                return $url;
+            }
+        }
+        // Fallback comun de NSL.
+        return add_query_arg(
+            array(
+                'loginSocial' => 'google',
+                'redirect'    => rawurlencode( home_url( '/' ) ),
+            ),
+            site_url( 'wp-login.php', 'login' )
+        );
+    }
+
+    // Super Socializer / Heateor.
+    if ( function_exists( 'the_champ_login_button' ) || defined( 'THE_CHAMP_SS_VERSION' ) ) {
+        $url = apply_filters( 'the_champ_login_url', '', 'google' );
+        if ( is_string( $url ) && $url ) {
+            return $url;
+        }
+    }
+
+    return '';
+}
+
+/**
+ * URL de inicio / registro con Google.
  *
  * @return string
  */
 function doroshopping_get_google_login_url() {
-    $account  = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url();
+    $custom = trim( (string) get_theme_mod( 'doroshopping_google_login_url', '' ) );
+    if ( $custom ) {
+        return esc_url( $custom );
+    }
+
+    $detected = doroshopping_detect_google_login_url();
+    if ( $detected ) {
+        return esc_url( apply_filters( 'doroshopping_google_login_url', $detected ) );
+    }
+
+    $account  = doroshopping_get_account_url();
     $fallback = add_query_arg( 'doro_google', '1', $account );
 
     /**
@@ -34,18 +98,15 @@ function doroshopping_get_google_login_url() {
 
 /**
  * Si el boton Google debe mostrarse.
- * Por defecto solo si un plugin ha sustituido la URL placeholder.
+ * Por defecto SIEMPRE visible (el diseño lo incluye); el plugin/customizer dan la URL real.
  *
  * @return bool
  */
 function doroshopping_is_google_login_enabled() {
-    $url      = doroshopping_get_google_login_url();
-    $has_real = is_string( $url ) && '' !== $url && false === strpos( $url, 'doro_google=1' );
-
     /**
      * @param bool $enabled Enabled.
      */
-    return (bool) apply_filters( 'doroshopping_google_login_enabled', $has_real );
+    return (bool) apply_filters( 'doroshopping_google_login_enabled', true );
 }
 
 /**
@@ -54,7 +115,7 @@ function doroshopping_is_google_login_enabled() {
  * @return string
  */
 function doroshopping_get_register_url() {
-    $account = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_registration_url();
+    $account = doroshopping_get_account_url();
     return add_query_arg( 'action', 'register', $account );
 }
 
@@ -117,8 +178,12 @@ function doroshopping_render_google_button( $context = 'page' ) {
         return;
     }
 
-    $url   = doroshopping_get_google_login_url();
-    $class = 'doro-google-btn doro-google-btn--' . sanitize_html_class( $context );
+    $url     = doroshopping_get_google_login_url();
+    $pending = ( false !== strpos( $url, 'doro_google=1' ) );
+    $class   = 'doro-google-btn doro-google-btn--' . sanitize_html_class( $context );
+    if ( $pending ) {
+        $class .= ' is-pending-setup';
+    }
 
     /**
      * Antes del boton (plugins pueden inyectar shortcodes).
@@ -132,6 +197,7 @@ function doroshopping_render_google_button( $context = 'page' ) {
         class="<?php echo esc_attr( $class ); ?>"
         data-google-login
         data-google-context="<?php echo esc_attr( $context ); ?>"
+        <?php echo $pending ? ' data-google-pending="1"' : ''; ?>
     >
         <svg class="doro-google-btn__icon" viewBox="0 0 24 24" aria-hidden="true" width="18" height="18">
             <path fill="#EA4335" d="M12 10.2v3.6h5.1c-.2 1.2-.9 2.3-1.9 3l3.1 2.4c1.8-1.7 2.9-4.1 2.9-7 0-.7-.1-1.3-.2-1.9H12z"/>
@@ -159,7 +225,7 @@ function doroshopping_render_login_modal() {
     }
     get_template_part( 'template-parts/auth/login-modal' );
 }
-add_action( 'wp_footer', 'doroshopping_render_login_modal', 20 );
+add_action( 'wp_footer', 'doroshopping_render_login_modal', 5 );
 
 /**
  * Clase body en vista de registro.

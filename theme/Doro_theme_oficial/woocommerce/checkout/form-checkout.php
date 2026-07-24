@@ -25,9 +25,14 @@ if ( ! WC()->checkout()->is_registration_enabled() && WC()->checkout()->is_regis
                 <section class="doro-checkout-card" id="doro-checkout-address">
                     <div class="doro-checkout-card__head">
                         <h2 class="doro-checkout-card__title"><?php esc_html_e( 'Dirección de entrega', 'doroshopping' ); ?></h2>
-                        <button type="button" class="doro-checkout-card__link" data-address-modal-open>
-                            + <?php esc_html_e( 'Añadir nueva dirección', 'doroshopping' ); ?>
-                        </button>
+                        <div class="doro-checkout-card__actions">
+                            <button type="button" class="doro-checkout-card__link" data-address-modal-open data-address-mode="add">
+                                + <?php esc_html_e( 'Añadir nueva dirección', 'doroshopping' ); ?>
+                            </button>
+                            <button type="button" class="doro-checkout-card__link doro-checkout-card__link--edit" data-address-modal-open data-address-mode="edit" hidden>
+                                <?php esc_html_e( 'Editar dirección', 'doroshopping' ); ?>
+                            </button>
+                        </div>
                     </div>
                     <div class="doro-checkout-address__preview" data-address-preview></div>
                 </section>

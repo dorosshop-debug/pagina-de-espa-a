@@ -46,9 +46,18 @@ function doroshopping_setup() {
     );
     add_theme_support( 'wc-product-gallery-zoom' );
     add_theme_support( 'wc-product-gallery-lightbox' );
-    add_theme_support( 'wc-product-gallery-slider' );
+    // Sin FlexSlider: el slider de WC chocaba con el layout (imagen principal en blanco).
+    // La galería la controla el JS del tema (thumbs + imagen principal).
 }
 add_action( 'after_setup_theme', 'doroshopping_setup' );
+
+/**
+ * Asegura que no quede el slider de galería activo (child themes / WC).
+ */
+function doroshopping_disable_wc_gallery_slider() {
+    remove_theme_support( 'wc-product-gallery-slider' );
+}
+add_action( 'after_setup_theme', 'doroshopping_disable_wc_gallery_slider', 100 );
 
 /**
  * URL del logo. Prioriza custom logo de WP; fallback al archivo del tema.

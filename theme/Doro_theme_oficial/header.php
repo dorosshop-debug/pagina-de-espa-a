@@ -22,7 +22,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 <a class="skip-link" href="#main-content"><?php esc_html_e( 'Saltar al contenido', 'doroshopping' ); ?></a>
 
 <?php
-if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) :
+$allow_elementor_chrome = (bool) get_theme_mod( 'doroshopping_allow_elementor_chrome', false );
+$elementor_header       = $allow_elementor_chrome
+	&& function_exists( 'elementor_theme_do_location' )
+	&& elementor_theme_do_location( 'header' );
+
+if ( ! $elementor_header ) :
     $compact_header = function_exists( 'doroshopping_is_compact_header' ) && doroshopping_is_compact_header();
     $header_class   = 'site-header' . ( $compact_header ? ' site-header--compact' : '' );
 ?>
@@ -111,10 +116,10 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
 
             <div class="site-header__dropdown-wrap" data-dropdown="locale">
                 <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-locale">
-                    <img class="site-header__flag" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/flags/spain.png' ); ?>" alt="" width="24" height="24">
+                    <img class="site-header__flag" src="<?php echo esc_url( function_exists( 'doroshopping_get_header_language_flag' ) ? doroshopping_get_header_language_flag() : get_template_directory_uri() . '/assets/images/flags/spain.png' ); ?>" alt="" width="24" height="24">
                     <span class="site-header__utility-text">
-                        <span class="site-header__utility-label"><?php esc_html_e( 'Espanol', 'doroshopping' ); ?></span>
-                        <span><?php esc_html_e( 'Moneda', 'doroshopping' ); ?></span>
+                        <span class="site-header__utility-label"><?php echo esc_html( function_exists( 'doroshopping_get_header_language_label' ) ? doroshopping_get_header_language_label() : __( 'Español', 'doroshopping' ) ); ?></span>
+                        <span><?php echo esc_html( function_exists( 'doroshopping_get_header_currency_label' ) ? doroshopping_get_header_currency_label() : __( 'Moneda', 'doroshopping' ) ); ?></span>
                     </span>
                     <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
@@ -125,8 +130,8 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                 <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-shipping">
                     <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     <span class="site-header__utility-text">
-                        <span class="site-header__utility-label"><?php esc_html_e( 'Ubicacion', 'doroshopping' ); ?></span>
-                        <span><?php esc_html_e( 'Envio', 'doroshopping' ); ?></span>
+                        <span class="site-header__utility-label"><?php echo esc_html( function_exists( 'doroshopping_get_header_location' ) ? doroshopping_get_header_location()['label'] : __( 'Ubicación', 'doroshopping' ) ); ?></span>
+                        <span><?php esc_html_e( 'Envío', 'doroshopping' ); ?></span>
                     </span>
                     <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
@@ -170,11 +175,12 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
                         )
                     );
                 } else {
-                    $shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+                    $shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+                    $offers_url = function_exists( 'doroshopping_get_offers_url' ) ? doroshopping_get_offers_url() : $shop_url;
                     ?>
                     <div class="site-nav__menu">
                         <a href="<?php echo esc_url( $shop_url ); ?>" class="is-active"><?php esc_html_e( 'Tienda', 'doroshopping' ); ?></a>
-                        <a href="<?php echo esc_url( $shop_url ); ?>"><?php esc_html_e( 'Ofertas', 'doroshopping' ); ?></a>
+                        <a href="<?php echo esc_url( $offers_url ); ?>"><?php esc_html_e( 'Ofertas', 'doroshopping' ); ?></a>
                         <a href="<?php echo esc_url( doroshopping_get_page_url( 'contacto' ) ); ?>"><?php esc_html_e( 'Contacto', 'doroshopping' ); ?></a>
                     </div>
                     <?php

@@ -259,6 +259,54 @@ function doroshopping_filter_by_min_rating( $q ) {
 add_action( 'woocommerce_product_query', 'doroshopping_filter_by_min_rating' );
 
 /**
+ * Filtrar tienda por productos en oferta (?on_sale=1).
+ *
+ * @param WP_Query $q Query.
+ * @return void
+ */
+function doroshopping_filter_shop_on_sale( $q ) {
+    if ( is_admin() || ! $q->is_main_query() ) {
+        return;
+    }
+    if ( empty( $_GET['on_sale'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        return;
+    }
+    if ( ! function_exists( 'wc_get_product_ids_on_sale' ) ) {
+        return;
+    }
+    $ids = array_filter( array_map( 'absint', wc_get_product_ids_on_sale() ) );
+    // Sin ofertas: forzar resultado vacío (no listar todo el catálogo).
+    $q->set( 'post__in', $ids ? $ids : array( 0 ) );
+}
+add_action( 'woocommerce_product_query', 'doroshopping_filter_shop_on_sale' );
+
+/**
+ * Corrige enlaces "Ofertas" del menú principal si apuntan a # o home.
+ *
+ * @param WP_Post[] $items Menu items.
+ * @return WP_Post[]
+ */
+function doroshopping_fix_offers_menu_links( $items ) {
+    if ( empty( $items ) || ! function_exists( 'doroshopping_get_offers_url' ) ) {
+        return $items;
+    }
+    $offers = doroshopping_get_offers_url();
+    $home   = untrailingslashit( home_url( '/' ) );
+    foreach ( $items as $item ) {
+        $title = isset( $item->title ) ? (string) $item->title : '';
+        if ( ! preg_match( '/ofertas/i', $title ) ) {
+            continue;
+        }
+        $url = isset( $item->url ) ? untrailingslashit( (string) $item->url ) : '';
+        if ( '' === $url || '#' === $url || $url === $home ) {
+            $item->url = $offers;
+        }
+    }
+    return $items;
+}
+add_filter( 'wp_nav_menu_objects', 'doroshopping_fix_offers_menu_links' );
+
+/**
  * Lazy-load en miniaturas de producto WC.
  *
  * @param array $attr Attributes.

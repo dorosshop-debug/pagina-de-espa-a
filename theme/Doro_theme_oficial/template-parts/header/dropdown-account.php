@@ -5,7 +5,7 @@
  * @package Doroshopping
  */
 
-$account_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url();
+$account_url = function_exists( 'doroshopping_get_account_url' ) ? doroshopping_get_account_url() : ( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url() );
 $orders_url  = ( function_exists( 'wc_get_endpoint_url' ) && $account_url )
     ? wc_get_endpoint_url( 'orders', '', $account_url )
     : $account_url;

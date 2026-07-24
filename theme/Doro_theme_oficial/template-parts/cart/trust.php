@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <div class="doro-cesta-trust">
-    <a class="doro-cesta-trust__item" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+    <a class="doro-cesta-trust__item" href="<?php echo esc_url( function_exists( 'doroshopping_get_page_url' ) ? doroshopping_get_page_url( 'proteccion-del-comprador' ) : home_url( '/' ) ); ?>">
         <span class="doro-cesta-trust__icon" aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </span>

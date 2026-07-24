@@ -1,12 +1,16 @@
 /* Carrito estilo AliExpress (Cesta + Resumen) + Checkout */
 
 .woocommerce-cart .doro-page__title,
-.woocommerce-cart .entry-title:not(.doro-cesta__title) {
+.woocommerce-cart .entry-title:not(.doro-cesta__title),
+.doro-cart-page .doro-page__title,
+.doro-cart-page .entry-title:not(.doro-cesta__title) {
     display: none !important;
 }
 
 .woocommerce-cart .doro-page__container,
 .woocommerce-checkout .doro-page__container,
+.doro-cart-page .doro-page__container,
+.doro-checkout-page .doro-page__container,
 .doro-cart > .woocommerce,
 .doro-checkout > .woocommerce {
     max-width: var(--container-max);
@@ -19,7 +23,9 @@
 .doro-cart,
 .doro-checkout,
 .woocommerce-cart .doro-page,
-.woocommerce-checkout .doro-page {
+.woocommerce-checkout .doro-page,
+.doro-cart-page .doro-page,
+.doro-checkout-page .doro-page {
     width: 100%;
     background: #f2f2f2;
     min-height: 50vh;
@@ -151,6 +157,56 @@
     margin: 0 0 var(--spacing-lg);
     font-size: 18px;
     font-weight: 700;
+}
+
+.doro-cesta-summary__shipping {
+    margin: 0 0 var(--spacing-md);
+    padding: 12px 14px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    background: #fafafa;
+}
+
+.doro-cesta-summary__shipping.is-loading {
+    opacity: 0.75;
+}
+
+.doro-cesta-summary__shipping-title {
+    margin: 0 0 6px;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+}
+
+.doro-cesta-summary__shipping-dest {
+    margin: 0 0 8px;
+    font-size: var(--font-size-sm);
+    color: var(--color-grey-text);
+}
+
+.doro-cesta-summary__shipping-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.doro-cesta-summary__shipping-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: var(--font-size-sm);
+    padding: 4px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.doro-cesta-summary__shipping-list li:last-child {
+    border-bottom: none;
+}
+
+.doro-cesta-summary__shipping-note {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--color-grey-text);
+    line-height: 1.4;
 }
 
 .doro-cesta-summary__row {
@@ -474,6 +530,17 @@
     padding: 0;
 }
 
+.doro-checkout-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+}
+
+.doro-checkout-card__link[hidden] {
+    display: none !important;
+}
+
 .doro-checkout-card__link:hover {
     text-decoration: underline;
 }
@@ -670,7 +737,7 @@ body.doro-modal-open {
 .doro-modal {
     position: fixed;
     inset: 0;
-    z-index: 700;
+    z-index: 10200;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -691,7 +758,7 @@ body.doro-modal-open {
     position: relative;
     z-index: 1;
     width: min(560px, 100%);
-    max-height: min(90vh, 720px);
+    max-height: min(92vh, 780px);
     overflow: hidden;
     background: var(--color-white);
     border-radius: 16px;
@@ -738,10 +805,32 @@ body.doro-modal-open {
 
 .doro-modal__body {
     padding: 0 var(--spacing-xl) var(--spacing-md);
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: auto !important;
     flex: 1 1 auto;
     min-height: 0;
+    max-height: calc(92vh - 150px);
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+}
+
+.doro-modal__body.is-invalid .woocommerce-invalid input,
+.doro-modal__body.is-invalid .woocommerce-invalid select,
+.doro-modal__body .form-row.woocommerce-invalid .input-text,
+.doro-modal__body .form-row.woocommerce-invalid select,
+.doro-modal__body .form-row.doro-field-error .input-text,
+.doro-modal__body .form-row.doro-field-error select {
+    border-color: #e53935 !important;
+}
+
+.doro-modal__error {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fdecea;
+    color: #b71c1c;
+    font-size: 13px;
 }
 
 .doro-modal__fields {

@@ -67,7 +67,12 @@ function doroshopping_enqueue_assets() {
         wp_enqueue_style( 'doroshopping-product', $uri . '/css/pages/product.css', $style_deps, $ver );
     }
 
-    if ( ( function_exists( 'is_cart' ) && is_cart() ) || ( function_exists( 'is_checkout' ) && is_checkout() ) || ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-received' ) ) ) {
+    $is_cart_like = ( function_exists( 'is_cart' ) && is_cart() )
+        || ( function_exists( 'is_checkout' ) && is_checkout() )
+        || ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-received' ) )
+        || ( is_page( array( 'carrito', 'finalizar-compra', 'cart', 'checkout' ) ) );
+
+    if ( $is_cart_like ) {
         wp_enqueue_style( 'doroshopping-cart-checkout', $uri . '/css/pages/cart-checkout.css', $style_deps, $ver );
         wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
     }
@@ -126,8 +131,8 @@ function doroshopping_enqueue_assets() {
             'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
             'wcAjaxUrl'    => class_exists( 'WC_AJAX' ) ? WC_AJAX::get_endpoint( '%%endpoint%%' ) : '',
             'nonce'        => wp_create_nonce( 'doroshopping_cart' ),
-            'checkoutUrl'  => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/' ),
-            'cartUrl'      => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/' ),
+            'checkoutUrl'  => function_exists( 'doroshopping_get_checkout_url' ) ? doroshopping_get_checkout_url() : '',
+            'cartUrl'      => function_exists( 'doroshopping_get_cart_url' ) ? doroshopping_get_cart_url() : '',
             'i18n'         => array(
                 'empty'     => __( 'Tu carrito está vacío.', 'doroshopping' ),
                 'remove'    => __( 'Eliminar producto', 'doroshopping' ),
@@ -168,6 +173,55 @@ function doroshopping_enqueue_assets() {
                 'added'   => __( 'Añadido a la lista de deseos.', 'doroshopping' ),
                 'removed' => __( 'Eliminado de la lista de deseos.', 'doroshopping' ),
             ),
+        )
+    );
+
+    $loc = function_exists( 'doroshopping_get_header_location' ) ? doroshopping_get_header_location() : array( 'code' => 'ES', 'label' => 'España' );
+    $cart_lines = array();
+    if ( function_exists( 'WC' ) && WC()->cart ) {
+        foreach ( WC()->cart->get_cart() as $item ) {
+            $p = isset( $item['data'] ) ? $item['data'] : null;
+            if ( ! $p || ! is_a( $p, 'WC_Product' ) ) {
+                continue;
+            }
+            $ref = function_exists( 'doroshopping_bigbuy_product_reference' ) ? doroshopping_bigbuy_product_reference( $p ) : $p->get_sku();
+            if ( ! $ref ) {
+                continue;
+            }
+            $cart_lines[] = array(
+                'reference' => $ref,
+                'sku'       => $ref,
+                'quantity'  => isset( $item['quantity'] ) ? (int) $item['quantity'] : 1,
+            );
+        }
+    }
+
+    wp_localize_script(
+        'doroshopping-main',
+        'doroshoppingShipping',
+        array(
+            'restUrl'   => esc_url_raw( rest_url( 'doro/v1/bigbuy-shipping' ) ),
+            'nonce'     => wp_create_nonce( 'wp_rest' ),
+            'country'   => isset( $loc['code'] ) ? $loc['code'] : 'ES',
+            'label'     => isset( $loc['label'] ) ? $loc['label'] : 'España',
+            'postcode'  => function_exists( 'doroshopping_get_shipping_postcode' ) ? doroshopping_get_shipping_postcode() : '',
+            'cartLines' => $cart_lines,
+            'labels'    => array(
+                'ES' => __( 'España', 'doroshopping' ),
+                'PT' => __( 'Portugal', 'doroshopping' ),
+                'FR' => __( 'Francia', 'doroshopping' ),
+                'DE' => __( 'Alemania', 'doroshopping' ),
+                'IT' => __( 'Italia', 'doroshopping' ),
+                'GB' => __( 'Reino Unido', 'doroshopping' ),
+                'UK' => __( 'Reino Unido', 'doroshopping' ),
+                'CH' => __( 'Suiza', 'doroshopping' ),
+            ),
+            'i18n'      => array(
+                'loading' => __( 'Calculando envío…', 'doroshopping' ),
+                'error'   => __( 'No se pudo calcular el envío.', 'doroshopping' ),
+            ),
+            'preview'   => false,
+            'checkoutUrl' => function_exists( 'doroshopping_get_checkout_url' ) ? doroshopping_get_checkout_url() : '',
         )
     );
 }

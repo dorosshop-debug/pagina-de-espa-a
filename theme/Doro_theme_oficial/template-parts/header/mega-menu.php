@@ -56,17 +56,26 @@ $default = ! empty( $panels ) ? $panels[0]['id'] : 'fallback';
                     <div class="mega-menu__columns">
                         <?php foreach ( $panel['columns'] as $column ) : ?>
                             <div class="mega-menu__column">
-                                <?php if ( ! empty( $column['image'] ) ) : ?>
-                                    <img class="mega-menu__thumb" src="<?php echo esc_url( $column['image'] ); ?>" alt="" loading="lazy" decoding="async" width="280" height="120">
-                                <?php endif; ?>
-                                <?php if ( ! empty( $column['heading'] ) ) : ?>
-                                    <h4 class="mega-menu__heading">
-                                        <?php if ( ! empty( $column['url'] ) ) : ?>
-                                            <a href="<?php echo esc_url( $column['url'] ); ?>"><?php echo esc_html( $column['heading'] ); ?></a>
-                                        <?php else : ?>
-                                            <?php echo esc_html( $column['heading'] ); ?>
+                                <?php if ( ! empty( $column['url'] ) ) : ?>
+                                    <a class="mega-menu__thumb-link" href="<?php echo esc_url( $column['url'] ); ?>">
+                                        <?php if ( ! empty( $column['image'] ) ) : ?>
+                                            <span class="mega-menu__thumb-wrap">
+                                                <img class="mega-menu__thumb" src="<?php echo esc_url( $column['image'] ); ?>" alt="" loading="lazy" decoding="async" width="160" height="110">
+                                            </span>
                                         <?php endif; ?>
-                                    </h4>
+                                        <?php if ( ! empty( $column['heading'] ) ) : ?>
+                                            <span class="mega-menu__heading"><?php echo esc_html( $column['heading'] ); ?></span>
+                                        <?php endif; ?>
+                                    </a>
+                                <?php else : ?>
+                                    <?php if ( ! empty( $column['image'] ) ) : ?>
+                                        <span class="mega-menu__thumb-wrap">
+                                            <img class="mega-menu__thumb" src="<?php echo esc_url( $column['image'] ); ?>" alt="" loading="lazy" decoding="async" width="160" height="110">
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if ( ! empty( $column['heading'] ) ) : ?>
+                                        <h4 class="mega-menu__heading"><?php echo esc_html( $column['heading'] ); ?></h4>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                                 <?php if ( ! empty( $column['links'] ) ) : ?>
                                     <ul>

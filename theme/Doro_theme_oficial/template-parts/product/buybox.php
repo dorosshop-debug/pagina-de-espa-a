@@ -63,8 +63,6 @@ if ( null !== $stock_qty && $stock_qty > 0 ) {
 } elseif ( ! $product->is_in_stock() ) {
     $stock_text = __( 'Agotado', 'doroshopping' );
 }
-
-$currency_label = apply_filters( 'doroshopping_buybox_currency_label', 'Euro (€)', $product );
 ?>
 
 <div class="doro-buybox" data-doro-buybox data-product-id="<?php echo esc_attr( (string) $product->get_id() ); ?>">
@@ -163,13 +161,6 @@ $currency_label = apply_filters( 'doroshopping_buybox_currency_label', 'Euro (�
     <?php if ( $stock_text ) : ?>
         <p class="doro-buybox__stock" data-buybox-stock role="status"><?php echo esc_html( $stock_text ); ?></p>
     <?php endif; ?>
-
-    <div class="doro-buybox__currency" data-buybox-currency>
-        <label class="screen-reader-text" for="doro-buybox-currency"><?php esc_html_e( 'Moneda', 'doroshopping' ); ?></label>
-        <select id="doro-buybox-currency" name="doro_currency" disabled title="<?php esc_attr_e( 'La moneda se sincronizará con el selector del header', 'doroshopping' ); ?>">
-            <option selected><?php echo esc_html( $currency_label ); ?></option>
-        </select>
-    </div>
 
     <div class="doro-buybox__actions" data-doro-buybox-actions>
         <?php woocommerce_template_single_add_to_cart(); ?>

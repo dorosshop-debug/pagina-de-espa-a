@@ -160,3 +160,115 @@ function doroshopping_is_compact_header() {
      */
     return (bool) apply_filters( 'doroshopping_is_compact_header', false );
 }
+
+/**
+ * URL de la página / listado de ofertas.
+ *
+ * Prioridad: categoría promociones-ofertas → shop con ?on_sale=1.
+ *
+ * @return string
+ */
+function doroshopping_get_offers_url() {
+    if ( taxonomy_exists( 'product_cat' ) ) {
+        $term = get_term_by( 'slug', 'promociones-ofertas', 'product_cat' );
+        if ( ! $term || is_wp_error( $term ) ) {
+            $term = get_term_by( 'slug', 'ofertas', 'product_cat' );
+        }
+        if ( $term && ! is_wp_error( $term ) ) {
+            $link = get_term_link( $term );
+            if ( ! is_wp_error( $link ) ) {
+                return $link;
+            }
+        }
+    }
+
+    $shop = function_exists( 'doroshopping_get_wc_page_url' ) ? doroshopping_get_wc_page_url( 'shop' ) : '';
+    if ( ! $shop && function_exists( 'wc_get_page_permalink' ) ) {
+        $shop = wc_get_page_permalink( 'shop' );
+    }
+    if ( ! $shop ) {
+        $shop = home_url( '/' );
+    }
+    return add_query_arg( 'on_sale', '1', $shop );
+}
+
+/**
+ * URL segura de una página WooCommerce (no cae a home si falta la página).
+ *
+ * @param string $page shop|cart|checkout|myaccount.
+ * @return string URL o cadena vacía.
+ */
+function doroshopping_get_wc_page_url( $page ) {
+    $page = sanitize_key( $page );
+    if ( ! $page ) {
+        return '';
+    }
+
+    if ( function_exists( 'wc_get_page_id' ) ) {
+        $id = (int) wc_get_page_id( $page );
+        if ( $id > 0 ) {
+            $link = get_permalink( $id );
+            if ( $link && ! doroshopping_url_is_home( $link ) ) {
+                return $link;
+            }
+            // ID apuntaba a home / inválido: seguir a fallbacks.
+        }
+    }
+
+    $slug_map = array(
+        'shop'      => array( 'tienda', 'shop' ),
+        'cart'      => array( 'carrito', 'cart' ),
+        'checkout'  => array( 'finalizar-compra', 'checkout', 'pago' ),
+        'myaccount' => array( 'mi-cuenta', 'my-account' ),
+    );
+
+    if ( empty( $slug_map[ $page ] ) ) {
+        return '';
+    }
+
+    foreach ( $slug_map[ $page ] as $slug ) {
+        if ( function_exists( 'doroshopping_get_page_by_slug' ) ) {
+            $found = doroshopping_get_page_by_slug( $slug );
+            if ( $found instanceof WP_Post ) {
+                $link = get_permalink( $found );
+                if ( $link ) {
+                    return $link;
+                }
+            }
+        }
+    }
+
+    return '';
+}
+
+/**
+ * @param string $url URL.
+ * @return bool
+ */
+function doroshopping_url_is_home( $url ) {
+    if ( ! $url ) {
+        return true;
+    }
+    $home = untrailingslashit( home_url( '/' ) );
+    $url  = untrailingslashit( $url );
+    return strtolower( $home ) === strtolower( $url );
+}
+
+/**
+ * URL de checkout (vacía si no hay página; nunca fuerza home).
+ *
+ * @return string
+ */
+function doroshopping_get_checkout_url() {
+    return doroshopping_get_wc_page_url( 'checkout' );
+}
+
+/**
+ * URL de carrito.
+ *
+ * @return string
+ */
+function doroshopping_get_cart_url() {
+    return doroshopping_get_wc_page_url( 'cart' );
+}
+

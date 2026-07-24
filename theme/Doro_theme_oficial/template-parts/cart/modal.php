@@ -5,7 +5,10 @@
  * @package Doroshopping
  */
 
-$checkout_url = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : '#';
+$checkout_url = function_exists( 'doroshopping_get_checkout_url' ) ? doroshopping_get_checkout_url() : '';
+if ( ! $checkout_url ) {
+    $checkout_url = '#';
+}
 $cart_count   = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
 ?>
 

@@ -303,6 +303,11 @@
     color: var(--color-orange);
 }
 
+.site-footer__domains-list a.is-current {
+    color: var(--color-orange);
+    text-decoration: underline;
+}
+
 .screen-reader-text {
     position: absolute;
     width: 1px;
@@ -316,9 +321,10 @@
 }
 
 .site-fab-cart {
-    position: fixed;
-    right: 24px;
-    bottom: 24px;
+    position: fixed !important;
+    left: 24px !important;
+    right: auto !important;
+    bottom: 24px !important;
     width: 56px;
     height: 56px;
     border: none;
@@ -329,7 +335,7 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-    z-index: 500;
+    z-index: 10050;
     cursor: pointer;
     transition: transform var(--transition);
 }

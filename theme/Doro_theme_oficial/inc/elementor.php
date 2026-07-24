@@ -22,6 +22,27 @@ function doroshopping_register_elementor_locations( $manager ) {
 add_action( 'elementor/theme/register_locations', 'doroshopping_register_elementor_locations' );
 
 /**
+ * Preferir header/footer del tema (cuenta, login popup, mega menú, FAB).
+ * Elementor Theme Builder solo los sustituye si el usuario lo activa en Personalizar.
+ *
+ * @param bool   $overwrite Si Elementor debe sustituir la location.
+ * @param string $location  Location (header|footer|...).
+ * @return bool
+ */
+function doroshopping_prefer_theme_chrome( $overwrite, $location ) {
+	if ( ! in_array( $location, array( 'header', 'footer' ), true ) ) {
+		return $overwrite;
+	}
+
+	if ( get_theme_mod( 'doroshopping_allow_elementor_chrome', false ) ) {
+		return $overwrite;
+	}
+
+	return false;
+}
+add_filter( 'elementor/theme/need_override_location', 'doroshopping_prefer_theme_chrome', 20, 2 );
+
+/**
  * Cargar widgets de Elementor.
  */
 function doroshopping_register_elementor_widgets( $widgets_manager ) {

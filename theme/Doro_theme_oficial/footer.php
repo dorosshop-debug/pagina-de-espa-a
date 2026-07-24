@@ -13,7 +13,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package Doroshopping
  */
 
-if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'footer' ) ) :
+$allow_elementor_chrome = (bool) get_theme_mod( 'doroshopping_allow_elementor_chrome', false );
+$elementor_footer       = $allow_elementor_chrome
+	&& function_exists( 'elementor_theme_do_location' )
+	&& elementor_theme_do_location( 'footer' );
+
+if ( ! $elementor_footer ) :
 ?>
 <footer class="site-footer">
     <div class="site-footer__edge" aria-hidden="true"></div>
@@ -26,11 +31,28 @@ if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_
             <div class="site-footer__domains-content">
                 <h4 class="site-footer__domains-title"><?php esc_html_e( 'Nuestras tiendas', 'doroshopping' ); ?></h4>
                 <ul class="site-footer__domains-list">
-                    <li><a href="https://doroshopping.com" target="_blank" rel="noopener noreferrer">doroshopping.com</a></li>
-                    <li><a href="https://doroshopping.es" target="_blank" rel="noopener noreferrer">doroshopping.es</a></li>
-                    <li><a href="https://doroshopping.fr" target="_blank" rel="noopener noreferrer">doroshopping.fr</a></li>
-                    <li><a href="https://doroshopping.de" target="_blank" rel="noopener noreferrer">doroshopping.de</a></li>
-                    <li><a href="https://doroshopping.uk" target="_blank" rel="noopener noreferrer">doroshopping.uk</a></li>
+                    <?php
+                    $stores = array(
+                        'doroshopping.com',
+                        'doroshopping.es',
+                        'doroshopping.fr',
+                        'doroshopping.de',
+                        'doroshopping.uk',
+                    );
+                    $current_host = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+                    $current_host = is_string( $current_host ) ? strtolower( $current_host ) : '';
+                    foreach ( $stores as $store_host ) :
+                        $is_current = ( $current_host === $store_host ) || ( 'www.' . $store_host === $current_host );
+                        $href       = $is_current ? home_url( '/' ) : 'https://' . $store_host;
+                        ?>
+                        <li>
+                            <a
+                                href="<?php echo esc_url( $href ); ?>"
+                                <?php echo $is_current ? 'aria-current="page"' : 'target="_blank" rel="noopener noreferrer"'; ?>
+                                class="<?php echo $is_current ? 'is-current' : ''; ?>"
+                            ><?php echo esc_html( $store_host ); ?></a>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
         </div>

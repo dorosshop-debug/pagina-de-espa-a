@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'DOROSHOPPING_VERSION', '1.5.4' );
+define( 'DOROSHOPPING_VERSION', '1.6.2' );
 define( 'DOROSHOPPING_DIR', get_template_directory() );
 define( 'DOROSHOPPING_URI', get_template_directory_uri() );
 
@@ -25,6 +25,7 @@ require_once DOROSHOPPING_DIR . '/inc/ajax-cart.php';
 require_once DOROSHOPPING_DIR . '/inc/ajax-search.php';
 require_once DOROSHOPPING_DIR . '/inc/seo.php';
 require_once DOROSHOPPING_DIR . '/inc/compatibility.php';
+require_once DOROSHOPPING_DIR . '/inc/bigbuy-shipping.php';
 require_once DOROSHOPPING_DIR . '/inc/wishlist.php';
 // HPOS / blocks: registrar el hook cuanto antes (antes de before_woocommerce_init).
 require_once DOROSHOPPING_DIR . '/inc/woocommerce-compat.php';

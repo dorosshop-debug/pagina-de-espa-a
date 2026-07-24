@@ -476,6 +476,95 @@ function doroshopping_customize_register( $wp_customize ) {
             )
         );
     }
+
+    /* ---- BigBuy envío ---- */
+    $wp_customize->add_section(
+        'doroshopping_bigbuy',
+        array(
+            'title'       => __( 'BigBuy / Envíos', 'doroshopping' ),
+            'description' => __( 'También puedes definir DORO_BIGBUY_API_KEY y DORO_BIGBUY_ENDPOINT en wp-config.php (prioridad sobre estos campos).', 'doroshopping' ),
+            'panel'       => 'doroshopping_panel',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'doroshopping_bigbuy_api_key',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_bigbuy_api_key',
+        array(
+            'label'       => __( 'API Key BigBuy', 'doroshopping' ),
+            'section'     => 'doroshopping_bigbuy',
+            'type'        => 'password',
+            'description' => __( 'Sin clave se usa la estimación local por país (fallback).', 'doroshopping' ),
+        )
+    );
+
+    $wp_customize->add_setting(
+        'doroshopping_bigbuy_endpoint',
+        array(
+            'default'           => 'https://api.bigbuy.eu/rest/shipping/orders.json',
+            'sanitize_callback' => 'esc_url_raw',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_bigbuy_endpoint',
+        array(
+            'label'   => __( 'Endpoint shipping BigBuy', 'doroshopping' ),
+            'section' => 'doroshopping_bigbuy',
+            'type'    => 'url',
+        )
+    );
+
+    /* ---- Auth / Google ---- */
+    $wp_customize->add_section(
+        'doroshopping_auth',
+        array(
+            'title'       => __( 'Login / Google', 'doroshopping' ),
+            'description' => __( 'El botón Google se muestra siempre. Conecta Nextend Social Login o pega la URL del proveedor.', 'doroshopping' ),
+            'panel'       => 'doroshopping_panel',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'doroshopping_google_login_url',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'esc_url_raw',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_google_login_url',
+        array(
+            'label'       => __( 'URL login con Google', 'doroshopping' ),
+            'description' => __( 'Ej. URL que te da Nextend. Vacío = detección automática del plugin.', 'doroshopping' ),
+            'section'     => 'doroshopping_auth',
+            'type'        => 'url',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'doroshopping_allow_elementor_chrome',
+        array(
+            'default'           => false,
+            'sanitize_callback' => static function ( $v ) {
+                return (bool) $v;
+            },
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_allow_elementor_chrome',
+        array(
+            'label'       => __( 'Permitir header/footer de Elementor', 'doroshopping' ),
+            'description' => __( 'Desactivado por defecto: el tema usa su header (cuenta, login popup, mega menú). Actívalo solo si diseñaste header en Elementor Theme Builder.', 'doroshopping' ),
+            'section'     => 'doroshopping_auth',
+            'type'        => 'checkbox',
+        )
+    );
 }
 add_action( 'customize_register', 'doroshopping_customize_register' );
 

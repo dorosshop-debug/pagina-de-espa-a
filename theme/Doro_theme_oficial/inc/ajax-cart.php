@@ -41,7 +41,13 @@ function doroshopping_get_cart_payload() {
     $items           = array();
     $count           = 0;
     $subtotal_html   = '';
-    $checkout_url    = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/' );
+    $checkout_url    = function_exists( 'doroshopping_get_checkout_url' ) ? doroshopping_get_checkout_url() : '';
+    if ( ! $checkout_url && function_exists( 'wc_get_checkout_url' ) ) {
+        $candidate = wc_get_checkout_url();
+        if ( $candidate && ! ( function_exists( 'doroshopping_url_is_home' ) && doroshopping_url_is_home( $candidate ) ) ) {
+            $checkout_url = $candidate;
+        }
+    }
     $recommendations = array();
 
     if ( ! doroshopping_ensure_wc_cart( false ) ) {

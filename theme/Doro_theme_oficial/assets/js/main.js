@@ -17,6 +17,7 @@ function doroshoppingBoot() {
     initVisualSearchSlot();
     initWishlist();
     initAddressModal();
+    initBigBuyShipping();
 }
 
 function doroshoppingStart() {
@@ -53,14 +54,35 @@ function initAddressModal() {
     var closers = modal.querySelectorAll('[data-address-modal-close]');
     var confirmBtn = modal.querySelector('[data-address-modal-confirm]');
     var preview = document.querySelector('[data-address-preview]');
+    var editBtn = document.querySelector('[data-address-mode="edit"]');
+    var titleEl = modal.querySelector('.doro-modal__title');
+    var bodyEl = modal.querySelector('.doro-modal__body');
+    var requiredIds = [
+        'billing_first_name',
+        'billing_last_name',
+        'billing_address_1',
+        'billing_city',
+        'billing_postcode',
+        'billing_phone',
+        'billing_email',
+        'billing_country'
+    ];
 
-    function openModal() {
+    function openModal(mode) {
         modal.hidden = false;
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('doro-modal-open');
+        if (titleEl) {
+            titleEl.textContent = mode === 'edit' ? 'Editar dirección de entrega' : 'Añadir nueva dirección';
+        }
+        clearFieldErrors();
         var first = modal.querySelector('input:not([type="hidden"]), select, textarea');
         if (first && typeof first.focus === 'function') {
             setTimeout(function () { first.focus(); }, 50);
+        }
+        // Asegura scroll usable en iOS / modales largos.
+        if (bodyEl) {
+            bodyEl.scrollTop = 0;
         }
     }
 
@@ -83,18 +105,64 @@ function initAddressModal() {
         return !!(readField('billing_first_name') || readField('billing_last_name')) && !!readField('billing_address_1');
     }
 
+    function clearFieldErrors() {
+        modal.querySelectorAll('.form-row.doro-field-error').forEach(function (row) {
+            row.classList.remove('doro-field-error', 'woocommerce-invalid');
+        });
+        var banner = modal.querySelector('[data-address-error]');
+        if (banner) banner.remove();
+        if (bodyEl) bodyEl.classList.remove('is-invalid');
+    }
+
+    function showErrorBanner(message) {
+        clearFieldErrors();
+        if (!bodyEl) return;
+        bodyEl.classList.add('is-invalid');
+        var banner = document.createElement('p');
+        banner.className = 'doro-modal__error';
+        banner.setAttribute('data-address-error', '1');
+        banner.textContent = message;
+        bodyEl.insertBefore(banner, bodyEl.firstChild);
+        bodyEl.scrollTop = 0;
+    }
+
     function validateModalFields() {
-        var fields = modal.querySelectorAll('input, select, textarea');
-        for (var i = 0; i < fields.length; i++) {
-            var field = fields[i];
-            if (field.disabled || field.type === 'hidden') continue;
-            if (typeof field.checkValidity === 'function' && !field.checkValidity()) {
-                if (typeof field.reportValidity === 'function') {
-                    field.reportValidity();
+        clearFieldErrors();
+        var firstInvalid = null;
+
+        requiredIds.forEach(function (id) {
+            var el = document.getElementById(id) || modal.querySelector('[name="' + id + '"]');
+            if (!el || el.disabled || el.type === 'hidden') return;
+            var row = el.closest('.form-row');
+            var isRequired = (row && row.classList.contains('validate-required')) || el.hasAttribute('required');
+            if (!isRequired && requiredIds.indexOf(id) === -1) return;
+            var value = el.value ? String(el.value).trim() : '';
+            if (!value) {
+                if (row) {
+                    row.classList.add('doro-field-error', 'woocommerce-invalid');
                 }
-                field.focus();
-                return false;
+                if (!firstInvalid) firstInvalid = el;
             }
+        });
+
+        // HTML5 / Woo required extras.
+        modal.querySelectorAll('.validate-required input, .validate-required select, .validate-required textarea, [required]').forEach(function (field) {
+            if (field.disabled || field.type === 'hidden') return;
+            var value = field.value ? String(field.value).trim() : '';
+            if (!value || (typeof field.checkValidity === 'function' && !field.checkValidity())) {
+                var row = field.closest('.form-row');
+                if (row) row.classList.add('doro-field-error', 'woocommerce-invalid');
+                if (!firstInvalid) firstInvalid = field;
+            }
+        });
+
+        if (firstInvalid) {
+            showErrorBanner('Completa los campos obligatorios marcados en rojo.');
+            if (typeof firstInvalid.focus === 'function') firstInvalid.focus();
+            if (typeof firstInvalid.reportValidity === 'function') {
+                try { firstInvalid.reportValidity(); } catch (err) { /* ignore */ }
+            }
+            return false;
         }
         return true;
     }
@@ -102,6 +170,15 @@ function initAddressModal() {
     function triggerCheckoutUpdate() {
         if (window.jQuery) {
             window.jQuery(document.body).trigger('update_checkout');
+        }
+    }
+
+    function syncEditButton() {
+        if (!editBtn) return;
+        if (hasAddress()) {
+            editBtn.hidden = false;
+        } else {
+            editBtn.hidden = true;
         }
     }
 
@@ -124,6 +201,7 @@ function initAddressModal() {
 
         if (!name && !address) {
             preview.innerHTML = '<p class="doro-checkout-address__empty">Aún no has añadido una dirección de entrega.</p>';
+            syncEditButton();
             return;
         }
         preview.innerHTML =
@@ -133,12 +211,13 @@ function initAddressModal() {
                 ((postcode || city) ? '<span>' + esc([postcode, city].filter(Boolean).join(' ')) + '</span>' : '') +
                 (phone ? '<span>' + esc(phone) + '</span>' : '') +
             '</div>';
+        syncEditButton();
     }
 
     openers.forEach(function (btn) {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
-            openModal();
+            openModal(btn.getAttribute('data-address-mode') || 'add');
         });
     });
 
@@ -176,7 +255,14 @@ function initAddressModal() {
         if (!hasAddress()) {
             e.preventDefault();
             e.stopPropagation();
-            openModal();
+            openModal('add');
+            return;
+        }
+        // Revalidar campos obligatorios antes de pagar.
+        if (!validateModalFields()) {
+            e.preventDefault();
+            e.stopPropagation();
+            openModal('edit');
         }
     }, true);
 
@@ -243,6 +329,14 @@ function initAuthModal() {
 
     document.addEventListener('doroshopping:open-auth-modal', openModal);
     window.doroshoppingOpenAuthModal = openModal;
+
+    document.addEventListener('click', function (e) {
+        var googleBtn = e.target.closest('[data-google-pending="1"]');
+        if (!googleBtn) return;
+        e.preventDefault();
+        e.stopPropagation();
+        window.alert('Configura el login con Google: activa Nextend Social Login (o pega la URL en Apariencia → Personalizar → DoroTheme → Login / Google).');
+    }, true);
 }
 
 function initHeaderDropdowns() {
@@ -1329,7 +1423,11 @@ function initProductBuybox() {
         }
         document.body.dispatchEvent(new CustomEvent('added_to_cart', { detail: { product_id: productId } }));
         if (thenCheckout) {
-            window.location.href = 'checkout.html';
+            var checkout =
+                (window.doroshoppingShipping && window.doroshoppingShipping.checkoutUrl) ||
+                (window.doroshoppingCart && window.doroshoppingCart.checkoutUrl) ||
+                'checkout.html';
+            window.location.href = checkout;
         }
         return true;
     }
@@ -1345,9 +1443,14 @@ function initProductBuybox() {
         });
     });
 
-    // Preview: interceptar submit del form (action #).
+    // Preview: interceptar submit del form (action #) solo en HTML estático.
     form.addEventListener('submit', function (e) {
-        var isPreview = !!(window.doroshoppingPreviewCart && typeof window.doroshoppingPreviewCart.add === 'function');
+        var isPreview = !!(
+            window.doroshoppingShipping &&
+            window.doroshoppingShipping.preview === true &&
+            window.doroshoppingPreviewCart &&
+            typeof window.doroshoppingPreviewCart.add === 'function'
+        );
         var buyNow = form.getAttribute('data-buy-now') === '1' ||
             (e.submitter && e.submitter.getAttribute('name') === 'doroshopping_buy_now');
 
@@ -1364,6 +1467,7 @@ function initProductBuybox() {
     buybox.querySelectorAll('.doro-buybox__buy-now').forEach(function (btn) {
         if (btn.tagName === 'A') {
             btn.addEventListener('click', function (e) {
+                if (!(window.doroshoppingShipping && window.doroshoppingShipping.preview === true)) return;
                 if (!(window.doroshoppingPreviewCart && typeof window.doroshoppingPreviewCart.add === 'function')) return;
                 e.preventDefault();
                 addPreview(true);
@@ -1499,107 +1603,194 @@ function initProductDescriptionClamp() {
 }
 
 /**
- * Carrusel vertical de miniaturas (izquierda, max 5 visibles).
+ * Galeria de producto sin FlexSlider: thumbs + imagen principal fiable.
  */
 function initProductGalleryThumbs() {
     var gallery = document.querySelector('.doro-product__gallery .woocommerce-product-gallery');
-    if (!gallery || gallery.getAttribute('data-thumbs-ready') === '1') return;
+    if (!gallery || gallery.getAttribute('data-doro-gallery') === '1') return;
 
-    function setup() {
-        var thumbs = gallery.querySelector('.flex-control-thumbs, ol.flex-control-nav.flex-control-thumbs');
-        if (!thumbs || thumbs.closest('.doro-gallery-thumbs')) {
-            if (thumbs) gallery.setAttribute('data-thumbs-ready', '1');
-            return false;
-        }
-
-        var items = thumbs.querySelectorAll('li');
-        var wrap = document.createElement('div');
-        wrap.className = 'doro-gallery-thumbs';
-
-        var btnPrev = document.createElement('button');
-        btnPrev.type = 'button';
-        btnPrev.className = 'doro-gallery-thumbs__btn doro-gallery-thumbs__btn--prev';
-        btnPrev.setAttribute('aria-label', 'Miniaturas anteriores');
-        btnPrev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>';
-
-        var btnNext = document.createElement('button');
-        btnNext.type = 'button';
-        btnNext.className = 'doro-gallery-thumbs__btn doro-gallery-thumbs__btn--next';
-        btnNext.setAttribute('aria-label', 'Miniaturas siguientes');
-        btnNext.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
-
-        thumbs.parentNode.insertBefore(wrap, thumbs);
-        wrap.appendChild(btnPrev);
-        wrap.appendChild(thumbs);
-        wrap.appendChild(btnNext);
-
-        function isHorizontal() {
-            return window.matchMedia('(max-width: 768px)').matches;
-        }
-
-        function step() {
-            if (isHorizontal()) {
-                return Math.max(thumbs.clientWidth * 0.8, 64);
+    var figures = Array.prototype.slice.call(
+        gallery.querySelectorAll('.woocommerce-product-gallery__image')
+    );
+    if (!figures.length) {
+        // Puede llegar tarde el HTML; reintentar breve.
+        var tries = 0;
+        var timer = setInterval(function () {
+            tries += 1;
+            figures = Array.prototype.slice.call(
+                gallery.querySelectorAll('.woocommerce-product-gallery__image')
+            );
+            if (figures.length || tries > 20) {
+                clearInterval(timer);
+                if (figures.length) buildGallery(gallery, figures);
             }
-            return Math.max(thumbs.clientHeight * 0.8, 88);
-        }
-
-        function updateButtons() {
-            if (items.length <= 5) {
-                btnPrev.hidden = true;
-                btnNext.hidden = true;
-                return;
-            }
-            btnPrev.hidden = false;
-            btnNext.hidden = false;
-            if (isHorizontal()) {
-                btnPrev.disabled = thumbs.scrollLeft <= 2;
-                btnNext.disabled = thumbs.scrollLeft + thumbs.clientWidth >= thumbs.scrollWidth - 2;
-            } else {
-                btnPrev.disabled = thumbs.scrollTop <= 2;
-                btnNext.disabled = thumbs.scrollTop + thumbs.clientHeight >= thumbs.scrollHeight - 2;
-            }
-        }
-
-        btnPrev.addEventListener('click', function () {
-            if (isHorizontal()) {
-                thumbs.scrollBy({ left: -step(), behavior: 'smooth' });
-            } else {
-                thumbs.scrollBy({ top: -step(), behavior: 'smooth' });
-            }
-        });
-
-        btnNext.addEventListener('click', function () {
-            if (isHorizontal()) {
-                thumbs.scrollBy({ left: step(), behavior: 'smooth' });
-            } else {
-                thumbs.scrollBy({ top: step(), behavior: 'smooth' });
-            }
-        });
-
-        thumbs.addEventListener('scroll', updateButtons, { passive: true });
-        window.addEventListener('resize', updateButtons);
-        updateButtons();
-        gallery.setAttribute('data-thumbs-ready', '1');
-        return true;
+        }, 150);
+        return;
     }
 
-    if (setup()) return;
-
-    // FlexSlider crea thumbs un poco despues.
-    var tries = 0;
-    var timer = setInterval(function () {
-        tries += 1;
-        if (setup() || tries > 20) {
-            clearInterval(timer);
-        }
-    }, 200);
+    buildGallery(gallery, figures);
 }
 
-/**
- * Icono de camara en el buscador (siempre visible).
- * Emite `doroshopping:visual-search` al elegir imagen (sin backend aun).
- */
+function buildGallery(gallery, figures) {
+    if (gallery.getAttribute('data-doro-gallery') === '1') return;
+    gallery.setAttribute('data-doro-gallery', '1');
+    gallery.classList.add('doro-gallery');
+
+    var items = figures.map(function (fig, index) {
+        var img = fig.querySelector('img');
+        var link = fig.querySelector('a');
+        var full =
+            (img && (img.getAttribute('data-large_image') || img.getAttribute('data-src') || img.currentSrc || img.src)) ||
+            (link && link.getAttribute('href')) ||
+            '';
+        var thumb =
+            (fig.getAttribute('data-thumb') ||
+                (img && (img.getAttribute('data-thumb') || img.currentSrc || img.src))) ||
+            full;
+        var zoom =
+            (img && img.getAttribute('data-large_image')) ||
+            (link && link.getAttribute('href')) ||
+            full;
+        return { fig: fig, img: img, full: full, thumb: thumb, zoom: zoom, index: index };
+    }).filter(function (item) {
+        return !!item.full;
+    });
+
+    if (!items.length) return;
+
+    var rail = document.createElement('div');
+    rail.className = 'doro-gallery__rail';
+
+    var btnPrev = document.createElement('button');
+    btnPrev.type = 'button';
+    btnPrev.className = 'doro-gallery-thumbs__btn doro-gallery-thumbs__btn--prev';
+    btnPrev.setAttribute('aria-label', 'Miniaturas anteriores');
+    btnPrev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 15l-6-6-6 6"/></svg>';
+
+    var thumbs = document.createElement('div');
+    thumbs.className = 'doro-gallery__thumbs';
+    thumbs.setAttribute('role', 'listbox');
+
+    var btnNext = document.createElement('button');
+    btnNext.type = 'button';
+    btnNext.className = 'doro-gallery-thumbs__btn doro-gallery-thumbs__btn--next';
+    btnNext.setAttribute('aria-label', 'Miniaturas siguientes');
+    btnNext.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+    var stage = document.createElement('div');
+    stage.className = 'doro-gallery__stage';
+
+    var stageLink = document.createElement('a');
+    stageLink.className = 'doro-gallery__stage-link';
+    stageLink.href = items[0].zoom || items[0].full;
+
+    var stageImg = document.createElement('img');
+    stageImg.className = 'doro-gallery__stage-img';
+    stageImg.alt = (items[0].img && items[0].img.alt) || '';
+    stageImg.src = items[0].full;
+    stageImg.decoding = 'async';
+
+    stageLink.appendChild(stageImg);
+    stage.appendChild(stageLink);
+
+    var active = 0;
+    var thumbButtons = [];
+
+    function setActive(index) {
+        if (index < 0 || index >= items.length) return;
+        active = index;
+        var item = items[index];
+        stageImg.src = item.full;
+        stageLink.href = item.zoom || item.full;
+        thumbButtons.forEach(function (btn, i) {
+            btn.classList.toggle('is-active', i === index);
+            btn.setAttribute('aria-selected', i === index ? 'true' : 'false');
+        });
+    }
+
+    items.forEach(function (item, index) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'doro-gallery__thumb' + (index === 0 ? ' is-active' : '');
+        btn.setAttribute('role', 'option');
+        btn.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+        btn.setAttribute('aria-label', 'Ver imagen ' + (index + 1));
+
+        var tImg = document.createElement('img');
+        tImg.src = item.thumb;
+        tImg.alt = '';
+        tImg.loading = 'lazy';
+        tImg.decoding = 'async';
+        btn.appendChild(tImg);
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setActive(index);
+        });
+
+        thumbs.appendChild(btn);
+        thumbButtons.push(btn);
+    });
+
+    function isHorizontal() {
+        return window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    function updateNav() {
+        if (items.length <= 5) {
+            btnPrev.hidden = true;
+            btnNext.hidden = true;
+            return;
+        }
+        btnPrev.hidden = false;
+        btnNext.hidden = false;
+        if (isHorizontal()) {
+            btnPrev.disabled = thumbs.scrollLeft <= 2;
+            btnNext.disabled = thumbs.scrollLeft + thumbs.clientWidth >= thumbs.scrollWidth - 2;
+        } else {
+            btnPrev.disabled = thumbs.scrollTop <= 2;
+            btnNext.disabled = thumbs.scrollTop + thumbs.clientHeight >= thumbs.scrollHeight - 2;
+        }
+    }
+
+    btnPrev.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (isHorizontal()) thumbs.scrollBy({ left: -80, behavior: 'smooth' });
+        else thumbs.scrollBy({ top: -88, behavior: 'smooth' });
+    });
+    btnNext.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (isHorizontal()) thumbs.scrollBy({ left: 80, behavior: 'smooth' });
+        else thumbs.scrollBy({ top: 88, behavior: 'smooth' });
+    });
+    thumbs.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', updateNav);
+
+    rail.appendChild(btnPrev);
+    rail.appendChild(thumbs);
+    rail.appendChild(btnNext);
+
+    gallery.insertBefore(rail, gallery.firstChild);
+    gallery.insertBefore(stage, rail.nextSibling);
+
+    // Abrir lightbox WC / Photoswipe si existe el trigger original.
+    stageLink.addEventListener('click', function (e) {
+        var trigger = gallery.querySelector('.woocommerce-product-gallery__trigger');
+        if (trigger) {
+            e.preventDefault();
+            // Activar la figura correspondiente y disparar zoom WC.
+            items.forEach(function (item, i) {
+                item.fig.classList.toggle('flex-active-slide', i === active);
+            });
+            trigger.click();
+        }
+    });
+
+    updateNav();
+    setActive(0);
+}
+
 function initVisualSearchSlot() {
     var wraps = Array.prototype.slice.call(document.querySelectorAll('[data-visual-search]'));
     if (!wraps.length) return;
@@ -1727,4 +1918,204 @@ function initWishlist() {
     });
 
     syncButtons();
+}
+
+/**
+ * Estimacion de envio BigBuy (producto + carrito), acoplada al pais/CP del header.
+ */
+function initBigBuyShipping() {
+    var cfg = window.doroshoppingShipping || null;
+    var roots = Array.prototype.slice.call(document.querySelectorAll('[data-doro-shipping]'));
+    if (!roots.length) return;
+
+    var FALLBACKS = {
+        DE: { carrier: 'DHL / DPD', time: '3 - 5 dias habiles', cost: '8.90 EUR' },
+        GB: { carrier: 'Royal Mail / DHL', time: '5 - 8 dias habiles', cost: '12.90 GBP' },
+        UK: { carrier: 'Royal Mail / DHL', time: '5 - 8 dias habiles', cost: '12.90 GBP' },
+        ES: { carrier: 'Correos Express / SEUR', time: '2 - 4 dias habiles', cost: '6.90 EUR' },
+        FR: { carrier: 'Colissimo / DHL', time: '3 - 5 dias habiles', cost: '7.90 EUR' },
+        IT: { carrier: 'BRT / DHL', time: '4 - 6 dias habiles', cost: '8.90 EUR' },
+        PT: { carrier: 'CTT / DHL', time: '3 - 5 dias habiles', cost: '6.90 EUR' },
+        CH: { carrier: 'Swiss Post / DHL', time: '5 - 8 dias habiles', cost: '14.90 CHF' }
+    };
+
+    function readCookie(name) {
+        var parts = (document.cookie || '').split(';');
+        for (var i = 0; i < parts.length; i++) {
+            var part = parts[i].trim();
+            if (part.indexOf(name + '=') === 0) {
+                return decodeURIComponent(part.slice(name.length + 1));
+            }
+        }
+        return '';
+    }
+
+    function countryCode() {
+        var fromCfg = cfg && cfg.country ? String(cfg.country).toUpperCase() : '';
+        var fromCookie = (readCookie('doroshopping_country') || '').toUpperCase();
+        var code = fromCookie || fromCfg || 'ES';
+        if (code === 'UK') code = 'GB';
+        return code.length >= 2 ? code.slice(0, 2) : 'ES';
+    }
+
+    function postcode() {
+        if (cfg && cfg.postcode) return String(cfg.postcode);
+        return readCookie('doroshopping_postcode') || '';
+    }
+
+    function countryLabel(code) {
+        var labels = (cfg && cfg.labels) || {};
+        return labels[code] || labels.ES || code;
+    }
+
+    function fallback(code) {
+        var data = FALLBACKS[code] || FALLBACKS.ES;
+        return {
+            success: true,
+            source: 'fallback',
+            carrier: data.carrier,
+            time: data.time,
+            cost: data.cost,
+            note: 'Coste estimado segun destino. El importe final puede variar ligeramente en checkout.',
+            country: code
+        };
+    }
+
+    function paint(root, data, code) {
+        if (!root || !data) return;
+        var dest = root.querySelector('[data-shipping-destination]');
+        var carrier = root.querySelector('[data-shipping-carrier]');
+        var eta = root.querySelector('[data-shipping-eta]');
+        var cost = root.querySelector('[data-shipping-cost]');
+        var note = root.querySelector('[data-shipping-note]');
+
+        if (dest) dest.textContent = countryLabel(code);
+        if (carrier) carrier.textContent = data.carrier || '-';
+        if (eta) eta.textContent = data.time || '-';
+        if (cost) cost.textContent = data.cost || '-';
+        if (note) note.textContent = data.note || '';
+
+        root.setAttribute('data-shipping-ready', data.success ? '1' : '0');
+        root.hidden = false;
+        root.classList.remove('is-loading');
+    }
+
+    function setLoading(root, on) {
+        root.classList.toggle('is-loading', !!on);
+        if (on) {
+            var carrier = root.querySelector('[data-shipping-carrier]');
+            var eta = root.querySelector('[data-shipping-eta]');
+            var cost = root.querySelector('[data-shipping-cost]');
+            var msg = (cfg && cfg.i18n && cfg.i18n.loading) || 'Calculando envio...';
+            if (carrier) carrier.textContent = msg;
+            if (eta) eta.textContent = '...';
+            if (cost) cost.textContent = '...';
+            root.hidden = false;
+        }
+    }
+
+    function buildPayload(root) {
+        var code = countryCode();
+        var qtyEl = document.querySelector('.doro-buybox form.cart input.qty, .doro-buybox .quantity .qty');
+        var qty = qtyEl ? Math.max(1, parseInt(qtyEl.value || qtyEl.textContent, 10) || 1) : 1;
+        var buybox = document.querySelector('[data-doro-buybox]');
+        var productId = buybox ? parseInt(buybox.getAttribute('data-product-id') || '0', 10) : 0;
+        var context = root.getAttribute('data-shipping-context') || (productId ? 'product' : 'cart');
+
+        var payload = {
+            country: code,
+            postcode: postcode()
+        };
+
+        if (context === 'cart' && cfg && Array.isArray(cfg.cartLines) && cfg.cartLines.length) {
+            payload.products = cfg.cartLines;
+        } else if (productId > 0) {
+            payload.product_id = productId;
+            payload.quantity = qty;
+        } else if (cfg && Array.isArray(cfg.cartLines) && cfg.cartLines.length) {
+            payload.products = cfg.cartLines;
+        } else {
+            payload.products = [{ reference: 'PREVIEW', sku: 'PREVIEW', quantity: 1 }];
+        }
+
+        return { payload: payload, code: code };
+    }
+
+    function mockFetch(payload, code) {
+        return Promise.resolve(fallback(code));
+    }
+
+    function liveFetch(payload) {
+        if (!cfg || !cfg.restUrl) {
+            return Promise.resolve(fallback(payload.country));
+        }
+        return fetch(cfg.restUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-WP-Nonce': (cfg && cfg.nonce) ? cfg.nonce : ''
+            },
+            body: JSON.stringify(payload)
+        })
+            .then(function (res) { return res.json(); })
+            .then(function (json) {
+                if (!json || json.success === false) {
+                    return fallback(payload.country);
+                }
+                return json;
+            })
+            .catch(function () {
+                return fallback(payload.country);
+            });
+    }
+
+    function refresh() {
+        roots.forEach(function (root) {
+            var built = buildPayload(root);
+            setLoading(root, true);
+            var runner = (cfg && cfg.preview) ? mockFetch : liveFetch;
+            runner(built.payload, built.code).then(function (data) {
+                paint(root, data, built.code);
+            });
+        });
+    }
+
+    document.addEventListener('change', function (e) {
+        var t = e.target;
+        if (!t) return;
+        if (t.id === 'locale-ubicacion' || t.name === 'ubicacion' || t.id === 'shipping-pais' || t.name === 'pais') {
+            var val = String(t.value || '').toUpperCase();
+            if (val.length >= 2) {
+                if (cfg) cfg.country = val.slice(0, 2);
+                document.cookie = 'doroshopping_country=' + encodeURIComponent(val.slice(0, 2)) + ';path=/;max-age=31536000';
+                refresh();
+            }
+        }
+        if (t.id === 'shipping-cp' || t.name === 'codigo_postal') {
+            if (cfg) cfg.postcode = t.value || '';
+            document.cookie = 'doroshopping_postcode=' + encodeURIComponent(t.value || '') + ';path=/;max-age=31536000';
+            refresh();
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        var select = e.target && e.target.closest ? e.target.closest('[data-locale-select="ubicacion"]') : null;
+        var opt = e.target && e.target.closest ? e.target.closest('.header-locale-select__option') : null;
+        if (!select || !opt || !select.contains(opt)) return;
+        var val = String(opt.getAttribute('data-value') || '').toUpperCase();
+        if (val.length < 2) return;
+        if (cfg) cfg.country = val.slice(0, 2);
+        document.cookie = 'doroshopping_country=' + encodeURIComponent(val.slice(0, 2)) + ';path=/;max-age=31536000';
+        setTimeout(refresh, 30);
+    });
+
+    var qtyInput = document.querySelector('.doro-buybox form.cart input.qty');
+    if (qtyInput) {
+        qtyInput.addEventListener('change', refresh);
+    }
+
+    refresh();
+    window.doroshoppingRefreshShipping = refresh;
 }

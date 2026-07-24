@@ -16,10 +16,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string
  */
 function doroshopping_buy_now_redirect( $url ) {
-    if ( ! empty( $_REQUEST['doroshopping_buy_now'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        return wc_get_checkout_url();
+    if ( empty( $_REQUEST['doroshopping_buy_now'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        return $url;
     }
-    return $url;
+    $checkout = function_exists( 'doroshopping_get_checkout_url' ) ? doroshopping_get_checkout_url() : '';
+    if ( $checkout ) {
+        return $checkout;
+    }
+    $cart = function_exists( 'doroshopping_get_cart_url' ) ? doroshopping_get_cart_url() : '';
+    return $cart ? $cart : $url;
 }
 add_filter( 'woocommerce_add_to_cart_redirect', 'doroshopping_buy_now_redirect' );
 
