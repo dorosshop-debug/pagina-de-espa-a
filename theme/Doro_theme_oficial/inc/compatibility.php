@@ -134,22 +134,283 @@ function doroshopping_get_header_language_flag() {
 }
 
 /**
- * Etiqueta de moneda actual (YayCurrency / WooCommerce).
+ * Etiqueta de moneda actual (CURCY / YayCurrency / WooCommerce).
  *
  * @return string
  */
 function doroshopping_get_header_currency_label() {
-    $code = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : 'EUR';
-    $code = apply_filters( 'doroshopping_header_currency_code', $code );
-
+    $code = doroshopping_get_current_currency_code();
+    $list = doroshopping_get_header_currencies();
+    if ( isset( $list[ $code ]['label'] ) ) {
+        return $list[ $code ]['label'];
+    }
     $names = array(
         'EUR' => 'Euro',
         'USD' => 'US Dollar',
         'GBP' => 'Pound',
-        'CHF' => 'Franc',
+        'CHF' => 'Franco suizo',
     );
     $name = isset( $names[ $code ] ) ? $names[ $code ] : $code;
     return $name . ' · ' . $code;
+}
+
+/**
+ * Código de moneda activa.
+ *
+ * @return string
+ */
+function doroshopping_get_current_currency_code() {
+    $code = '';
+
+    if ( ! empty( $_COOKIE['doroshopping_currency'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+        $code = strtoupper( sanitize_text_field( wp_unslash( $_COOKIE['doroshopping_currency'] ) ) );
+    }
+    if ( ! $code && ! empty( $_COOKIE['wmc_current_currency'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+        $code = strtoupper( sanitize_text_field( wp_unslash( $_COOKIE['wmc_current_currency'] ) ) );
+    }
+    if ( ! $code && isset( $_GET['wmc-currency'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $code = strtoupper( sanitize_text_field( wp_unslash( $_GET['wmc-currency'] ) ) );
+    }
+
+    // CURCY (VillaTheme).
+    if ( ! $code ) {
+        foreach ( array( 'WOOMULTI_CURRENCY_F_Data', 'WOOMULTI_CURRENCY_Data' ) as $class ) {
+            if ( class_exists( $class ) && is_callable( array( $class, 'get_ins' ) ) ) {
+                $settings = $class::get_ins();
+                if ( $settings && is_callable( array( $settings, 'get_current_currency' ) ) ) {
+                    $code = strtoupper( (string) $settings->get_current_currency() );
+                    break;
+                }
+            }
+        }
+    }
+
+    // YayCurrency.
+    if ( ! $code && class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper', false ) && is_callable( array( 'Yay_Currency\Helpers\YayCurrencyHelper', 'detect_current_currency' ) ) ) {
+        $current = \Yay_Currency\Helpers\YayCurrencyHelper::detect_current_currency();
+        if ( is_array( $current ) && ! empty( $current['currency'] ) ) {
+            $code = strtoupper( (string) $current['currency'] );
+        }
+    }
+
+    if ( ! $code && function_exists( 'get_woocommerce_currency' ) ) {
+        $code = get_woocommerce_currency();
+    }
+    if ( ! $code ) {
+        $code = 'EUR';
+    }
+
+    return strtoupper( apply_filters( 'doroshopping_header_currency_code', $code ) );
+}
+
+/**
+ * Monedas disponibles para el selector del header (YayCurrency + CURCY, fusionadas).
+ *
+ * @return array<string,array{label:string,flag:string}>
+ */
+function doroshopping_get_header_currencies() {
+    $flags_uri = get_template_directory_uri() . '/assets/images/flags';
+    $meta      = array(
+        'EUR' => array(
+            'label' => 'Euro (€) - EUR',
+            'flag'  => $flags_uri . '/euro.svg',
+        ),
+        'CHF' => array(
+            'label' => 'Franco suizo (CHF)',
+            'flag'  => $flags_uri . '/suiza.svg',
+        ),
+        'GBP' => array(
+            'label' => 'Libra esterlina (£) - GBP',
+            'flag'  => $flags_uri . '/reino-unido.png',
+        ),
+        'USD' => array(
+            'label' => 'US Dollar ($) - USD',
+            'flag'  => $flags_uri . '/euro.svg',
+        ),
+    );
+
+    $codes = array();
+
+    /**
+     * Añade códigos ISO a la lista.
+     *
+     * @param mixed $raw Raw list.
+     * @return void
+     */
+    $push = static function ( $raw ) use ( &$codes ) {
+        if ( empty( $raw ) ) {
+            return;
+        }
+        if ( ! is_array( $raw ) ) {
+            $raw = array( $raw );
+        }
+        foreach ( $raw as $key => $item ) {
+            $c = '';
+            if ( is_string( $item ) && strlen( $item ) >= 3 && strlen( $item ) <= 4 && ! is_numeric( $item ) ) {
+                $c = $item;
+            } elseif ( is_string( $key ) && strlen( $key ) >= 3 && strlen( $key ) <= 4 && ctype_alpha( $key ) ) {
+                $c = $key;
+            } elseif ( is_array( $item ) ) {
+                if ( ! empty( $item['currency'] ) ) {
+                    $c = $item['currency'];
+                } elseif ( ! empty( $item['code'] ) ) {
+                    $c = $item['code'];
+                }
+            } elseif ( is_object( $item ) ) {
+                if ( isset( $item->currency ) ) {
+                    $c = $item->currency;
+                } elseif ( isset( $item->post_title ) ) {
+                    $c = $item->post_title;
+                }
+            }
+            $c = strtoupper( sanitize_text_field( (string) $c ) );
+            if ( $c && preg_match( '/^[A-Z]{3}$/', $c ) ) {
+                $codes[] = $c;
+            }
+        }
+    };
+
+    // 1) YayCurrency (CPT yay-currency: el código es el post_title).
+    if ( post_type_exists( 'yay-currency' ) ) {
+        $yay_posts = get_posts(
+            array(
+                'post_type'      => 'yay-currency',
+                'post_status'    => 'publish',
+                'posts_per_page' => 50,
+                'orderby'        => 'menu_order title',
+                'order'          => 'ASC',
+            )
+        );
+        foreach ( $yay_posts as $post ) {
+            $push( $post->post_title );
+        }
+    }
+    if ( class_exists( 'Yay_Currency\Helpers\Helper', false ) && is_callable( array( 'Yay_Currency\Helpers\Helper', 'get_currencies_post_type' ) ) ) {
+        $push( \Yay_Currency\Helpers\Helper::get_currencies_post_type() );
+    }
+    if ( class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper', false ) ) {
+        if ( is_callable( array( 'Yay_Currency\Helpers\YayCurrencyHelper', 'get_currencies' ) ) ) {
+            $push( \Yay_Currency\Helpers\YayCurrencyHelper::get_currencies() );
+        }
+        // Lista convertida / aplicada.
+        if ( is_callable( array( 'Yay_Currency\Helpers\YayCurrencyHelper', 'converted_currency' ) ) ) {
+            $push( \Yay_Currency\Helpers\YayCurrencyHelper::converted_currency() );
+        }
+    }
+
+    // 2) CURCY (fusionar, no sustituir).
+    foreach ( array( 'WOOMULTI_CURRENCY_F_Data', 'WOOMULTI_CURRENCY_Data' ) as $class ) {
+        if ( ! class_exists( $class ) || ! is_callable( array( $class, 'get_ins' ) ) ) {
+            continue;
+        }
+        $settings = $class::get_ins();
+        if ( ! $settings ) {
+            continue;
+        }
+        if ( is_callable( array( $settings, 'get_currencies' ) ) ) {
+            $push( $settings->get_currencies() );
+        }
+        if ( is_callable( array( $settings, 'get_list_currencies' ) ) ) {
+            $push( $settings->get_list_currencies() );
+        }
+    }
+    $params = get_option( 'woo_multi_currency_params', array() );
+    if ( is_array( $params ) && ! empty( $params['currency'] ) ) {
+        $push( $params['currency'] );
+    }
+
+    // 3) Fallback si los plugins no devolvieron nada.
+    if ( empty( $codes ) ) {
+        $codes = array( 'EUR', 'CHF', 'GBP' );
+    }
+
+    // Orden preferido: EUR, CHF, GBP y el resto.
+    $preferred = array( 'EUR', 'CHF', 'GBP', 'USD' );
+    $codes     = array_values( array_unique( array_filter( $codes ) ) );
+    $ordered   = array();
+    foreach ( $preferred as $p ) {
+        if ( in_array( $p, $codes, true ) ) {
+            $ordered[] = $p;
+        }
+    }
+    foreach ( $codes as $c ) {
+        if ( ! in_array( $c, $ordered, true ) ) {
+            $ordered[] = $c;
+        }
+    }
+
+    $out = array();
+    foreach ( $ordered as $code ) {
+        $out[ $code ] = isset( $meta[ $code ] )
+            ? $meta[ $code ]
+            : array(
+                'label' => $code,
+                'flag'  => $flags_uri . '/euro.svg',
+            );
+    }
+
+    return apply_filters( 'doroshopping_header_currencies', $out );
+}
+
+/**
+ * Aplica una moneda en CURCY / cookies / plugins.
+ *
+ * @param string $currency Código ISO.
+ * @return void
+ */
+function doroshopping_apply_currency( $currency ) {
+    $currency = strtoupper( sanitize_text_field( $currency ) );
+    if ( ! $currency ) {
+        return;
+    }
+
+    $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+    $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+
+    setcookie( 'doroshopping_currency', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+    $_COOKIE['doroshopping_currency'] = $currency;
+
+    // CURCY.
+    setcookie( 'wmc_current_currency', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+    setcookie( 'wmc_current_currency_old', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+    $_COOKIE['wmc_current_currency'] = $currency;
+
+    // YayCurrency / genéricos.
+    setcookie( 'yay_currency_code', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+    setcookie( 'woocommerce_currency', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+
+    if ( class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper', false ) && is_callable( array( 'Yay_Currency\Helpers\YayCurrencyHelper', 'set_currency_code' ) ) ) {
+        \Yay_Currency\Helpers\YayCurrencyHelper::set_currency_code( $currency );
+    }
+
+    // YayCurrency suele usar cookie/param con el código.
+    setcookie( 'yay_currency_code', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+    $_COOKIE['yay_currency_code'] = $currency;
+
+    // Si existe el CPT, guardar ID para el switcher de Yay.
+    if ( post_type_exists( 'yay-currency' ) ) {
+        $yay_id = 0;
+        $all    = get_posts(
+            array(
+                'post_type'      => 'yay-currency',
+                'post_status'    => 'publish',
+                'posts_per_page' => 50,
+            )
+        );
+        foreach ( $all as $p ) {
+            if ( strtoupper( $p->post_title ) === $currency ) {
+                $yay_id = (int) $p->ID;
+                break;
+            }
+        }
+        if ( $yay_id ) {
+            setcookie( 'yay_currency_id', (string) $yay_id, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+            $_COOKIE['yay_currency_id'] = (string) $yay_id;
+        }
+    }
+
+    do_action( 'doroshopping_set_currency', $currency );
+    do_action( 'wmc_set_currency', $currency );
 }
 
 /**
@@ -160,14 +421,13 @@ function doroshopping_get_header_currency_label() {
 function doroshopping_get_header_location() {
     $flags_uri = get_template_directory_uri() . '/assets/images/flags';
     $map       = array(
-        'ES' => array( 'label' => __( 'España', 'doroshopping' ), 'flag' => $flags_uri . '/spain.png' ),
-        'PT' => array( 'label' => __( 'Portugal', 'doroshopping' ), 'flag' => $flags_uri . '/ptg.png' ),
-        'FR' => array( 'label' => __( 'Francia', 'doroshopping' ), 'flag' => $flags_uri . '/francia.png' ),
-        'DE' => array( 'label' => __( 'Alemania', 'doroshopping' ), 'flag' => $flags_uri . '/alemania.png' ),
-        'IT' => array( 'label' => __( 'Italia', 'doroshopping' ), 'flag' => $flags_uri . '/italia.png' ),
-        'GB' => array( 'label' => __( 'Reino Unido', 'doroshopping' ), 'flag' => $flags_uri . '/reino-unido.png' ),
-        'UK' => array( 'label' => __( 'Reino Unido', 'doroshopping' ), 'flag' => $flags_uri . '/reino-unido.png' ),
-        'CH' => array( 'label' => __( 'Suiza', 'doroshopping' ), 'flag' => $flags_uri . '/reino-unido.png' ),
+        'ES' => array( 'label' => __( 'España', 'doroshopping' ), 'flag' => $flags_uri . '/spain.png', 'lang' => 'es', 'currency' => 'EUR' ),
+        'PT' => array( 'label' => __( 'Portugal', 'doroshopping' ), 'flag' => $flags_uri . '/ptg.png', 'lang' => 'pt', 'currency' => 'EUR' ),
+        'FR' => array( 'label' => __( 'Francia', 'doroshopping' ), 'flag' => $flags_uri . '/francia.png', 'lang' => 'fr', 'currency' => 'EUR' ),
+        'DE' => array( 'label' => __( 'Alemania', 'doroshopping' ), 'flag' => $flags_uri . '/alemania.png', 'lang' => 'de', 'currency' => 'EUR' ),
+        'IT' => array( 'label' => __( 'Italia', 'doroshopping' ), 'flag' => $flags_uri . '/italia.png', 'lang' => 'it', 'currency' => 'EUR' ),
+        'GB' => array( 'label' => __( 'Reino Unido', 'doroshopping' ), 'flag' => $flags_uri . '/reino-unido.png', 'lang' => 'en', 'currency' => 'GBP' ),
+        'CH' => array( 'label' => __( 'Suiza', 'doroshopping' ), 'flag' => $flags_uri . '/suiza.svg', 'lang' => 'fr', 'currency' => 'CHF' ),
     );
 
     $code = '';
@@ -196,6 +456,9 @@ function doroshopping_get_header_location() {
         $code = 'ES';
     }
     $code = strtoupper( $code );
+    if ( 'UK' === $code ) {
+        $code = 'GB';
+    }
 
     $label = isset( $map[ $code ]['label'] ) ? $map[ $code ]['label'] : $code;
     $flag  = isset( $map[ $code ]['flag'] ) ? $map[ $code ]['flag'] : $flags_uri . '/spain.png';
@@ -206,6 +469,26 @@ function doroshopping_get_header_location() {
         'flag'  => $flag,
         'map'   => $map,
     );
+}
+
+/**
+ * Mapa país → idioma / moneda (para header y JS).
+ *
+ * @return array<string,array{lang:string,currency:string}>
+ */
+function doroshopping_get_location_locale_map() {
+    $loc = doroshopping_get_header_location();
+    $out = array();
+    if ( empty( $loc['map'] ) || ! is_array( $loc['map'] ) ) {
+        return $out;
+    }
+    foreach ( $loc['map'] as $code => $item ) {
+        $out[ strtoupper( $code ) ] = array(
+            'lang'     => isset( $item['lang'] ) ? (string) $item['lang'] : 'es',
+            'currency' => isset( $item['currency'] ) ? (string) $item['currency'] : 'EUR',
+        );
+    }
+    return $out;
 }
 
 /**
@@ -221,25 +504,39 @@ function doroshopping_header_language_switcher() {
 add_action( 'doroshopping_header_utility_language', 'doroshopping_header_language_switcher' );
 
 /**
- * YayCurrency / otros selectores de moneda.
+ * YayCurrency / CURCY / otros selectores de moneda (slot opcional; el dropdown usa selector propio).
  */
 function doroshopping_header_currency_switcher() {
+    // Preferir CURCY si está activo (evita Yay con 1 moneda tapando las 3 de CURCY).
+    if ( shortcode_exists( 'woo_multi_currency' ) ) {
+        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency" data-curcy-currency-slot hidden aria-hidden="true">';
+        echo do_shortcode( '[woo_multi_currency]' );
+        echo '</div>';
+        return;
+    }
+    if ( shortcode_exists( 'woo_multi_currency_plain_horizontal' ) ) {
+        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency" data-curcy-currency-slot hidden aria-hidden="true">';
+        echo do_shortcode( '[woo_multi_currency_plain_horizontal]' );
+        echo '</div>';
+        return;
+    }
+
     if ( shortcode_exists( 'yaycurrency-switcher' ) ) {
-        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency" data-yay-currency-slot>';
+        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency" data-yay-currency-slot hidden aria-hidden="true">';
         echo do_shortcode( '[yaycurrency-switcher switcher_size="small" show_flag="yes" show_name="yes" show_symbol="yes" show_code="yes" device="all"]' );
         echo '</div>';
         return;
     }
 
     if ( shortcode_exists( 'yith_woocommerce_currency_switcher' ) ) {
-        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency">';
+        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency" hidden aria-hidden="true">';
         echo do_shortcode( '[yith_woocommerce_currency_switcher]' );
         echo '</div>';
         return;
     }
 
     if ( shortcode_exists( 'woocs' ) ) {
-        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency">';
+        echo '<div class="site-header__plugin-slot site-header__plugin-slot--currency" hidden aria-hidden="true">';
         echo do_shortcode( '[woocs]' );
         echo '</div>';
         return;
@@ -302,13 +599,16 @@ function doroshopping_handle_locale_preferences() {
         exit;
     }
 
-    // País → cookie + cliente WooCommerce.
+    // País → cookie + cliente WooCommerce + idioma/moneda sugeridos.
     if ( isset( $_POST['ubicacion'] ) ) {
         $country = strtoupper( sanitize_text_field( wp_unslash( $_POST['ubicacion'] ) ) );
         if ( strlen( $country ) >= 2 ) {
             $country = substr( $country, 0, 2 );
-            $path    = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
-            $domain  = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+            if ( 'UK' === $country ) {
+                $country = 'GB';
+            }
+            $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+            $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
             setcookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
             $_COOKIE['doroshopping_country'] = $country;
 
@@ -316,6 +616,14 @@ function doroshopping_handle_locale_preferences() {
                 WC()->customer->set_billing_country( $country );
                 WC()->customer->set_shipping_country( $country );
                 WC()->customer->save();
+            }
+
+            $locale_map = doroshopping_get_location_locale_map();
+            if ( empty( $_POST['lengua'] ) && isset( $locale_map[ $country ]['lang'] ) ) {
+                $_POST['lengua'] = $locale_map[ $country ]['lang'];
+            }
+            if ( empty( $_POST['divisa'] ) && isset( $locale_map[ $country ]['currency'] ) ) {
+                $_POST['divisa'] = $locale_map[ $country ]['currency'];
             }
         }
     }
@@ -333,11 +641,19 @@ function doroshopping_handle_locale_preferences() {
 
     if ( ! empty( $_POST['divisa'] ) ) {
         $currency = strtoupper( sanitize_text_field( wp_unslash( $_POST['divisa'] ) ) );
-        $path     = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
-        $domain   = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
-        setcookie( 'doroshopping_currency', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+        doroshopping_apply_currency( $currency );
+        // CURCY + YayCurrency cambian moneda por query arg.
+        $redirect = add_query_arg(
+            array(
+                'wmc-currency' => $currency,
+                'yay-currency' => $currency,
+            ),
+            $redirect
+        );
     }
 
+    // Evitar caché del navegador en el redirect inmediato.
+    nocache_headers();
     wp_safe_redirect( $redirect );
     exit;
 }

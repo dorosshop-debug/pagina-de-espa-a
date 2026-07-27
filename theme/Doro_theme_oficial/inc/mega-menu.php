@@ -20,9 +20,17 @@ function doroshopping_mega_menu_icon( $key = 'tag' ) {
         'phone'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>',
         'laptop'  => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
         'home'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>',
-        'sport'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20"/></svg>',
+        'sport'   => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>',
         'tag'     => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5"/></svg>',
-        'default' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+        'beauty'  => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3c2 3 6 5 6 9a6 6 0 0 1-12 0c0-4 4-6 6-9z"/><path d="M9 18h6"/></svg>',
+        'fashion' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12l4 7-10 13L2 10z"/><path d="M11 3 8 9l4 13 4-13-3-6"/></svg>',
+        'car'     => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 17h14l-1-7H6z"/><path d="M7 17l-1 3M17 17l1 3"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/><path d="M5 10l2-5h10l2 5"/></svg>',
+        'baby'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/><path d="M9 12h6"/></svg>',
+        'pet'     => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="8" cy="9" r="2"/><circle cx="16" cy="9" r="2"/><circle cx="6" cy="14" r="2"/><circle cx="18" cy="14" r="2"/><path d="M12 11c2 1 3 3 3 5a3 3 0 0 1-6 0c0-2 1-4 3-5z"/></svg>',
+        'book'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+        'tool'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+        'grid'    => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+        'default' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
     );
 
     return isset( $icons[ $key ] ) ? $icons[ $key ] : $icons['default'];
@@ -31,28 +39,149 @@ function doroshopping_mega_menu_icon( $key = 'tag' ) {
 /**
  * Detecta icono por slug/nombre.
  *
- * @param string $slug Slug.
- * @param string $name Name.
+ * @param string   $slug  Slug.
+ * @param string   $name  Name.
+ * @param int|null $index Indice del panel (fallback variado).
  * @return string
  */
-function doroshopping_mega_menu_icon_key( $slug, $name = '' ) {
-    $hay = strtolower( $slug . ' ' . $name );
-    if ( preg_match( '/electro|movil|phone|tablet|tech/', $hay ) ) {
-        return 'phone';
+function doroshopping_mega_menu_icon_key( $slug, $name = '', $index = null ) {
+    $hay = strtolower( remove_accents( $slug . ' ' . $name ) );
+
+    $rules = array(
+        array(
+            'icon'    => 'tag',
+            'pattern' => '/promocion|oferta|outlet|liquidacion|rebaja|descuento|sale/',
+        ),
+        array(
+            'icon'    => 'phone',
+            'pattern' => '/electron|movil|telefon|tablet|smart|audio|video|foto|camara|tv|sonido|imagen/',
+        ),
+        array(
+            'icon'    => 'laptop',
+            'pattern' => '/informa|ordenad|portatil|pc|comput|gaming|impresor|perifer|software|redes/',
+        ),
+        array(
+            'icon'    => 'home',
+            'pattern' => '/hogar|cocina|casa|mueble|decor|electrodom|limpieza|jardin|iluminacion|menaje/',
+        ),
+        array(
+            'icon'    => 'sport',
+            'pattern' => '/deporte|sport|fitness|outdoor|cicl|camp|camping|gym|ocio|recre|baloncesto|futbol|natacion/',
+        ),
+        array(
+            'icon'    => 'beauty',
+            'pattern' => '/belleza|cosmet|perfum|cuidado|salud|higiene|maquillaje|peluquer/',
+        ),
+        array(
+            'icon'    => 'fashion',
+            'pattern' => '/moda|ropa|vestir|zapat|calzado|textil|accesorio/',
+        ),
+        array(
+            'icon'    => 'car',
+            'pattern' => '/auto|motor|coche|vehicul|moto|neumatic|garage/',
+        ),
+        array(
+            'icon'    => 'baby',
+            'pattern' => '/juguet|bebe|infant|nino|nina|puericultura/',
+        ),
+        array(
+            'icon'    => 'pet',
+            'pattern' => '/mascot|animal|perro|gato|veterin/',
+        ),
+        array(
+            'icon'    => 'book',
+            'pattern' => '/libro|papeler|oficina|escolar|arte|manualidad/',
+        ),
+        array(
+            'icon'    => 'tool',
+            'pattern' => '/herramient|bricolaje|industrial|construc|fontaner|electric/',
+        ),
+    );
+
+    foreach ( $rules as $rule ) {
+        if ( preg_match( $rule['pattern'], $hay ) ) {
+            return $rule['icon'];
+        }
     }
-    if ( preg_match( '/informa|pc|laptop|ordenad|gaming|compu/', $hay ) ) {
-        return 'laptop';
+
+    if ( null !== $index ) {
+        $pool = array( 'phone', 'laptop', 'home', 'sport', 'tag', 'beauty', 'fashion', 'car', 'baby', 'pet', 'book', 'tool' );
+        return $pool[ absint( $index ) % count( $pool ) ];
     }
-    if ( preg_match( '/hogar|cocina|casa|home/', $hay ) ) {
-        return 'home';
+
+    return 'grid';
+}
+
+/**
+ * ¿Ocultar esta categoría del mega menú? (Sin categorizar / Uncategorized).
+ *
+ * @param WP_Term|int|string $term Term, ID o nombre/slug.
+ * @return bool
+ */
+function doroshopping_mega_menu_is_hidden_category( $term ) {
+    $term_id = 0;
+    $slug    = '';
+    $name    = '';
+
+    if ( is_object( $term ) ) {
+        $term_id = isset( $term->term_id ) ? (int) $term->term_id : 0;
+        $slug    = isset( $term->slug ) ? (string) $term->slug : '';
+        $name    = isset( $term->name ) ? (string) $term->name : '';
+    } elseif ( is_numeric( $term ) ) {
+        $term_id = (int) $term;
+        $loaded  = get_term( $term_id, 'product_cat' );
+        if ( $loaded && ! is_wp_error( $loaded ) ) {
+            $slug = (string) $loaded->slug;
+            $name = (string) $loaded->name;
+        }
+    } elseif ( is_string( $term ) ) {
+        $slug = sanitize_title( $term );
+        $name = $term;
     }
-    if ( preg_match( '/deporte|sport|fitness|bike/', $hay ) ) {
-        return 'sport';
+
+    $default_id = (int) get_option( 'default_product_cat', 0 );
+    if ( $default_id > 0 && $term_id === $default_id ) {
+        return true;
     }
-    if ( preg_match( '/oferta|promo|sale/', $hay ) ) {
-        return 'tag';
+
+    $slug = strtolower( remove_accents( $slug ) );
+    $name = strtolower( remove_accents( $name ) );
+
+    if ( $slug && preg_match( '/^(uncategorized|sin[-_]?categor|non[-_]?class|unkategor)/', $slug ) ) {
+        return true;
     }
-    return 'default';
+
+    if ( $name && preg_match( '/^(sin categoriz|uncategoriz|non class|unkategor)/', $name ) ) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * ¿Ocultar ítem de menú WP del mega menú?
+ *
+ * @param object $item Menu item.
+ * @return bool
+ */
+function doroshopping_mega_menu_is_hidden_nav_item( $item ) {
+    if ( ! $item ) {
+        return false;
+    }
+
+    if ( isset( $item->type, $item->object, $item->object_id )
+        && 'taxonomy' === $item->type
+        && 'product_cat' === $item->object
+    ) {
+        return doroshopping_mega_menu_is_hidden_category( (int) $item->object_id );
+    }
+
+    $title = isset( $item->title ) ? (string) $item->title : '';
+    if ( $title ) {
+        return doroshopping_mega_menu_is_hidden_category( $title );
+    }
+
+    return false;
 }
 
 /**
@@ -113,6 +242,19 @@ function doroshopping_maybe_flush_mega_menu_on_upgrade() {
 add_action( 'init', 'doroshopping_maybe_flush_mega_menu_on_upgrade', 5 );
 
 /**
+ * Vaciar cache al actualizar iconos del mega menú.
+ */
+function doroshopping_maybe_flush_mega_menu_icons() {
+    $stored = get_option( 'doroshopping_mega_menu_icons_ver', '' );
+    if ( '3' === $stored ) {
+        return;
+    }
+    doroshopping_flush_mega_menu_cache();
+    update_option( 'doroshopping_mega_menu_icons_ver', '3', false );
+}
+add_action( 'init', 'doroshopping_maybe_flush_mega_menu_icons', 6 );
+
+/**
  * Mega menú desde menú asignado a location "categories".
  *
  * Estructura esperada: ítems top-level = pestañas; hijos = columnas; nietos = links.
@@ -147,7 +289,11 @@ function doroshopping_mega_menu_from_nav() {
     $thumbs = array( $img . '/Banner_mundial_doro.webp', $img . '/Banner_doro_6.webp' );
     $panels = array();
 
-    foreach ( $by_parent[0] as $top ) {
+    foreach ( $by_parent[0] as $top_index => $top ) {
+        if ( doroshopping_mega_menu_is_hidden_nav_item( $top ) ) {
+            continue;
+        }
+
         $columns = array();
         $children = isset( $by_parent[ $top->ID ] ) ? $by_parent[ $top->ID ] : array();
 
@@ -165,9 +311,16 @@ function doroshopping_mega_menu_from_nav() {
             );
         } else {
             foreach ( $children as $ci => $child ) {
+                if ( doroshopping_mega_menu_is_hidden_nav_item( $child ) ) {
+                    continue;
+                }
+
                 $links = array();
                 $grand = isset( $by_parent[ $child->ID ] ) ? $by_parent[ $child->ID ] : array();
                 foreach ( $grand as $g ) {
+                    if ( doroshopping_mega_menu_is_hidden_nav_item( $g ) ) {
+                        continue;
+                    }
                     $links[] = array(
                         'label' => $g->title,
                         'url'   => $g->url,
@@ -191,7 +344,7 @@ function doroshopping_mega_menu_from_nav() {
         $panels[] = array(
             'id'      => 'nav-' . $top->ID,
             'label'   => $top->title,
-            'icon'    => doroshopping_mega_menu_icon_key( sanitize_title( $top->title ), $top->title ),
+            'icon'    => doroshopping_mega_menu_icon_key( sanitize_title( $top->title ), $top->title, $top_index ),
             'url'     => $top->url,
             'columns' => $columns,
         );
@@ -228,6 +381,10 @@ function doroshopping_mega_menu_from_product_cats() {
     $panels = array();
 
     foreach ( $parents as $pi => $parent ) {
+        if ( doroshopping_mega_menu_is_hidden_category( $parent ) ) {
+            continue;
+        }
+
         $children = get_terms(
             array(
                 'taxonomy'   => 'product_cat',
@@ -240,6 +397,10 @@ function doroshopping_mega_menu_from_product_cats() {
         $columns = array();
         if ( ! is_wp_error( $children ) && ! empty( $children ) ) {
             foreach ( $children as $ci => $child ) {
+                if ( doroshopping_mega_menu_is_hidden_category( $child ) ) {
+                    continue;
+                }
+
                 $grand = get_terms(
                     array(
                         'taxonomy'   => 'product_cat',
@@ -251,6 +412,10 @@ function doroshopping_mega_menu_from_product_cats() {
                 $links = array();
                 if ( ! is_wp_error( $grand ) && ! empty( $grand ) ) {
                     foreach ( $grand as $g ) {
+                        if ( doroshopping_mega_menu_is_hidden_category( $g ) ) {
+                            continue;
+                        }
+
                         $links[] = array(
                             'label' => $g->name,
                             'url'   => get_term_link( $g ),
@@ -286,7 +451,7 @@ function doroshopping_mega_menu_from_product_cats() {
         $panels[] = array(
             'id'      => 'cat-' . $parent->term_id,
             'label'   => $parent->name,
-            'icon'    => doroshopping_mega_menu_icon_key( $parent->slug, $parent->name ),
+            'icon'    => doroshopping_mega_menu_icon_key( $parent->slug, $parent->name, $pi ),
             'url'     => get_term_link( $parent ),
             'columns' => $columns,
         );

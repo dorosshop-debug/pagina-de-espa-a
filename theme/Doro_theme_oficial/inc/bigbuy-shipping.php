@@ -1,6 +1,10 @@
 <?php
 /**
- * Estimación de envío BigBuy (REST + fallback por país).
+ * Estimación de envío BigBuy (Shipping API oficial).
+ *
+ * Guía: POST /rest/shipping/orders.json
+ * Auth: Authorization: Bearer API_KEY
+ * Base: https://api.bigbuy.eu | sandbox: https://api.sandbox.bigbuy.eu
  *
  * API key: define('DORO_BIGBUY_API_KEY', '...') en wp-config.php
  * o Personalizar > DoroTheme > BigBuy.
@@ -25,7 +29,35 @@ function doroshopping_bigbuy_api_key() {
 }
 
 /**
- * Endpoint REST BigBuy shipping orders.
+ * Modo API: live | sandbox.
+ *
+ * @return string
+ */
+function doroshopping_bigbuy_mode() {
+    if ( defined( 'DORO_BIGBUY_MODE' ) && DORO_BIGBUY_MODE ) {
+        $mode = strtolower( (string) DORO_BIGBUY_MODE );
+        return ( 'sandbox' === $mode ) ? 'sandbox' : 'live';
+    }
+    $mode = strtolower( (string) get_theme_mod( 'doroshopping_bigbuy_mode', 'live' ) );
+    return ( 'sandbox' === $mode ) ? 'sandbox' : 'live';
+}
+
+/**
+ * URL base BigBuy según modo.
+ *
+ * @return string
+ */
+function doroshopping_bigbuy_base_url() {
+    if ( defined( 'DORO_BIGBUY_BASE_URL' ) && DORO_BIGBUY_BASE_URL ) {
+        return untrailingslashit( (string) DORO_BIGBUY_BASE_URL );
+    }
+    return ( 'sandbox' === doroshopping_bigbuy_mode() )
+        ? 'https://api.sandbox.bigbuy.eu'
+        : 'https://api.bigbuy.eu';
+}
+
+/**
+ * Endpoint REST BigBuy shipping orders (formato oficial de la guía).
  *
  * @return string
  */
@@ -37,7 +69,7 @@ function doroshopping_bigbuy_endpoint() {
     if ( $custom ) {
         return $custom;
     }
-    return 'https://api.bigbuy.eu/rest/shipping/orders.json';
+    return doroshopping_bigbuy_base_url() . '/rest/shipping/orders.json';
 }
 
 /**
@@ -122,11 +154,65 @@ function doroshopping_bigbuy_shipping_fallback( $country, $reason = '' ) {
         'cost'     => $data['cost'],
         'note'     => $note,
         'country'  => $country,
+        'options'  => array(),
+        'reason'   => $reason ? sanitize_key( $reason ) : '',
     );
 }
 
 /**
- * Parsear respuesta BigBuy.
+ * Normalizar una opción de shippingOptions (guía BigBuy).
+ *
+ * @param array $option Opción cruda.
+ * @return array|null
+ */
+function doroshopping_bigbuy_normalize_shipping_option( $option ) {
+    if ( ! is_array( $option ) ) {
+        return null;
+    }
+
+    $service = isset( $option['shippingService'] ) && is_array( $option['shippingService'] )
+        ? $option['shippingService']
+        : $option;
+
+    $name = $service['serviceName']
+        ?? $service['name']
+        ?? $option['name']
+        ?? $option['carrier']
+        ?? '';
+
+    if ( ! $name ) {
+        return null;
+    }
+
+    $delay = $service['delay']
+        ?? $option['delay']
+        ?? $option['deliveryTime']
+        ?? $option['delivery_time']
+        ?? __( 'Según disponibilidad', 'doroshopping' );
+
+    if ( is_array( $delay ) ) {
+        $delay = implode( ' - ', array_map( 'strval', $delay ) ) . ' ' . __( 'días', 'doroshopping' );
+    }
+
+    $cost_raw = $option['cost'] ?? $option['price'] ?? $option['amount'] ?? null;
+    $cost_num = ( null !== $cost_raw && is_numeric( $cost_raw ) ) ? (float) $cost_raw : null;
+
+    return array(
+        'id'               => isset( $service['id'] ) ? (string) $service['id'] : '',
+        'carrier'          => (string) $name,
+        'service_name'     => strtolower( sanitize_title( (string) $name ) ),
+        'time'             => (string) $delay,
+        'cost'             => $cost_num,
+        'cost_label'       => null !== $cost_num
+            ? number_format( $cost_num, 2, '.', '' ) . ' EUR'
+            : __( 'Consultar', 'doroshopping' ),
+        'transport_method' => isset( $service['transportMethod'] ) ? (string) $service['transportMethod'] : '',
+        'weight'           => isset( $option['weight'] ) ? (float) $option['weight'] : null,
+    );
+}
+
+/**
+ * Parsear respuesta BigBuy Shipping API (shippingOptions).
  *
  * @param array  $body    JSON.
  * @param string $country ISO2.
@@ -137,58 +223,66 @@ function doroshopping_parse_bigbuy_shipping_response( $body, $country ) {
         return doroshopping_bigbuy_shipping_fallback( $country, 'invalid_body' );
     }
 
-    $methods = $body['shippingMethods']
+    // Formato oficial guía: shippingOptions[].
+    $raw_options = $body['shippingOptions']
+        ?? $body['shipping_options']
+        ?? $body['shippingMethods']
         ?? $body['shipping_methods']
         ?? $body['carriers']
         ?? $body['data']
-        ?? $body;
+        ?? null;
 
-    if ( ! is_array( $methods ) ) {
+    // A veces la raíz ya es la lista.
+    if ( null === $raw_options && isset( $body[0] ) ) {
+        $raw_options = $body;
+    }
+
+    if ( ! is_array( $raw_options ) || empty( $raw_options ) ) {
         return doroshopping_bigbuy_shipping_fallback( $country, 'no_carriers' );
     }
 
-    $first = array_values( $methods )[0] ?? array();
-    if ( ! is_array( $first ) ) {
+    $options = array();
+    foreach ( $raw_options as $raw ) {
+        $normalized = doroshopping_bigbuy_normalize_shipping_option( $raw );
+        if ( $normalized ) {
+            $options[] = $normalized;
+        }
+    }
+
+    if ( empty( $options ) ) {
         return doroshopping_bigbuy_shipping_fallback( $country, 'bad_carrier' );
     }
 
-    $carrier = $first['name']
-        ?? $first['carrier']
-        ?? $first['transport']
-        ?? $first['shipping_service']
-        ?? 'Transportista BigBuy';
+    // Elegir la opción más barata (como hace BigBuy al crear pedido).
+    usort(
+        $options,
+        static function ( $a, $b ) {
+            $ca = isset( $a['cost'] ) && null !== $a['cost'] ? (float) $a['cost'] : PHP_FLOAT_MAX;
+            $cb = isset( $b['cost'] ) && null !== $b['cost'] ? (float) $b['cost'] : PHP_FLOAT_MAX;
+            if ( $ca === $cb ) {
+                return 0;
+            }
+            return ( $ca < $cb ) ? -1 : 1;
+        }
+    );
 
-    $price = $first['price']
-        ?? $first['cost']
-        ?? $first['amount']
-        ?? null;
-
-    $currency = $first['currency'] ?? 'EUR';
-
-    $days = $first['deliveryTime']
-        ?? $first['delivery_time']
-        ?? $first['transitTime']
-        ?? __( 'Según disponibilidad', 'doroshopping' );
-
-    if ( is_array( $days ) ) {
-        $days = implode( ' - ', $days ) . ' ' . __( 'días hábiles', 'doroshopping' );
-    }
+    $best = $options[0];
 
     return array(
         'success' => true,
         'source'  => 'bigbuy',
-        'carrier' => (string) $carrier,
-        'time'    => (string) $days,
-        'cost'    => null !== $price
-            ? number_format( (float) $price, 2, '.', '' ) . ' ' . $currency
-            : __( 'Calculado por BigBuy', 'doroshopping' ),
-        'note'    => __( 'Información calculada según BigBuy. El coste final puede variar en checkout.', 'doroshopping' ),
+        'carrier' => $best['carrier'],
+        'time'    => $best['time'],
+        'cost'    => $best['cost_label'],
+        'note'    => __( 'Tarifa BigBuy (opción más económica). El coste final puede variar en checkout.', 'doroshopping' ),
         'country' => strtoupper( $country ),
+        'options' => array_slice( $options, 0, 5 ),
+        'mode'    => doroshopping_bigbuy_mode(),
     );
 }
 
 /**
- * Referencia BigBuy de un producto WC.
+ * Referencia BigBuy de un producto WC (SKU / meta de plugins).
  *
  * @param WC_Product $product Producto.
  * @return string
@@ -197,12 +291,80 @@ function doroshopping_bigbuy_product_reference( $product ) {
     if ( ! $product ) {
         return '';
     }
-    $id  = $product->get_id();
-    $ref = get_post_meta( $id, '_bigbuy_id', true );
-    if ( ! $ref ) {
-        $ref = $product->get_sku();
+
+    $id    = $product->get_id();
+    $metas = array(
+        '_bigbuy_id',
+        '_bigbuy_sku',
+        '_bigbuy_reference',
+        'bigbuy_sku',
+        'bigbuy_reference',
+        '_sku_bigbuy',
+    );
+
+    foreach ( $metas as $meta_key ) {
+        $ref = get_post_meta( $id, $meta_key, true );
+        if ( $ref ) {
+            return (string) $ref;
+        }
     }
-    return $ref ? (string) $ref : '';
+
+    // Variación: a veces el SKU BigBuy está en el padre.
+    if ( $product->is_type( 'variation' ) ) {
+        $parent_id = $product->get_parent_id();
+        foreach ( $metas as $meta_key ) {
+            $ref = get_post_meta( $parent_id, $meta_key, true );
+            if ( $ref ) {
+                return (string) $ref;
+            }
+        }
+        $parent = wc_get_product( $parent_id );
+        if ( $parent && $parent->get_sku() ) {
+            return (string) $parent->get_sku();
+        }
+    }
+
+    $sku = $product->get_sku();
+    return $sku ? (string) $sku : '';
+}
+
+/**
+ * Payload oficial según guía BigBuy Shipping API.
+ *
+ * @param string $country  ISO2.
+ * @param string $postcode CP.
+ * @param array  $products Productos normalizados.
+ * @return array
+ */
+function doroshopping_bigbuy_shipping_payload( $country, $postcode, $products ) {
+    $delivery = array(
+        'isoCountry' => strtoupper( $country ),
+    );
+    if ( $postcode ) {
+        $delivery['postcode'] = $postcode;
+    }
+
+    $lines = array();
+    foreach ( $products as $product ) {
+        $ref = isset( $product['reference'] ) ? (string) $product['reference'] : '';
+        if ( ! $ref && ! empty( $product['sku'] ) ) {
+            $ref = (string) $product['sku'];
+        }
+        if ( ! $ref ) {
+            continue;
+        }
+        $lines[] = array(
+            'reference' => $ref,
+            'quantity'  => isset( $product['quantity'] ) ? max( 1, absint( $product['quantity'] ) ) : 1,
+        );
+    }
+
+    return array(
+        'order' => array(
+            'delivery' => $delivery,
+            'products' => $lines,
+        ),
+    );
 }
 
 /**
@@ -249,18 +411,29 @@ function doroshopping_bigbuy_quote( $country, $postcode, $lines ) {
         return doroshopping_bigbuy_shipping_fallback( $country, 'no_api_key' );
     }
 
-    $payload = array(
-        'destination' => array(
-            'country'  => $country,
-            'postcode' => $postcode,
-        ),
-        'products'    => $products,
+    // Cache corta para no saturar la API (misma clave país+CP+productos).
+    $cache_key = 'doro_bb_ship_' . md5(
+        wp_json_encode(
+            array(
+                'c' => $country,
+                'p' => $postcode,
+                'm' => doroshopping_bigbuy_mode(),
+                'l' => $products,
+            )
+        )
     );
+    $cached = get_transient( $cache_key );
+    if ( is_array( $cached ) && ! empty( $cached['success'] ) ) {
+        $cached['cached'] = true;
+        return $cached;
+    }
+
+    $payload = doroshopping_bigbuy_shipping_payload( $country, $postcode, $products );
 
     $response = wp_remote_post(
         doroshopping_bigbuy_endpoint(),
         array(
-            'timeout' => 8,
+            'timeout' => 12,
             'headers' => array(
                 'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type'  => 'application/json',
@@ -278,10 +451,15 @@ function doroshopping_bigbuy_quote( $country, $postcode, $lines ) {
     $body = json_decode( wp_remote_retrieve_body( $response ), true );
 
     if ( $code < 200 || $code >= 300 || ! is_array( $body ) ) {
-        return doroshopping_bigbuy_shipping_fallback( $country, 'bad_response' );
+        return doroshopping_bigbuy_shipping_fallback( $country, 'http_' . $code );
     }
 
-    return doroshopping_parse_bigbuy_shipping_response( $body, $country );
+    $parsed = doroshopping_parse_bigbuy_shipping_response( $body, $country );
+    if ( ! empty( $parsed['success'] ) && 'bigbuy' === ( $parsed['source'] ?? '' ) ) {
+        set_transient( $cache_key, $parsed, 15 * MINUTE_IN_SECONDS );
+    }
+
+    return $parsed;
 }
 
 /**
@@ -428,4 +606,3 @@ function doroshopping_filter_shipping_destination_label( $label ) {
     return $label;
 }
 add_filter( 'doroshopping_shipping_destination_label', 'doroshopping_filter_shipping_destination_label' );
-

@@ -1,7 +1,10 @@
-/* Páginas CMS, 404 y búsqueda */
+/* Páginas CMS, 404, búsqueda y legales */
 .doro-page {
     width: 100%;
-    background: #f5f5f5;
+    background:
+        radial-gradient(1200px 420px at 10% -10%, rgba(255, 106, 0, 0.08), transparent 60%),
+        radial-gradient(900px 380px at 90% 0%, rgba(46, 107, 255, 0.06), transparent 55%),
+        #f3f4f6;
     padding: var(--spacing-xl) 0 var(--spacing-2xl);
     min-height: 40vh;
 }
@@ -17,18 +20,30 @@
 .doro-page--search .doro-page__container {
     background: var(--color-white);
     border: 1px solid var(--color-grey-border);
-    border-radius: var(--radius-md);
+    border-radius: 16px;
     padding: var(--spacing-xl);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
 }
 
 .doro-page__header {
     margin-bottom: var(--spacing-lg);
 }
 
+.doro-page__eyebrow {
+    margin: 0 0 8px;
+    color: var(--color-orange);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
 .doro-page__title {
     margin: 0 0 var(--spacing-sm);
-    font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
     font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-dark);
 }
 
 .doro-page__lead {
@@ -39,7 +54,7 @@
 
 .doro-page__content {
     font-size: var(--font-size-base);
-    line-height: 1.6;
+    line-height: 1.7;
     color: var(--color-dark);
 }
 
@@ -49,6 +64,83 @@
 
 .doro-page__content > *:last-child {
     margin-bottom: 0;
+}
+
+.doro-page__content h2,
+.doro-page__content h3,
+.doro-page__content h4 {
+    margin: 1.6em 0 0.55em;
+    line-height: 1.3;
+    color: var(--color-dark);
+}
+
+.doro-page__content h2 {
+    font-size: 1.25rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-grey-border);
+}
+
+.doro-page__content h3 {
+    font-size: 1.08rem;
+}
+
+.doro-page__content p {
+    margin: 0 0 1em;
+}
+
+.doro-page__content ul,
+.doro-page__content ol {
+    margin: 0 0 1.1em;
+    padding-left: 1.25em;
+}
+
+.doro-page__content li + li {
+    margin-top: 0.35em;
+}
+
+.doro-page__content a {
+    color: var(--color-orange);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.doro-page__content a:hover {
+    filter: brightness(0.92);
+}
+
+/* —— Páginas legales (privacidad / términos) —— */
+.doro-page--legal .doro-page__container {
+    max-width: 920px;
+}
+
+.doro-page__article--legal {
+    padding: clamp(24px, 4vw, 48px);
+}
+
+.doro-page__header--legal {
+    padding-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-grey-border);
+    background:
+        linear-gradient(135deg, rgba(255, 106, 0, 0.06), rgba(46, 107, 255, 0.04));
+    border-radius: 12px;
+    padding: 20px 22px;
+    border: 1px solid rgba(255, 106, 0, 0.12);
+}
+
+.doro-page__content--legal {
+    font-size: 15px;
+    max-width: 72ch;
+}
+
+.doro-page__content--legal > p:first-of-type {
+    font-size: 1.05rem;
+    color: #334155;
+}
+
+.doro-page__content--legal strong {
+    color: var(--color-dark);
 }
 
 .doro-page__cta {
@@ -102,4 +194,16 @@
 .doro-page__result-excerpt {
     color: var(--color-grey-text);
     font-size: var(--font-size-sm);
+}
+
+@media (max-width: 640px) {
+    .doro-page__article,
+    .doro-page__article--legal {
+        padding: var(--spacing-lg);
+        border-radius: 12px;
+    }
+
+    .doro-page__header--legal {
+        padding: 16px;
+    }
 }

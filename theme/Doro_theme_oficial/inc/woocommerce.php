@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return int
  */
 function doroshopping_loop_columns() {
-    return 4;
+    return 6;
 }
 add_filter( 'loop_shop_columns', 'doroshopping_loop_columns' );
 
@@ -26,7 +26,7 @@ add_filter( 'loop_shop_columns', 'doroshopping_loop_columns' );
  * @return int
  */
 function doroshopping_products_per_page( $cols ) {
-    return 24;
+    return 30;
 }
 add_filter( 'loop_shop_per_page', 'doroshopping_products_per_page', 20 );
 
@@ -79,6 +79,42 @@ function doroshopping_shop_toolbar() {
 add_action( 'woocommerce_before_shop_loop', 'doroshopping_shop_toolbar', 20 );
 
 /**
+ * Sustituye la paginación numérica por botón «Ver más» (carga AJAX en tienda).
+ */
+remove_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 10 );
+add_action( 'woocommerce_after_shop_loop', 'doroshopping_shop_load_more_button', 10 );
+
+/**
+ * Botón Ver más al final del loop de tienda / categoría.
+ *
+ * @return void
+ */
+function doroshopping_shop_load_more_button() {
+    $total   = (int) wc_get_loop_prop( 'total_pages' );
+    $current = (int) wc_get_loop_prop( 'current_page' );
+    if ( $total < 2 || $current >= $total ) {
+        return;
+    }
+
+    $next_page = $current + 1;
+    $next_url  = get_pagenum_link( $next_page, false );
+    ?>
+    <div class="doro-load-more" data-doro-load-more>
+        <button
+            type="button"
+            class="doro-load-more__btn"
+            data-doro-load-more-btn
+            data-next-url="<?php echo esc_url( $next_url ); ?>"
+            data-next-page="<?php echo esc_attr( (string) $next_page ); ?>"
+            data-total-pages="<?php echo esc_attr( (string) $total ); ?>"
+        >
+            <?php esc_html_e( 'Ver más', 'doroshopping' ); ?>
+        </button>
+    </div>
+    <?php
+}
+
+/**
  * Rating en ficha de producto con estrellas del tema.
  */
 remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
@@ -110,7 +146,7 @@ function doroshopping_single_rating() {
  * Abrir/cerrar contenedor de relacionados.
  */
 function doroshopping_related_wrap_start() {
-    echo '<div id="doro-related" class="doro-product__related-wrap">';
+    echo '<div id="doro-related" class="doro-product__related-wrap" data-related-carousel>';
 }
 function doroshopping_related_wrap_end() {
     echo '</div>';
@@ -119,13 +155,13 @@ add_action( 'woocommerce_after_single_product_summary', 'doroshopping_related_wr
 add_action( 'woocommerce_after_single_product_summary', 'doroshopping_related_wrap_end', 21 );
 
 /**
- * Más productos relacionados.
+ * Más productos relacionados (carrusel).
  *
  * @param array $args Args.
  * @return array
  */
 function doroshopping_related_products_args( $args ) {
-    $args['posts_per_page'] = 10;
+    $args['posts_per_page'] = 16;
     $args['columns']        = 5;
     return $args;
 }
@@ -229,6 +265,70 @@ function doroshopping_register_shop_sidebar() {
     );
 }
 add_action( 'widgets_init', 'doroshopping_register_shop_sidebar' );
+
+/**
+ * Aplica filtros de atributos (?filter_color=slug) al loop de tienda.
+ *
+ * @param WC_Query $q Query.
+ * @return void
+ */
+function doroshopping_apply_attribute_filters( $q ) {
+    if ( is_admin() || ! $q->is_main_query() ) {
+        return;
+    }
+    if ( ! function_exists( 'wc_get_attribute_taxonomies' ) ) {
+        return;
+    }
+
+    $tax_query = (array) $q->get( 'tax_query' );
+    if ( empty( $tax_query ) ) {
+        $tax_query = array();
+    }
+
+    $added = false;
+    foreach ( wc_get_attribute_taxonomies() as $tax ) {
+        $attr_name  = $tax->attribute_name;
+        $filter_key = 'filter_' . sanitize_title( $attr_name );
+        if ( empty( $_GET[ $filter_key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            continue;
+        }
+        $slug     = sanitize_title( wp_unslash( $_GET[ $filter_key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $taxonomy = wc_attribute_taxonomy_name( $attr_name );
+        if ( ! $slug || ! taxonomy_exists( $taxonomy ) ) {
+            continue;
+        }
+        $tax_query[] = array(
+            'taxonomy' => $taxonomy,
+            'field'    => 'slug',
+            'terms'    => array( $slug ),
+            'operator' => 'IN',
+        );
+        $added = true;
+    }
+
+    if ( $added ) {
+        if ( count( $tax_query ) > 1 && empty( $tax_query['relation'] ) ) {
+            $tax_query['relation'] = 'AND';
+        }
+        $q->set( 'tax_query', $tax_query );
+    }
+
+    // Valoración mínima.
+    if ( ! empty( $_GET['min_rating'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $min_rating = absint( $_GET['min_rating'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( $min_rating > 0 ) {
+            $meta_query   = (array) $q->get( 'meta_query' );
+            $meta_query[] = array(
+                'key'     => '_wc_average_rating',
+                'value'   => $min_rating,
+                'compare' => '>=',
+                'type'    => 'DECIMAL',
+            );
+            $q->set( 'meta_query', $meta_query );
+        }
+    }
+}
+add_action( 'woocommerce_product_query', 'doroshopping_apply_attribute_filters' );
 
 /**
  * Filtro por valoración mínima (?min_rating=3|4).

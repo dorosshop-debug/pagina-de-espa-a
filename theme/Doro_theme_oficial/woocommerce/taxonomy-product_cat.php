@@ -39,6 +39,22 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
 <main id="main-content" class="doro-category">
     <div class="doro-category__title-bar">
         <div class="doro-category__title-inner">
+            <nav class="doro-category__breadcrumb woocommerce-breadcrumb" aria-label="<?php esc_attr_e( 'Migas de pan', 'doroshopping' ); ?>">
+                <?php
+                if ( function_exists( 'woocommerce_breadcrumb' ) ) {
+                    woocommerce_breadcrumb(
+                        array(
+                            'delimiter'   => ' <span class="doro-category__breadcrumb-sep" aria-hidden="true">/</span> ',
+                            'wrap_before' => '',
+                            'wrap_after'  => '',
+                            'before'      => '',
+                            'after'       => '',
+                            'home'        => _x( 'Inicio', 'breadcrumb', 'doroshopping' ),
+                        )
+                    );
+                }
+                ?>
+            </nav>
             <h1 class="doro-category__title"><?php echo esc_html( $term->name ); ?></h1>
             <?php if ( ! empty( $term->description ) ) : ?>
                 <p class="doro-category__intro"><?php echo esc_html( wp_strip_all_tags( $term->description ) ); ?></p>

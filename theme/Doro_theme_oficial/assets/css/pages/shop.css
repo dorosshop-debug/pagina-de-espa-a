@@ -49,7 +49,13 @@
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     position: sticky;
-    top: 16px;
+    top: 88px;
+    max-height: calc(100vh - 104px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    align-self: start;
+    z-index: 5;
+    -webkit-overflow-scrolling: touch;
 }
 
 .doro-shop__ad {
@@ -140,6 +146,169 @@
     color: var(--color-grey-text);
 }
 
+/* Categorías desplegables */
+.doro-shop__filter-list--cats > .doro-shop__cat-item {
+    margin-bottom: 4px;
+}
+
+.doro-shop__cat-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.doro-shop__cat-link {
+    flex: 1;
+    min-width: 0;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    text-decoration: none !important;
+}
+
+.doro-shop__cat-link:hover {
+    background: #faf7f4;
+}
+
+.doro-shop__cat-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.doro-shop__cat-count {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--color-grey-text);
+}
+
+.doro-shop__cat-toggle {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-grey-text);
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.doro-shop__cat-toggle:hover {
+    background: #f5f5f5;
+    color: var(--color-dark);
+}
+
+.doro-shop__cat-item.is-open > .doro-shop__cat-row > .doro-shop__cat-toggle {
+    transform: rotate(180deg);
+    color: var(--color-orange);
+}
+
+.doro-shop__subcats {
+    list-style: none;
+    margin: 0 0 6px;
+    padding: 2px 0 4px 12px;
+    border-left: 2px solid #f0e0d0;
+    margin-left: 8px;
+}
+
+.doro-shop__subcats[hidden] {
+    display: none !important;
+}
+
+.doro-shop__subcats .doro-shop__cat-item {
+    margin-bottom: 2px;
+}
+
+.doro-shop__subcats .doro-shop__cat-link {
+    font-size: 13px;
+    padding: 5px 4px;
+}
+
+.doro-shop__subcats--nested {
+    margin-left: 10px;
+    padding-left: 10px;
+}
+
+.doro-shop__cat-item--grand .doro-shop__cat-link {
+    font-size: 12px;
+    color: #555;
+}
+
+/* Colores / tallas */
+.doro-shop__filter-list--colors {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.doro-shop__color-swatch {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start !important;
+}
+
+.doro-shop__color-dot {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: #ddd;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.doro-shop__color-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.doro-shop__color-swatch.is-active .doro-shop__color-dot {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-orange);
+}
+
+.doro-shop__filter-list--sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.doro-shop__filter-list--sizes > li {
+    margin: 0;
+}
+
+.doro-shop__size-chip {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center !important;
+    min-width: 40px;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: 8px;
+    background: #fff;
+    gap: 4px;
+}
+
+.doro-shop__size-chip .doro-shop__cat-count {
+    display: none;
+}
+
+.doro-shop__size-chip.is-active,
+.doro-shop__size-chip:hover {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+}
+
 .doro-shop__main {
     min-width: 0;
 }
@@ -180,7 +349,7 @@
 .doro-shop ul.products,
 .woocommerce ul.products {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: var(--spacing-md);
     list-style: none;
     margin: 0;
@@ -229,10 +398,17 @@
     color: var(--color-orange);
 }
 
+@media (max-width: 1280px) {
+    .doro-shop ul.products,
+    .woocommerce ul.products {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 1100px) {
     .doro-shop ul.products,
     .woocommerce ul.products {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 

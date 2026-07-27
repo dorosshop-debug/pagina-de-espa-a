@@ -242,3 +242,73 @@ function doroshopping_ajax_add_to_cart() {
 add_action( 'wp_ajax_doroshopping_add_to_cart', 'doroshopping_ajax_add_to_cart' );
 add_action( 'wp_ajax_nopriv_doroshopping_add_to_cart', 'doroshopping_ajax_add_to_cart' );
 
+/**
+ * Home: cargar más productos destacados (lotes de 30).
+ */
+function doroshopping_ajax_home_load_more() {
+    check_ajax_referer( 'doroshopping_home', 'nonce' );
+
+    if ( ! function_exists( 'doroshopping_get_products_by_category' ) || ! function_exists( 'doroshopping_render_home_product_card' ) ) {
+        wp_send_json_error( array( 'message' => 'unavailable' ), 500 );
+    }
+
+    $cat_id  = isset( $_POST['cat_id'] ) ? absint( $_POST['cat_id'] ) : 0;
+    $page    = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 1;
+    $batch   = isset( $_POST['batch'] ) ? absint( $_POST['batch'] ) : 30;
+    $max     = isset( $_POST['max'] ) ? absint( $_POST['max'] ) : 90;
+    $shown   = isset( $_POST['shown'] ) ? absint( $_POST['shown'] ) : 0;
+
+    if ( $batch < 1 ) {
+        $batch = 30;
+    }
+    if ( $max < $batch ) {
+        $max = $batch;
+    }
+    if ( $page < 2 ) {
+        $page = 2;
+    }
+
+    $remaining = max( 0, $max - $shown );
+    if ( $remaining < 1 ) {
+        wp_send_json_success(
+            array(
+                'html'       => '',
+                'count'      => 0,
+                'shown'      => $shown,
+                'page'       => $page,
+                'done'       => true,
+                'go_to_shop' => true,
+            )
+        );
+    }
+
+    $limit    = min( $batch, $remaining );
+    $products = doroshopping_get_products_by_category( $cat_id, $limit, 'popularity', $page );
+    $html     = '';
+    $count    = 0;
+
+    if ( is_array( $products ) ) {
+        foreach ( $products as $product ) {
+            $html .= doroshopping_render_home_product_card( $product );
+            $count++;
+        }
+    }
+
+    $new_shown  = $shown + $count;
+    $go_to_shop = ( $count < $limit ) || ( $new_shown >= $max );
+
+    wp_send_json_success(
+        array(
+            'html'       => $html,
+            'count'      => $count,
+            'shown'      => $new_shown,
+            'page'       => $page,
+            'done'       => $go_to_shop,
+            'go_to_shop' => $go_to_shop,
+        )
+    );
+}
+add_action( 'wp_ajax_doroshopping_home_load_more', 'doroshopping_ajax_home_load_more' );
+add_action( 'wp_ajax_nopriv_doroshopping_home_load_more', 'doroshopping_ajax_home_load_more' );
+
+

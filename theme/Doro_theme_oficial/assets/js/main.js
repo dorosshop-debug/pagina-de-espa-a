@@ -6,6 +6,7 @@ function doroshoppingBoot() {
     initLocaleFlagOptions();
     initHeroCarousel();
     initCategoryCarousels();
+    initRelatedProductsCarousel();
     initPromoParallax();
     initCartModal();
     initLiveSearch();
@@ -18,6 +19,12 @@ function doroshoppingBoot() {
     initWishlist();
     initAddressModal();
     initBigBuyShipping();
+    initCheckoutHelpers();
+    initCheckoutCountrySeed();
+    hideTechnicalCheckoutNotices();
+    initShopLoadMore();
+    initShopCategoryFilter();
+    initHomeLoadMore();
 }
 
 function doroshoppingStart() {
@@ -68,22 +75,91 @@ function initAddressModal() {
         'billing_country'
     ];
 
+    function $jq() {
+        return window.jQuery || null;
+    }
+
+    /**
+     * Select2/SelectWoo en el modal se rompe (desplegable abajo / países en Departamento).
+     * Usamos <select> nativo; country_to_state de WooCommerce sigue funcionando.
+     */
+    function useNativeSelects() {
+        var $ = $jq();
+
+        if ($ && $.fn) {
+            var plugin = $.fn.selectWoo ? 'selectWoo' : ($.fn.select2 ? 'select2' : null);
+            if (plugin) {
+                $(modal).find('select').each(function () {
+                    var $el = $(this);
+                    if ($el.hasClass('select2-hidden-accessible') || $el.data(plugin) || $el.data('select2') || $el.data('selectWoo')) {
+                        try {
+                            $el[plugin]('destroy');
+                        } catch (err) { /* ignore */ }
+                    }
+                    $el.removeClass('select2-hidden-accessible enhanced');
+                    $el.css({ width: '100%', display: 'block', visibility: 'visible' });
+                    $el.removeAttr('aria-hidden tabindex');
+                });
+            }
+        }
+
+        modal.querySelectorAll('.select2-container').forEach(function (el) {
+            if (el.parentNode) el.parentNode.removeChild(el);
+        });
+
+        modal.querySelectorAll('select').forEach(function (sel) {
+            sel.style.display = 'block';
+            sel.style.visibility = 'visible';
+            sel.style.width = '100%';
+            sel.removeAttribute('aria-hidden');
+        });
+    }
+
+    function syncShippingFromBilling() {
+        var map = [
+            ['billing_first_name', 'shipping_first_name'],
+            ['billing_last_name', 'shipping_last_name'],
+            ['billing_company', 'shipping_company'],
+            ['billing_country', 'shipping_country'],
+            ['billing_address_1', 'shipping_address_1'],
+            ['billing_address_2', 'shipping_address_2'],
+            ['billing_city', 'shipping_city'],
+            ['billing_state', 'shipping_state'],
+            ['billing_postcode', 'shipping_postcode']
+        ];
+        map.forEach(function (pair) {
+            var from = document.getElementById(pair[0]);
+            var to = document.getElementById(pair[1]);
+            if (from && to) {
+                to.value = from.value;
+            }
+        });
+        var shipToDiff = document.getElementById('ship-to-different-address-checkbox');
+        if (shipToDiff) {
+            shipToDiff.checked = false;
+        }
+    }
+
     function openModal(mode) {
         modal.hidden = false;
+        modal.removeAttribute('hidden');
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('doro-modal-open');
         if (titleEl) {
             titleEl.textContent = mode === 'edit' ? 'Editar dirección de entrega' : 'Añadir nueva dirección';
         }
         clearFieldErrors();
-        var first = modal.querySelector('input:not([type="hidden"]), select, textarea');
-        if (first && typeof first.focus === 'function') {
-            setTimeout(function () { first.focus(); }, 50);
-        }
-        // Asegura scroll usable en iOS / modales largos.
         if (bodyEl) {
             bodyEl.scrollTop = 0;
         }
+        useNativeSelects();
+        setTimeout(function () {
+            useNativeSelects();
+            var first = modal.querySelector('#billing_first_name, input:not([type="hidden"]), select, textarea');
+            if (first && typeof first.focus === 'function') {
+                first.focus();
+            }
+        }, 50);
     }
 
     function closeModal() {
@@ -91,6 +167,9 @@ function initAddressModal() {
         if (active && modal.contains(active) && typeof active.blur === 'function') {
             active.blur();
         }
+        document.querySelectorAll('body > .select2-container--open, body > .select2-dropdown').forEach(function (el) {
+            if (el.parentNode) el.parentNode.removeChild(el);
+        });
         modal.setAttribute('aria-hidden', 'true');
         modal.hidden = true;
         document.body.classList.remove('doro-modal-open');
@@ -134,8 +213,6 @@ function initAddressModal() {
             var el = document.getElementById(id) || modal.querySelector('[name="' + id + '"]');
             if (!el || el.disabled || el.type === 'hidden') return;
             var row = el.closest('.form-row');
-            var isRequired = (row && row.classList.contains('validate-required')) || el.hasAttribute('required');
-            if (!isRequired && requiredIds.indexOf(id) === -1) return;
             var value = el.value ? String(el.value).trim() : '';
             if (!value) {
                 if (row) {
@@ -145,11 +222,21 @@ function initAddressModal() {
             }
         });
 
-        // HTML5 / Woo required extras.
+        var state = document.getElementById('billing_state');
+        if (state && !state.disabled) {
+            var stateRow = state.closest('.form-row');
+            var stateRequired = stateRow && stateRow.classList.contains('validate-required');
+            var stateVal = state.value ? String(state.value).trim() : '';
+            if (stateRequired && !stateVal) {
+                if (stateRow) stateRow.classList.add('doro-field-error', 'woocommerce-invalid');
+                if (!firstInvalid) firstInvalid = state;
+            }
+        }
+
         modal.querySelectorAll('.validate-required input, .validate-required select, .validate-required textarea, [required]').forEach(function (field) {
             if (field.disabled || field.type === 'hidden') return;
             var value = field.value ? String(field.value).trim() : '';
-            if (!value || (typeof field.checkValidity === 'function' && !field.checkValidity())) {
+            if (!value) {
                 var row = field.closest('.form-row');
                 if (row) row.classList.add('doro-field-error', 'woocommerce-invalid');
                 if (!firstInvalid) firstInvalid = field;
@@ -159,27 +246,21 @@ function initAddressModal() {
         if (firstInvalid) {
             showErrorBanner('Completa los campos obligatorios marcados en rojo.');
             if (typeof firstInvalid.focus === 'function') firstInvalid.focus();
-            if (typeof firstInvalid.reportValidity === 'function') {
-                try { firstInvalid.reportValidity(); } catch (err) { /* ignore */ }
-            }
             return false;
         }
         return true;
     }
 
     function triggerCheckoutUpdate() {
-        if (window.jQuery) {
-            window.jQuery(document.body).trigger('update_checkout');
+        var $ = $jq();
+        if ($) {
+            $(document.body).trigger('update_checkout');
         }
     }
 
     function syncEditButton() {
         if (!editBtn) return;
-        if (hasAddress()) {
-            editBtn.hidden = false;
-        } else {
-            editBtn.hidden = true;
-        }
+        editBtn.hidden = !hasAddress();
     }
 
     function updatePreview() {
@@ -189,6 +270,8 @@ function initAddressModal() {
         var city = readField('billing_city');
         var postcode = readField('billing_postcode');
         var phone = readField('billing_phone');
+        var country = readField('billing_country');
+        var state = readField('billing_state');
 
         function esc(str) {
             return String(str || '')
@@ -200,15 +283,19 @@ function initAddressModal() {
         }
 
         if (!name && !address) {
-            preview.innerHTML = '<p class="doro-checkout-address__empty">Aún no has añadido una dirección de entrega.</p>';
+            var emptyMsg = (window.doroshoppingShipping && window.doroshoppingShipping.i18n && window.doroshoppingShipping.i18n.emptyAddress)
+                ? window.doroshoppingShipping.i18n.emptyAddress
+                : 'Aún no has añadido una dirección de entrega.';
+            preview.innerHTML = '<p class="doro-checkout-address__empty">' + esc(emptyMsg) + '</p>';
             syncEditButton();
             return;
         }
         preview.innerHTML =
             '<div class="doro-checkout-address__card">' +
-                '<strong>' + esc(name || 'Dirección') + '</strong>' +
+                '<strong>' + esc(name || 'Direccion') + '</strong>' +
                 (address ? '<span>' + esc(address) + '</span>' : '') +
                 ((postcode || city) ? '<span>' + esc([postcode, city].filter(Boolean).join(' ')) + '</span>' : '') +
+                ((state || country) ? '<span>' + esc([state, country].filter(Boolean).join(', ')) + '</span>' : '') +
                 (phone ? '<span>' + esc(phone) + '</span>' : '') +
             '</div>';
         syncEditButton();
@@ -232,6 +319,7 @@ function initAddressModal() {
         confirmBtn.addEventListener('click', function (e) {
             e.preventDefault();
             if (!validateModalFields()) return;
+            syncShippingFromBilling();
             updatePreview();
             closeModal();
             triggerCheckoutUpdate();
@@ -248,7 +336,23 @@ function initAddressModal() {
         if (e.key === 'Escape' && !modal.hidden) closeModal();
     });
 
-    // Si intentan pagar sin dirección, abrir el modal.
+    var $ = $jq();
+    if ($) {
+        $(document.body).on('country_to_state_changed updated_checkout', function () {
+            if (!modal.hidden) {
+                setTimeout(useNativeSelects, 20);
+                setTimeout(useNativeSelects, 150);
+            }
+        });
+        $(modal).on('change', '#billing_country', function () {
+            setTimeout(useNativeSelects, 100);
+            setTimeout(useNativeSelects, 250);
+        });
+    }
+
+    useNativeSelects();
+    setTimeout(useNativeSelects, 300);
+
     document.body.addEventListener('click', function (e) {
         var placeOrder = e.target.closest('#place_order');
         if (!placeOrder) return;
@@ -258,7 +362,6 @@ function initAddressModal() {
             openModal('add');
             return;
         }
-        // Revalidar campos obligatorios antes de pagar.
         if (!validateModalFields()) {
             e.preventDefault();
             e.stopPropagation();
@@ -270,8 +373,281 @@ function initAddressModal() {
 }
 
 /**
- * Modal de login (AliExpress style).
+ * Franja login/cupón del checkout (sustituye avisos WC).
  */
+function initCheckoutHelpers() {
+    var buttons = document.querySelectorAll('[data-doro-checkout-toggle]');
+    if (!buttons.length) return;
+
+    buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var type = btn.getAttribute('data-doro-checkout-toggle');
+            var panel = document.getElementById(type === 'login' ? 'doro-checkout-login-panel' : 'doro-checkout-coupon-panel');
+            if (!panel) return;
+
+            var willOpen = panel.hasAttribute('hidden');
+            document.querySelectorAll('.doro-checkout-panel').forEach(function (el) {
+                el.hidden = true;
+                el.setAttribute('hidden', '');
+            });
+            document.querySelectorAll('[data-doro-checkout-toggle]').forEach(function (other) {
+                other.setAttribute('aria-expanded', 'false');
+            });
+
+            if (willOpen) {
+                panel.hidden = false;
+                panel.removeAttribute('hidden');
+                btn.setAttribute('aria-expanded', 'true');
+                var focusEl = panel.querySelector('input:not([type="hidden"]), button');
+                if (focusEl && typeof focusEl.focus === 'function') {
+                    setTimeout(function () { focusEl.focus(); }, 40);
+                }
+            }
+        });
+    });
+}
+
+/**
+ * Prefija país de facturación/envío desde cookie (Klarna / Stripe locales).
+ */
+function initCheckoutCountrySeed() {
+    if (!document.body.classList.contains('woocommerce-checkout') && !document.querySelector('.doro-checkout-form')) {
+        return;
+    }
+
+    function readCookie(name) {
+        var match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()[\]\\/+^])/g, '\\$1') + '=([^;]*)'));
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    var fromCookie = (readCookie('doroshopping_country') || '').toUpperCase().slice(0, 2);
+    if (fromCookie === 'UK') fromCookie = 'GB';
+    var country = fromCookie || 'ES';
+
+    ['billing_country', 'shipping_country'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (!el.value) {
+            el.value = country;
+            if (window.jQuery) {
+                window.jQuery(el).trigger('change');
+            }
+        }
+    });
+
+    if (window.jQuery) {
+        setTimeout(function () {
+            window.jQuery(document.body).trigger('update_checkout');
+        }, 400);
+    }
+}
+
+/**
+ * Oculta el aviso técnico de zona de coincidencia si el filtro PHP no llega a tiempo.
+ */
+function hideTechnicalCheckoutNotices() {
+    function scrub() {
+        document.querySelectorAll('.woocommerce-message, .woocommerce-info').forEach(function (el) {
+            var text = (el.textContent || '').toLowerCase();
+            if (text.indexOf('zona de coincidencia') !== -1 || text.indexOf('matching zone') !== -1) {
+                el.classList.add('doro-notice-hidden');
+                el.setAttribute('hidden', '');
+            }
+        });
+    }
+    scrub();
+    if (window.jQuery) {
+        window.jQuery(document.body).on('updated_checkout', scrub);
+    }
+}
+
+/**
+ * Tienda: botón «Ver más» carga la siguiente página y añade productos al grid.
+ */
+function initShopLoadMore() {
+    var wrap = document.querySelector('[data-doro-load-more]');
+    var btn = wrap ? wrap.querySelector('[data-doro-load-more-btn]') : null;
+    if (!btn) return;
+
+    var grid = document.querySelector('.doro-shop ul.products, .woocommerce ul.products');
+    if (!grid) return;
+
+    var loading = false;
+    var labelDefault = btn.textContent;
+
+    btn.addEventListener('click', function () {
+        if (loading) return;
+        var nextUrl = btn.getAttribute('data-next-url');
+        if (!nextUrl) return;
+
+        loading = true;
+        btn.classList.add('is-loading');
+        btn.disabled = true;
+        btn.textContent = (window.doroshoppingI18n && window.doroshoppingI18n.loading) ? window.doroshoppingI18n.loading : 'Cargando…';
+
+        fetch(nextUrl, { credentials: 'same-origin' })
+            .then(function (res) { return res.text(); })
+            .then(function (html) {
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(html, 'text/html');
+                var nextItems = doc.querySelectorAll('.doro-shop ul.products > li.product, .woocommerce ul.products > li.product');
+                nextItems.forEach(function (item) {
+                    grid.appendChild(document.importNode(item, true));
+                });
+
+                var nextBtn = doc.querySelector('[data-doro-load-more-btn]');
+                if (nextBtn && nextBtn.getAttribute('data-next-url')) {
+                    btn.setAttribute('data-next-url', nextBtn.getAttribute('data-next-url'));
+                    btn.setAttribute('data-next-page', nextBtn.getAttribute('data-next-page') || '');
+                    btn.setAttribute('data-total-pages', nextBtn.getAttribute('data-total-pages') || '');
+                    btn.disabled = false;
+                    btn.classList.remove('is-loading');
+                    btn.textContent = labelDefault;
+                } else {
+                    if (wrap) wrap.remove();
+                }
+
+                if (window.jQuery) {
+                    window.jQuery(document.body).trigger('doro_products_loaded');
+                }
+            })
+            .catch(function () {
+                window.location.href = nextUrl;
+            })
+            .finally(function () {
+                loading = false;
+            });
+    });
+}
+
+/**
+ * Filtro de categorías: desplegar / plegar subcategorías.
+ */
+function initShopCategoryFilter() {
+    var root = document.querySelector('.doro-shop__filter-list--cats');
+    if (!root) return;
+
+    root.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-doro-cat-toggle]');
+        if (!btn || !root.contains(btn)) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var item = btn.closest('.doro-shop__cat-item');
+        var panelId = btn.getAttribute('aria-controls');
+        var panel = panelId ? document.getElementById(panelId) : (item ? item.querySelector(':scope > .doro-shop__subcats') : null);
+        if (!item || !panel) return;
+
+        var willOpen = panel.hasAttribute('hidden');
+        if (willOpen) {
+            panel.hidden = false;
+            panel.removeAttribute('hidden');
+            item.classList.add('is-open');
+            btn.setAttribute('aria-expanded', 'true');
+        } else {
+            panel.hidden = true;
+            panel.setAttribute('hidden', '');
+            item.classList.remove('is-open');
+            btn.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
+
+/**
+ * Home: Ver más carga lotes de 30 hasta el máximo del Customizer; luego → tienda.
+ */
+function initHomeLoadMore() {
+    var section = document.querySelector('[data-home-products]');
+    if (!section) return;
+
+    var grid = section.querySelector('[data-home-products-grid]');
+    var wrap = section.querySelector('[data-home-load-more]');
+    var btn = section.querySelector('[data-home-load-more-btn]');
+    if (!grid || !wrap) return;
+
+    var cfg = window.doroshoppingHome || {};
+    var ajaxUrl = cfg.ajaxUrl || '';
+    var nonce = cfg.nonce || '';
+    var i18n = cfg.i18n || {};
+    var loading = false;
+
+    function switchToShop() {
+        var shopUrl = section.getAttribute('data-shop-url') || '/';
+        wrap.innerHTML = '';
+        var link = document.createElement('a');
+        link.className = 'doro-load-more__btn';
+        link.href = shopUrl;
+        link.textContent = i18n.viewShop || 'Ver más en la tienda';
+        wrap.appendChild(link);
+    }
+
+    if (!btn) return;
+
+    btn.addEventListener('click', function () {
+        if (loading || !ajaxUrl) return;
+
+        var page = parseInt(section.getAttribute('data-page') || '1', 10) + 1;
+        var shown = parseInt(section.getAttribute('data-shown') || '0', 10);
+        var max = parseInt(section.getAttribute('data-max') || '90', 10);
+        var batch = parseInt(section.getAttribute('data-batch') || '30', 10);
+        var catId = section.getAttribute('data-cat-id') || '0';
+
+        if (shown >= max) {
+            switchToShop();
+            return;
+        }
+
+        loading = true;
+        btn.disabled = true;
+        btn.classList.add('is-loading');
+        btn.textContent = i18n.loading || 'Cargando…';
+
+        var body = new FormData();
+        body.append('action', 'doroshopping_home_load_more');
+        body.append('nonce', nonce);
+        body.append('page', String(page));
+        body.append('shown', String(shown));
+        body.append('max', String(max));
+        body.append('batch', String(batch));
+        body.append('cat_id', String(catId));
+
+        fetch(ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
+            .then(function (res) { return res.json(); })
+            .then(function (json) {
+                if (!json || !json.success || !json.data) {
+                    throw new Error('bad response');
+                }
+                var data = json.data;
+                if (data.html) {
+                    var tmp = document.createElement('div');
+                    tmp.innerHTML = data.html;
+                    while (tmp.firstChild) {
+                        grid.appendChild(tmp.firstChild);
+                    }
+                }
+
+                section.setAttribute('data-page', String(data.page || page));
+                section.setAttribute('data-shown', String(data.shown != null ? data.shown : shown));
+
+                if (data.go_to_shop || data.done || !data.count) {
+                    switchToShop();
+                    return;
+                }
+
+                btn.disabled = false;
+                btn.classList.remove('is-loading');
+                btn.textContent = i18n.viewMore || 'Ver más';
+            })
+            .catch(function () {
+                switchToShop();
+            })
+            .finally(function () {
+                loading = false;
+            });
+    });
+}
+
 function initAuthModal() {
     var modal = document.getElementById('doro-auth-modal');
     if (!modal) return;
@@ -335,7 +711,7 @@ function initAuthModal() {
         if (!googleBtn) return;
         e.preventDefault();
         e.stopPropagation();
-        window.alert('Configura el login con Google: activa Nextend Social Login (o pega la URL en Apariencia → Personalizar → DoroTheme → Login / Google).');
+        window.alert('Configura el login con Google: activa Nextend Social Login (o pega la URL en Apariencia â†’ Personalizar â†’ DoroTheme â†’ Login / Google).');
     }, true);
 }
 
@@ -401,6 +777,7 @@ function initLocaleFlagOptions() {
 
     var headerFlag = document.querySelector('.site-header__flag');
     var headerLangLabel = document.querySelector('[aria-controls="dropdown-locale"] .site-header__utility-label');
+    var localeMap = (window.doroshoppingShipping && window.doroshoppingShipping.localeMap) || {};
 
     function closeSelect(select) {
         var toggle = select.querySelector('[data-locale-toggle]');
@@ -415,6 +792,98 @@ function initLocaleFlagOptions() {
             if (except && select === except) return;
             closeSelect(select);
         });
+    }
+
+    function setSelectValue(fieldName, value) {
+        if (!value) return;
+        var select = document.querySelector('[data-locale-select="' + fieldName + '"]');
+        if (!select) return;
+        var input = select.querySelector('input[type="hidden"]');
+        var valueWrap = select.querySelector('.header-locale-select__value');
+        var options = Array.prototype.slice.call(select.querySelectorAll('.header-locale-select__option'));
+        var match = options.filter(function (btn) {
+            return (btn.getAttribute('data-value') || '').toLowerCase() === String(value).toLowerCase();
+        })[0];
+        if (!match) return;
+
+        options.forEach(function (other) {
+            var selected = other === match;
+            other.classList.toggle('is-selected', selected);
+            other.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+        if (input) input.value = match.getAttribute('data-value') || value;
+
+        if (valueWrap) {
+            var flag = match.getAttribute('data-flag') || '';
+            var label = match.getAttribute('data-label') || '';
+            valueWrap.innerHTML = '';
+            if (flag) {
+                var img = document.createElement('img');
+                img.className = 'header-locale-select__flag';
+                img.src = flag;
+                img.alt = '';
+                img.width = 16;
+                img.height = 16;
+                valueWrap.appendChild(img);
+            }
+            var text = document.createElement('span');
+            text.className = 'header-locale-select__text';
+            text.textContent = label;
+            valueWrap.appendChild(text);
+        }
+
+        if (fieldName === 'lengua' && headerLangLabel) {
+            headerLangLabel.textContent = match.getAttribute('data-label') || value;
+        }
+    }
+
+    function setCurrency(code) {
+        if (!code) return;
+        code = String(code).toUpperCase();
+        setSelectValue('divisa', code);
+
+        var fallback = document.getElementById('locale-divisa');
+        if (fallback && fallback.tagName === 'SELECT') {
+            fallback.value = code;
+        }
+
+        // CURCY / Yay / selectores de plugin (slot oculto).
+        var slot = document.querySelector('[data-curcy-currency-slot], [data-yay-currency-slot], .site-header__plugin-slot--currency');
+        if (!slot) return;
+        var selectsInSlot = slot.querySelectorAll('select');
+        selectsInSlot.forEach(function (sel) {
+            var opts = Array.prototype.slice.call(sel.options || []);
+            var found = opts.filter(function (opt) {
+                var v = String(opt.value || '').toUpperCase();
+                var t = String(opt.text || '').toUpperCase();
+                return v === code || v.indexOf(code) !== -1 || t.indexOf(code) !== -1;
+            })[0];
+            if (found) {
+                sel.value = found.value;
+                if (window.jQuery) {
+                    window.jQuery(sel).trigger('change');
+                } else {
+                    sel.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        });
+        // CURCY enlaces data-currency.
+        var link = slot.querySelector('[data-currency="' + code + '"], a[href*="wmc-currency=' + code + '"]');
+        if (link && typeof link.click === 'function' && !link.classList.contains('wmc-active')) {
+            // No auto-click al elegir ubicación (evitar navegación doble); Guardar aplica ?wmc-currency=.
+        }
+    }
+
+    function applyLocationDefaults(countryCode, btn) {
+        var code = String(countryCode || '').toUpperCase();
+        if (code === 'UK') code = 'GB';
+        var fromBtnLang = btn ? btn.getAttribute('data-lang') : '';
+        var fromBtnCur = btn ? btn.getAttribute('data-currency') : '';
+        var mapped = localeMap[code] || {};
+        var lang = fromBtnLang || mapped.lang || '';
+        var currency = fromBtnCur || mapped.currency || '';
+        if (lang) setSelectValue('lengua', lang);
+        if (currency) setCurrency(currency);
     }
 
     selects.forEach(function (select) {
@@ -471,8 +940,9 @@ function initLocaleFlagOptions() {
                 text.textContent = label;
                 valueWrap.appendChild(text);
 
-                if (field === 'ubicacion' && headerFlag && flag) {
-                    headerFlag.src = flag;
+                if (field === 'ubicacion') {
+                    if (headerFlag && flag) headerFlag.src = flag;
+                    applyLocationDefaults(value, btn);
                 }
                 if (field === 'lengua' && headerLangLabel && label) {
                     headerLangLabel.textContent = label;
@@ -490,6 +960,18 @@ function initLocaleFlagOptions() {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeAll();
     });
+
+    // Guardar: feedback inmediato.
+    var form = document.querySelector('[data-locale-form]');
+    if (form) {
+        form.addEventListener('submit', function () {
+            var btn = form.querySelector('.header-dropdown__submit');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Guardando…';
+            }
+        });
+    }
 }
 
 function initMegaMenu() {
@@ -776,6 +1258,184 @@ function initCategoryCarousels() {
     });
 }
 
+function initRelatedProductsCarousel() {
+    var roots = document.querySelectorAll('[data-related-carousel]');
+    if (!roots.length) return;
+
+    var intervalMs = 4500;
+
+    function getVisibleCount() {
+        if (window.innerWidth <= 480) return 2;
+        if (window.innerWidth <= 768) return 3;
+        if (window.innerWidth <= 1100) return 4;
+        return 5;
+    }
+
+    function getGap(list) {
+        var style = window.getComputedStyle(list);
+        var gap = parseFloat(style.columnGap || style.gap);
+        return isNaN(gap) ? 12 : gap;
+    }
+
+    roots.forEach(function (root) {
+        if (root.getAttribute('data-carousel-ready') === '1') return;
+
+        var list = root.querySelector('ul.products');
+        if (!list) return;
+
+        var items = Array.prototype.slice.call(list.children).filter(function (el) {
+            return el.nodeType === 1 && el.classList.contains('product');
+        });
+        if (items.length < 2) return;
+
+        root.setAttribute('data-carousel-ready', '1');
+
+        var carousel = document.createElement('div');
+        carousel.className = 'doro-related-carousel';
+
+        var viewport = document.createElement('div');
+        viewport.className = 'doro-related-carousel__viewport';
+
+        list.parentNode.insertBefore(carousel, list);
+        viewport.appendChild(list);
+        carousel.appendChild(viewport);
+
+        list.classList.add('is-carousel-track');
+
+        var prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'doro-related-carousel__btn doro-related-carousel__btn--prev';
+        prevBtn.setAttribute('aria-label', 'Anterior');
+        prevBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>';
+
+        var nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'doro-related-carousel__btn doro-related-carousel__btn--next';
+        nextBtn.setAttribute('aria-label', 'Siguiente');
+        nextBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
+
+        var dotsWrap = document.createElement('div');
+        dotsWrap.className = 'doro-related-carousel__dots';
+        dotsWrap.setAttribute('role', 'tablist');
+
+        carousel.appendChild(prevBtn);
+        carousel.appendChild(nextBtn);
+        carousel.appendChild(dotsWrap);
+
+        var current = 0;
+        var timer = null;
+        var pageCount = 1;
+
+        function rebuildDots() {
+            dotsWrap.innerHTML = '';
+            for (var i = 0; i < pageCount; i++) {
+                var dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'doro-related-carousel__dot' + (i === current ? ' is-active' : '');
+                dot.setAttribute('aria-label', 'Página ' + (i + 1));
+                dot.setAttribute('data-page', String(i));
+                dotsWrap.appendChild(dot);
+            }
+            dotsWrap.querySelectorAll('.doro-related-carousel__dot').forEach(function (dot) {
+                dot.addEventListener('click', function () {
+                    goTo(parseInt(dot.getAttribute('data-page'), 10));
+                    startAuto();
+                });
+            });
+        }
+
+        function updateButtons() {
+            var multi = pageCount > 1;
+            prevBtn.disabled = !multi;
+            nextBtn.disabled = !multi;
+            dotsWrap.style.display = multi ? '' : 'none';
+            prevBtn.style.display = multi ? '' : 'none';
+            nextBtn.style.display = multi ? '' : 'none';
+        }
+
+        function goTo(page) {
+            var visible = getVisibleCount();
+            var gap = getGap(list);
+            pageCount = Math.max(1, Math.ceil(items.length / visible));
+            current = ((page % pageCount) + pageCount) % pageCount;
+
+            var productWidth = items[0].getBoundingClientRect().width;
+            var shift = current * visible * (productWidth + gap);
+            list.style.transform = shift > 0 ? 'translateX(-' + shift + 'px)' : 'translateX(0)';
+
+            if (dotsWrap.children.length !== pageCount) rebuildDots();
+            dotsWrap.querySelectorAll('.doro-related-carousel__dot').forEach(function (dot, i) {
+                dot.classList.toggle('is-active', i === current);
+            });
+            updateButtons();
+        }
+
+        function next() {
+            goTo(current + 1);
+        }
+
+        function prev() {
+            goTo(current - 1);
+        }
+
+        function startAuto() {
+            stopAuto();
+            if (pageCount < 2) return;
+            timer = setInterval(next, intervalMs);
+        }
+
+        function stopAuto() {
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+
+        prevBtn.addEventListener('click', function () {
+            prev();
+            startAuto();
+        });
+        nextBtn.addEventListener('click', function () {
+            next();
+            startAuto();
+        });
+
+        carousel.addEventListener('mouseenter', stopAuto);
+        carousel.addEventListener('mouseleave', startAuto);
+
+        var touchStartX = 0;
+        var touchDelta = 0;
+        viewport.addEventListener('touchstart', function (e) {
+            if (!e.touches.length) return;
+            touchStartX = e.touches[0].clientX;
+            touchDelta = 0;
+            stopAuto();
+        }, { passive: true });
+        viewport.addEventListener('touchmove', function (e) {
+            if (!e.touches.length) return;
+            touchDelta = e.touches[0].clientX - touchStartX;
+        }, { passive: true });
+        viewport.addEventListener('touchend', function () {
+            if (Math.abs(touchDelta) > 40) {
+                if (touchDelta < 0) next();
+                else prev();
+            }
+            startAuto();
+        });
+
+        var resizeTimer;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                goTo(current);
+            }, 120);
+        });
+
+        goTo(0);
+        startAuto();
+    });
+}
+
 function initPromoParallax() {
     var promo = document.querySelector('[data-promo-parallax]');
     if (!promo) return;
@@ -905,7 +1565,7 @@ function initCartModal() {
         updateCounts(data.count || 0);
 
         if (subtotalEl) {
-            subtotalEl.innerHTML = data.subtotal_html || '—';
+            subtotalEl.innerHTML = data.subtotal_html || 'â€”';
         }
 
         if (checkoutEl) {
@@ -931,7 +1591,7 @@ function initCartModal() {
                             '</div>' +
                             '<div class="cart-modal__item-bottom">' +
                                 '<div class="cart-modal__qty">' +
-                                    '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="-1" aria-label="' + escapeHtml(i18n('decrease', 'Reducir cantidad')) + '">−</button>' +
+                                    '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="-1" aria-label="' + escapeHtml(i18n('decrease', 'Reducir cantidad')) + '">âˆ’</button>' +
                                     '<span class="cart-modal__qty-value">' + escapeHtml(item.quantity) + '</span>' +
                                     '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="1" aria-label="' + escapeHtml(i18n('increase', 'Aumentar cantidad')) + '">+</button>' +
                                 '</div>' +
@@ -972,7 +1632,7 @@ function initCartModal() {
             return Promise.resolve({
                 items: [],
                 count: 0,
-                subtotal_html: '—',
+                subtotal_html: 'â€”',
                 checkout_url: cfg.checkoutUrl || '#',
                 recommendations: [],
                 empty_message: i18n('empty', 'Tu carrito esta vacio.')

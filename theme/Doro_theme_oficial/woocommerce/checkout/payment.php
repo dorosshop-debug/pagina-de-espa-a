@@ -26,7 +26,14 @@ if ( ! wp_doing_ajax() ) {
                     wc_get_template( 'checkout/payment-method.php', array( 'gateway' => $gateway ) );
                 }
             } else {
-                echo '<li class="woocommerce-notice woocommerce-notice--info woocommerce-info">' . esc_html( apply_filters( 'woocommerce_no_available_payment_methods_message', WC()->customer->get_billing_country() ? __( 'No hay métodos de pago disponibles. Contacta con la tienda.', 'doroshopping' ) : __( 'Introduce tu dirección para ver métodos de pago.', 'doroshopping' ) ) ) . '</li>';
+                $no_gateways_msg = apply_filters(
+                    'woocommerce_no_available_payment_methods_message',
+                    WC()->customer->get_billing_country()
+                        ? __( 'No hay métodos de pago disponibles. Contacta con la tienda.', 'doroshopping' )
+                        : __( 'Introduce tu dirección para ver métodos de pago.', 'doroshopping' )
+                );
+                // Plugins (p. ej. Elementor) pueden devolver HTML; no escapar como texto plano.
+                echo '<li class="woocommerce-notice woocommerce-notice--info woocommerce-info">' . wp_kses_post( $no_gateways_msg ) . '</li>';
             }
             ?>
         </ul>

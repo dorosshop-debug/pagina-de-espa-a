@@ -390,7 +390,7 @@ function doroshopping_customize_register( $wp_customize ) {
     $wp_customize->add_setting(
         'doroshopping_home_featured_limit',
         array(
-            'default'           => 24,
+            'default'           => 90,
             'sanitize_callback' => 'absint',
         )
     );
@@ -398,11 +398,13 @@ function doroshopping_customize_register( $wp_customize ) {
         'doroshopping_home_featured_limit',
         array(
             'label'       => __( 'Cantidad de productos destacados', 'doroshopping' ),
+            'description' => __( 'Máximo de productos en el home. Se muestran de 30 en 30 con «Ver más». Al alcanzar este límite, el botón lleva a la tienda.', 'doroshopping' ),
             'section'     => 'doroshopping_home_grids',
             'type'        => 'number',
             'input_attrs' => array(
-                'min' => 4,
-                'max' => 48,
+                'min' => 30,
+                'max' => 300,
+                'step' => 30,
             ),
         )
     );
@@ -482,7 +484,7 @@ function doroshopping_customize_register( $wp_customize ) {
         'doroshopping_bigbuy',
         array(
             'title'       => __( 'BigBuy / Envíos', 'doroshopping' ),
-            'description' => __( 'También puedes definir DORO_BIGBUY_API_KEY y DORO_BIGBUY_ENDPOINT en wp-config.php (prioridad sobre estos campos).', 'doroshopping' ),
+            'description' => __( 'Shipping API oficial BigBuy (POST /rest/shipping/orders.json). También: DORO_BIGBUY_API_KEY y DORO_BIGBUY_MODE en wp-config.php.', 'doroshopping' ),
             'panel'       => 'doroshopping_panel',
         )
     );
@@ -500,23 +502,48 @@ function doroshopping_customize_register( $wp_customize ) {
             'label'       => __( 'API Key BigBuy', 'doroshopping' ),
             'section'     => 'doroshopping_bigbuy',
             'type'        => 'password',
-            'description' => __( 'Sin clave se usa la estimación local por país (fallback).', 'doroshopping' ),
+            'description' => __( 'Header: Authorization Bearer. Sin clave se usa estimación local por país.', 'doroshopping' ),
+        )
+    );
+
+    $wp_customize->add_setting(
+        'doroshopping_bigbuy_mode',
+        array(
+            'default'           => 'live',
+            'sanitize_callback' => static function ( $value ) {
+                $value = sanitize_key( (string) $value );
+                return in_array( $value, array( 'live', 'sandbox' ), true ) ? $value : 'live';
+            },
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_bigbuy_mode',
+        array(
+            'label'       => __( 'Entorno API', 'doroshopping' ),
+            'section'     => 'doroshopping_bigbuy',
+            'type'        => 'select',
+            'choices'     => array(
+                'live'    => __( 'Producción (api.bigbuy.eu)', 'doroshopping' ),
+                'sandbox' => __( 'Sandbox / pruebas (api.sandbox.bigbuy.eu)', 'doroshopping' ),
+            ),
+            'description' => __( 'Según la guía BigBuy. También: define(\'DORO_BIGBUY_MODE\', \'sandbox\');', 'doroshopping' ),
         )
     );
 
     $wp_customize->add_setting(
         'doroshopping_bigbuy_endpoint',
         array(
-            'default'           => 'https://api.bigbuy.eu/rest/shipping/orders.json',
+            'default'           => '',
             'sanitize_callback' => 'esc_url_raw',
         )
     );
     $wp_customize->add_control(
         'doroshopping_bigbuy_endpoint',
         array(
-            'label'   => __( 'Endpoint shipping BigBuy', 'doroshopping' ),
-            'section' => 'doroshopping_bigbuy',
-            'type'    => 'url',
+            'label'       => __( 'Endpoint shipping (opcional)', 'doroshopping' ),
+            'section'     => 'doroshopping_bigbuy',
+            'type'        => 'url',
+            'description' => __( 'Vacío = /rest/shipping/orders.json según el entorno. Solo rellénalo si BigBuy te da otra URL.', 'doroshopping' ),
         )
     );
 
@@ -656,15 +683,17 @@ add_action( 'wp_enqueue_scripts', 'doroshopping_customizer_css', 20 );
  * @param string $orderby Orderby.
  * @return array
  */
-function doroshopping_get_products_by_category( $cat_id = 0, $limit = 8, $orderby = 'popularity' ) {
+function doroshopping_get_products_by_category( $cat_id = 0, $limit = 8, $orderby = 'popularity', $page = 1 ) {
     if ( ! function_exists( 'wc_get_products' ) ) {
         return array();
     }
 
     $args = array(
         'limit'   => max( 1, (int) $limit ),
+        'page'    => max( 1, (int) $page ),
         'status'  => 'publish',
         'orderby' => $orderby,
+        'return'  => 'objects',
     );
 
     $cat_id = absint( $cat_id );

@@ -153,6 +153,20 @@ class Products_Grid_Widget extends \Elementor\Widget_Base {
                 wp_reset_postdata();
                 ?>
             </div>
+            <?php
+            $more_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+            if ( $cat_id > 0 ) {
+                $term_link = get_term_link( $cat_id, 'product_cat' );
+                if ( ! is_wp_error( $term_link ) ) {
+                    $more_url = $term_link;
+                }
+            }
+            ?>
+            <div class="doro-load-more">
+                <a class="doro-load-more__btn" href="<?php echo esc_url( $more_url ); ?>">
+                    <?php esc_html_e( 'Ver más', 'doroshopping' ); ?>
+                </a>
+            </div>
         </section>
         <?php
     }

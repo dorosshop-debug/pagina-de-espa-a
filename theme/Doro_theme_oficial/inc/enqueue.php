@@ -126,6 +126,20 @@ function doroshopping_enqueue_assets() {
 
     wp_localize_script(
         'doroshopping-main',
+        'doroshoppingHome',
+        array(
+            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+            'nonce'   => wp_create_nonce( 'doroshopping_home' ),
+            'i18n'    => array(
+                'loading'  => __( 'Cargando…', 'doroshopping' ),
+                'viewMore' => __( 'Ver más', 'doroshopping' ),
+                'viewShop' => __( 'Ver más en la tienda', 'doroshopping' ),
+            ),
+        )
+    );
+
+    wp_localize_script(
+        'doroshopping-main',
         'doroshoppingCart',
         array(
             'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
@@ -217,9 +231,11 @@ function doroshopping_enqueue_assets() {
                 'CH' => __( 'Suiza', 'doroshopping' ),
             ),
             'i18n'      => array(
-                'loading' => __( 'Calculando envío…', 'doroshopping' ),
-                'error'   => __( 'No se pudo calcular el envío.', 'doroshopping' ),
+                'loading'      => __( 'Calculando envío…', 'doroshopping' ),
+                'error'        => __( 'No se pudo calcular el envío.', 'doroshopping' ),
+                'emptyAddress' => __( 'Aún no has añadido una dirección de entrega.', 'doroshopping' ),
             ),
+            'localeMap' => function_exists( 'doroshopping_get_location_locale_map' ) ? doroshopping_get_location_locale_map() : array(),
             'preview'   => false,
             'checkoutUrl' => function_exists( 'doroshopping_get_checkout_url' ) ? doroshopping_get_checkout_url() : '',
         )
