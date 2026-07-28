@@ -450,3 +450,131 @@
         gap: var(--spacing-sm);
     }
 }
+
+/* Ofertas vacías: sugerencias + carrusel */
+.doro-shop-offers-empty {
+    padding: var(--spacing-xl) 0 var(--spacing-lg);
+}
+
+.doro-shop-offers-empty__intro {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto var(--spacing-xl);
+}
+
+.doro-shop-offers-empty__title {
+    margin: 0 0 var(--spacing-sm);
+    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    color: var(--color-dark);
+}
+
+.doro-shop-offers-empty__text {
+    margin: 0;
+    color: var(--color-grey-text);
+    line-height: 1.5;
+}
+
+.doro-shop-offers-empty__subtitle {
+    margin: 0 0 var(--spacing-md);
+    font-size: var(--font-size-lg);
+    color: var(--color-dark);
+}
+
+.doro-shop-offers-empty__carousel-wrap {
+    position: relative;
+    margin-bottom: var(--spacing-xl);
+}
+
+.doro-shop-offers-empty__carousel-wrap ul.products.is-carousel-track {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    width: 100%;
+    transition: transform 0.45s ease;
+}
+
+.doro-shop-offers-empty__carousel-wrap ul.products.is-carousel-track > li.product {
+    flex: 0 0 calc((100% - 48px) / 5);
+    width: calc((100% - 48px) / 5) !important;
+    max-width: none !important;
+    margin: 0 !important;
+}
+
+.doro-shop-offers-empty__funnel {
+    margin-bottom: var(--spacing-lg);
+}
+
+.doro-shop-offers-empty__funnel-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.doro-shop-offers-empty__funnel-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 16px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: 999px;
+    color: var(--color-dark);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.doro-shop-offers-empty__funnel-link:hover {
+    border-color: var(--color-orange);
+    color: var(--color-orange);
+    background: #fff8f0;
+}
+
+.doro-shop-offers-empty__actions {
+    text-align: center;
+    margin-top: var(--spacing-lg);
+}
+
+.doro-shop-offers-empty__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 24px;
+    border-radius: 999px;
+    background: var(--color-orange);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.doro-shop-offers-empty__cta:hover {
+    opacity: 0.92;
+}
+
+@media (max-width: 1100px) {
+    .doro-shop-offers-empty__carousel-wrap ul.products.is-carousel-track > li.product {
+        flex-basis: calc((100% - 36px) / 4);
+        width: calc((100% - 36px) / 4) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .doro-shop-offers-empty__carousel-wrap ul.products.is-carousel-track {
+        gap: 8px;
+    }
+
+    .doro-shop-offers-empty__carousel-wrap ul.products.is-carousel-track > li.product {
+        flex-basis: calc((100% - 16px) / 3);
+        width: calc((100% - 16px) / 3) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .doro-shop-offers-empty__carousel-wrap ul.products.is-carousel-track > li.product {
+        flex-basis: calc((100% - 8px) / 2);
+        width: calc((100% - 8px) / 2) !important;
+    }
+}

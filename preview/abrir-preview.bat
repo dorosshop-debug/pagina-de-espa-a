@@ -21,11 +21,4 @@ echo Iniciando preview en http://127.0.0.1:%PORT%/
 start "Doro Preview" cmd /c "python -m http.server %PORT%"
 timeout /t 1 /nobreak >nul
 start "" "http://127.0.0.1:%PORT%/index.html"
-start "" "http://127.0.0.1:%PORT%/shop.html"
-start "" "http://127.0.0.1:%PORT%/product.html"
-start "" "http://127.0.0.1:%PORT%/category.html"
-start "" "http://127.0.0.1:%PORT%/cart.html"
-start "" "http://127.0.0.1:%PORT%/checkout.html"
-start "" "http://127.0.0.1:%PORT%/wishlist.html"
-start "" "http://127.0.0.1:%PORT%/account.html"
-start "" "http://127.0.0.1:%PORT%/thankyou.html"
+start "" "http://127.0.0.1:%PORT%/offers.html?logged=1"

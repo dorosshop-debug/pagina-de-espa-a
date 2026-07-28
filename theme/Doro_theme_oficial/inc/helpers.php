@@ -193,6 +193,62 @@ function doroshopping_get_offers_url() {
 }
 
 /**
+ * ¿Vista de ofertas (on_sale o categoría de promociones)?
+ *
+ * @return bool
+ */
+function doroshopping_is_offers_view() {
+    if ( ! is_admin() && ! empty( $_GET['on_sale'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        return true;
+    }
+
+    if ( is_product_category() ) {
+        $term = get_queried_object();
+        if ( $term instanceof WP_Term ) {
+            if ( in_array( $term->slug, array( 'promociones-ofertas', 'ofertas' ), true ) ) {
+                return true;
+            }
+        }
+    }
+
+    return (bool) apply_filters( 'doroshopping_is_offers_view', false );
+}
+
+/**
+ * Productos sugeridos cuando no hay ofertas disponibles.
+ *
+ * @param int $limit Límite.
+ * @return WC_Product[]
+ */
+function doroshopping_get_suggested_products( $limit = 16 ) {
+    if ( ! function_exists( 'wc_get_products' ) ) {
+        return array();
+    }
+
+    $limit = max( 4, min( 24, absint( $limit ) ) );
+    $args  = array(
+        'status'  => 'publish',
+        'limit'   => $limit,
+        'orderby' => 'popularity',
+        'order'   => 'DESC',
+    );
+
+    $products = wc_get_products( $args );
+    if ( empty( $products ) ) {
+        $products = wc_get_products(
+            array(
+                'status'  => 'publish',
+                'limit'   => $limit,
+                'orderby' => 'date',
+                'order'   => 'DESC',
+            )
+        );
+    }
+
+    return is_array( $products ) ? $products : array();
+}
+
+/**
  * URL segura de una página WooCommerce (no cae a home si falta la página).
  *
  * @param string $page shop|cart|checkout|myaccount.

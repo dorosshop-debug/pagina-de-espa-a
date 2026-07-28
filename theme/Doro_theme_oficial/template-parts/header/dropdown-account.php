@@ -50,13 +50,13 @@ $logged_in   = is_user_logged_in();
             </a>
         </li>
         <li>
-            <a href="<?php echo esc_url( $account_url ); ?>">
+            <a href="<?php echo esc_url( doroshopping_get_page_url( 'cupones' ) ); ?>">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9h16v2H4z"/><path d="M7 9V7a5 5 0 0 1 10 0v2"/><path d="M9 13h6"/></svg>
                 <?php esc_html_e( 'Mis Cupones', 'doroshopping' ); ?>
             </a>
         </li>
         <li>
-            <a href="<?php echo esc_url( doroshopping_get_page_url( 'contacto' ) ); ?>">
+            <a href="<?php echo esc_url( doroshopping_get_page_url( 'centro-de-ayuda' ) ); ?>">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>
                 <?php esc_html_e( 'Centro de Ayuda & Soporte', 'doroshopping' ); ?>
             </a>
@@ -76,8 +76,8 @@ $logged_in   = is_user_logged_in();
     </ul>
 
     <ul class="header-dropdown__list header-dropdown__list--footer">
-        <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'contacto' ) ); ?>"><?php esc_html_e( 'Centro de ayuda', 'doroshopping' ); ?></a></li>
-        <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'ayuda-faq' ) ); ?>"><?php esc_html_e( 'FAQ\'s - Preguntas Frecuentes', 'doroshopping' ); ?></a></li>
+        <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'centro-de-ayuda' ) ); ?>"><?php esc_html_e( 'Centro de ayuda', 'doroshopping' ); ?></a></li>
+        <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'preguntas-frecuentes' ) ); ?>"><?php esc_html_e( 'FAQ\'s - Preguntas Frecuentes', 'doroshopping' ); ?></a></li>
         <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'politica-de-devoluciones' ) ); ?>"><?php esc_html_e( 'Politica de devoluciones y reembolsos', 'doroshopping' ); ?></a></li>
         <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'politica-de-privacidad' ) ); ?>"><?php esc_html_e( 'Politica de proteccion de datos personales', 'doroshopping' ); ?></a></li>
         <?php if ( $logged_in ) : ?>

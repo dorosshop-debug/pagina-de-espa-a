@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doroshopping - Ofertas (preview)</title>
+    <link rel="icon" href="../theme/Doro_theme_oficial/assets/images/icon.png">
+    <link rel="stylesheet" href="../theme/Doro_theme_oficial/assets/css/main.css">
+</head>
+<body class="woocommerce logged-in">
+
+<div data-include="partials/header-compact.html"></div>
+
+<main id="main-content" class="doro-shop">
+    <div class="doro-shop__container">
+        <header class="doro-shop__header">
+            <h1 class="doro-shop__title">Ofertas</h1>
+        </header>
+
+        <div class="doro-shop__layout">
+            <aside class="doro-shop__sidebar" aria-label="Filtros"></aside>
+            <div class="doro-shop__main">
+                <section class="doro-shop-offers-empty" aria-labelledby="doro-offers-empty-title">
+                    <div class="doro-shop-offers-empty__intro">
+                        <h2 id="doro-offers-empty-title" class="doro-shop-offers-empty__title">Ahora mismo no hay ofertas activas</h2>
+                        <p class="doro-shop-offers-empty__text">Te mostramos productos populares que podrían interesarte. Vuelve pronto para ver nuevas promociones.</p>
+                    </div>
+
+                    <div class="doro-shop-offers-empty__carousel-wrap" data-product-carousel>
+                        <h3 class="doro-shop-offers-empty__subtitle">Productos recomendados para ti</h3>
+                        <ul class="products columns-5" id="offers-suggested-products"></ul>
+                    </div>
+
+                    <div class="doro-shop-offers-empty__funnel">
+                        <h3 class="doro-shop-offers-empty__subtitle">Explora por categoría</h3>
+                        <div class="doro-shop-offers-empty__funnel-grid">
+                            <a class="doro-shop-offers-empty__funnel-link" href="category.html?c=electronica">Electrónica</a>
+                            <a class="doro-shop-offers-empty__funnel-link" href="category.html?c=informatica">Informática</a>
+                            <a class="doro-shop-offers-empty__funnel-link" href="category.html?c=hogar">Hogar</a>
+                            <a class="doro-shop-offers-empty__funnel-link" href="category.html?c=deportes">Deportes</a>
+                            <a class="doro-shop-offers-empty__funnel-link" href="category.html?c=gaming">Gaming</a>
+                        </div>
+                    </div>
+
+                    <div class="doro-shop-offers-empty__actions">
+                        <a class="doro-shop-offers-empty__cta" href="shop.html">Ver toda la tienda</a>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div data-include="partials/footer.html"></div>
+
+<script src="partials/load-partials.js"></script>
+<script src="preview-session.js"></script>
+<script src="preview-data.js"></script>
+<script src="preview-offers.js"></script>
+<script src="../theme/Doro_theme_oficial/assets/js/main.js"></script>
+</body>
+</html>

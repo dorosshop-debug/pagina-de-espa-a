@@ -129,6 +129,34 @@ function doroshopping_is_register_view() {
 }
 
 /**
+ * ¿Flujo de contraseña (recuperar / establecer tras registro)?
+ *
+ * @return bool
+ */
+function doroshopping_is_password_flow_view() {
+    if ( ! function_exists( 'is_account_page' ) || ! is_account_page() || is_user_logged_in() ) {
+        return false;
+    }
+
+    if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'lost-password' ) ) {
+        return true;
+    }
+
+    if ( isset( $_GET['action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $action = sanitize_key( wp_unslash( $_GET['action'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( in_array( $action, array( 'rp', 'resetpass', 'newaccount' ), true ) ) {
+            return true;
+        }
+    }
+
+    if ( ! empty( $_GET['key'] ) && ! empty( $_GET['login'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * Nombre corto para el header.
  *
  * @return string
@@ -236,6 +264,12 @@ add_action( 'wp_footer', 'doroshopping_render_login_modal', 5 );
 function doroshopping_auth_body_class( $classes ) {
     if ( doroshopping_is_register_view() ) {
         $classes[] = 'doro-register-view';
+    }
+    if ( function_exists( 'doroshopping_is_password_flow_view' ) && doroshopping_is_password_flow_view() ) {
+        $classes[] = 'doro-password-view';
+    }
+    if ( is_user_logged_in() && function_exists( 'is_account_page' ) && is_account_page() ) {
+        $classes[] = 'doro-account-logged-view';
     }
     return $classes;
 }

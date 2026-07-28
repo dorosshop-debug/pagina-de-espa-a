@@ -54,10 +54,11 @@ if ( ! isset( $currencies[ $currency_code ] ) ) {
 	$currency_code = (string) array_key_first( $currencies );
 }
 
-$doroshopping_render_flag_select = static function ( $field_id, $name, $label_id, $items, $selected, $placeholder = '' ) {
+$doroshopping_render_flag_select = static function ( $field_id, $name, $label_id, $items, $selected, $placeholder = '', $field_label = '' ) {
 	$current       = isset( $items[ $selected ] ) ? $items[ $selected ] : null;
 	$current_label = $current ? $current['label'] : $placeholder;
 	$current_flag  = $current ? $current['flag'] : '';
+	$field_label   = $field_label ? $field_label : $placeholder;
 	?>
 	<div class="header-locale-select" data-locale-select="<?php echo esc_attr( $field_id ); ?>">
 		<input type="hidden" name="<?php echo esc_attr( $name ); ?>" id="locale-<?php echo esc_attr( $field_id ); ?>" value="<?php echo esc_attr( $selected ); ?>">
@@ -69,11 +70,14 @@ $doroshopping_render_flag_select = static function ( $field_id, $name, $label_id
 			aria-labelledby="<?php echo esc_attr( $label_id ); ?>"
 			data-locale-toggle
 		>
-			<span class="header-locale-select__value">
-				<?php if ( $current_flag ) : ?>
-					<img class="header-locale-select__flag" src="<?php echo esc_url( $current_flag ); ?>" alt="" width="16" height="16" decoding="async">
-				<?php endif; ?>
-				<span class="header-locale-select__text"><?php echo esc_html( $current_label ); ?></span>
+			<span class="header-locale-select__inner">
+				<span id="<?php echo esc_attr( $label_id ); ?>" class="header-locale-select__field-label"><?php echo esc_html( $field_label ); ?></span>
+				<span class="header-locale-select__value">
+					<?php if ( $current_flag ) : ?>
+						<img class="header-locale-select__flag" src="<?php echo esc_url( $current_flag ); ?>" alt="" width="16" height="16" decoding="async">
+					<?php endif; ?>
+					<span class="header-locale-select__text"><?php echo esc_html( $current_label ); ?></span>
+				</span>
 			</span>
 			<svg class="header-locale-select__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
 		</button>
@@ -110,7 +114,7 @@ $doroshopping_render_flag_select = static function ( $field_id, $name, $label_id
 ?>
 
 <div class="header-dropdown header-dropdown--locale" id="dropdown-locale" hidden>
-	<p class="header-dropdown__title"><?php esc_html_e( 'Selecciona tu ubicación, lengua y moneda de preferencia.', 'doroshopping' ); ?></p>
+	<p class="header-dropdown__title"><?php esc_html_e( 'Seleccione el país/región, el idioma y la moneda que prefiera para comprar.', 'doroshopping' ); ?></p>
 
 	<?php
 	// Slot oculto de plugin (sincronización JS opcional); el selector visible es el del tema.
@@ -144,25 +148,46 @@ $doroshopping_render_flag_select = static function ( $field_id, $name, $label_id
 		<input type="hidden" name="doroshopping_redirect" value="<?php echo esc_url( $redirect_to ); ?>">
 		<?php wp_nonce_field( 'doroshopping_locale_prefs', 'doroshopping_locale_nonce' ); ?>
 
-		<label id="locale-divisa-label"><?php esc_html_e( 'Divisa', 'doroshopping' ); ?></label>
 		<?php
-		$doroshopping_render_flag_select( 'divisa', 'divisa', 'locale-divisa-label', $currencies, $currency_code, __( 'Elegir moneda', 'doroshopping' ) );
+		$doroshopping_render_flag_select(
+			'ubicacion',
+			'ubicacion',
+			'locale-ubicacion-label',
+			$locations,
+			$selected_loc,
+			__( 'Elegir ubicación', 'doroshopping' ),
+			__( 'Ubicación', 'doroshopping' )
+		);
 		?>
-		<p class="header-dropdown__hint"><?php esc_html_e( 'La moneda se aplica al guardar (CURCY / plugin de divisas).', 'doroshopping' ); ?></p>
 
-		<label id="locale-ubicacion-label"><?php esc_html_e( 'Ubicación', 'doroshopping' ); ?></label>
-		<?php
-		$doroshopping_render_flag_select( 'ubicacion', 'ubicacion', 'locale-ubicacion-label', $locations, $selected_loc, __( 'Elegir ubicación', 'doroshopping' ) );
-		?>
-
-		<label id="locale-lengua-label"><?php esc_html_e( 'Lengua', 'doroshopping' ); ?></label>
 		<?php
 		if ( ! empty( $languages ) ) {
-			$doroshopping_render_flag_select( 'lengua', 'lengua', 'locale-lengua-label', $languages, $lang_code );
+			$doroshopping_render_flag_select(
+				'lengua',
+				'lengua',
+				'locale-lengua-label',
+				$languages,
+				$lang_code,
+				'',
+				__( 'Lengua', 'doroshopping' )
+			);
 		} else {
 			echo '<p class="header-dropdown__hint">' . esc_html__( 'Activa Polylang para cambiar de idioma.', 'doroshopping' ) . '</p>';
 		}
 		?>
+
+		<?php
+		$doroshopping_render_flag_select(
+			'divisa',
+			'divisa',
+			'locale-divisa-label',
+			$currencies,
+			$currency_code,
+			__( 'Elegir moneda', 'doroshopping' ),
+			__( 'Moneda', 'doroshopping' )
+		);
+		?>
+		<p class="header-dropdown__hint"><?php esc_html_e( 'La moneda se aplica al guardar (CURCY / plugin de divisas).', 'doroshopping' ); ?></p>
 
 		<button type="submit" class="header-dropdown__submit" name="doroshopping_locale_submit" value="1"><?php esc_html_e( 'Guardar', 'doroshopping' ); ?></button>
 	</form>

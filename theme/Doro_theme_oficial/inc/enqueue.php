@@ -82,10 +82,32 @@ function doroshopping_enqueue_assets() {
         wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
     }
 
+    $is_support_page = is_page_template( array(
+            'page-coupons.php',
+            'page-help.php',
+            'page-faq.php',
+            'page-payments.php',
+            'page-shipping.php',
+            'page-buyer-protection.php',
+        ) )
+        || is_page( array(
+            'cupones',
+            'centro-de-ayuda',
+            'preguntas-frecuentes',
+            'ayuda-faq',
+            'metodos-de-pago',
+            'envios',
+            'proteccion-del-comprador',
+        ) );
+
+    if ( $is_support_page ) {
+        wp_enqueue_style( 'doroshopping-support', $uri . '/css/pages/support.css', $style_deps, $ver );
+    }
+
     if ( is_search() ) {
         wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );
         wp_enqueue_style( 'doroshopping-page', $uri . '/css/pages/page.css', $style_deps, $ver );
-    } elseif ( is_404() || ( is_page() && ! is_front_page() && ! ( function_exists( 'is_cart' ) && is_cart() ) && ! ( function_exists( 'is_checkout' ) && is_checkout() ) && ! ( function_exists( 'is_account_page' ) && is_account_page() ) && ! ( function_exists( 'doroshopping_is_wishlist_page' ) && doroshopping_is_wishlist_page() ) ) ) {
+    } elseif ( is_404() || ( is_page() && ! is_front_page() && ! $is_support_page && ! ( function_exists( 'is_cart' ) && is_cart() ) && ! ( function_exists( 'is_checkout' ) && is_checkout() ) && ! ( function_exists( 'is_account_page' ) && is_account_page() ) && ! ( function_exists( 'doroshopping_is_wishlist_page' ) && doroshopping_is_wishlist_page() ) ) ) {
         wp_enqueue_style( 'doroshopping-page', $uri . '/css/pages/page.css', $style_deps, $ver );
     }
 
@@ -103,6 +125,7 @@ function doroshopping_enqueue_assets() {
         && ! wp_style_is( 'doroshopping-account', 'enqueued' )
         && ! wp_style_is( 'doroshopping-page', 'enqueued' )
         && ! wp_style_is( 'doroshopping-category', 'enqueued' )
+        && ! wp_style_is( 'doroshopping-support', 'enqueued' )
     ) {
         wp_enqueue_style( 'doroshopping-home', $uri . '/css/pages/home.css', $style_deps, $ver );
         wp_enqueue_style( 'doroshopping-shop', $uri . '/css/pages/shop.css', $style_deps, $ver );

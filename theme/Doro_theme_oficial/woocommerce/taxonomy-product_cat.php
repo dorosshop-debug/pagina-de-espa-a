@@ -79,6 +79,9 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
                         }
                         ?>
                         <a class="doro-category__sub" href="<?php echo esc_url( $link ); ?>">
+                            <span class="doro-category__sub-count" aria-label="<?php echo esc_attr( sprintf( _n( '%d producto', '%d productos', (int) $child->count, 'doroshopping' ), (int) $child->count ) ); ?>">
+                                <?php echo esc_html( (string) (int) $child->count ); ?>
+                            </span>
                             <span class="doro-category__sub-circle">
                                 <?php if ( $img_url ) : ?>
                                     <img src="<?php echo esc_url( $img_url ); ?>" alt="" loading="lazy" decoding="async" width="88" height="88">

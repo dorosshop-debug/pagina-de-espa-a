@@ -78,7 +78,8 @@ if ( ! $elementor_footer ) :
                     <ul class="site-footer__links">
                         <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'nosotros' ) ); ?>"><?php esc_html_e( 'Sobre Nosotros', 'doroshopping' ); ?></a></li>
                         <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'politica-de-privacidad' ) ); ?>"><?php esc_html_e( 'Politicas de Privacidad', 'doroshopping' ); ?></a></li>
-                        <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'ayuda-faq' ) ); ?>"><?php esc_html_e( 'Ayuda y FAQ\'s', 'doroshopping' ); ?></a></li>
+                        <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'centro-de-ayuda' ) ); ?>"><?php esc_html_e( 'Centro de ayuda', 'doroshopping' ); ?></a></li>
+                        <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'preguntas-frecuentes' ) ); ?>"><?php esc_html_e( 'FAQ\'s', 'doroshopping' ); ?></a></li>
                         <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'contacto' ) ); ?>"><?php esc_html_e( 'Contacto', 'doroshopping' ); ?></a></li>
                     </ul>
                 <?php endif; ?>
@@ -94,7 +95,10 @@ if ( ! $elementor_footer ) :
                 <ul class="site-footer__links">
                     <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'metodos-de-pago' ) ); ?>"><?php esc_html_e( 'Pago', 'doroshopping' ); ?></a></li>
                     <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'envios' ) ); ?>"><?php esc_html_e( 'Envio', 'doroshopping' ); ?></a></li>
-                    <li><a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_registration_url() ); ?>"><?php esc_html_e( 'Crear una cuenta', 'doroshopping' ); ?></a></li>
+                    <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'cupones' ) ); ?>"><?php esc_html_e( 'Cupones', 'doroshopping' ); ?></a></li>
+                    <?php if ( ! is_user_logged_in() ) : ?>
+                    <li class="site-footer__link-create-account"><a href="<?php echo esc_url( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'myaccount' ) : wp_registration_url() ); ?>"><?php esc_html_e( 'Crear una cuenta', 'doroshopping' ); ?></a></li>
+                    <?php endif; ?>
                     <li><a href="<?php echo esc_url( doroshopping_get_page_url( 'proteccion-del-comprador' ) ); ?>"><?php esc_html_e( 'Proteccion del Comprador', 'doroshopping' ); ?></a></li>
                 </ul>
             </div>

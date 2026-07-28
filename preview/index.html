@@ -101,52 +101,59 @@
                     <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
                 <div class="header-dropdown header-dropdown--locale" id="dropdown-locale" hidden>
-                    <p class="header-dropdown__title">Selecciona tu Ubicacion Lengua y Moneda de preferencia.</p>
+                    <p class="header-dropdown__title">Seleccione el país/región, el idioma y la moneda que prefiera para comprar.</p>
                     <form class="header-dropdown__form" action="#" method="post" data-locale-form>
-                        <label id="locale-ubicacion-label">Ubicacion</label>
                         <div class="header-locale-select" data-locale-select="ubicacion">
                             <input type="hidden" name="ubicacion" id="locale-ubicacion" value="es">
                             <button type="button" class="header-locale-select__toggle" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="locale-ubicacion-label" data-locale-toggle>
-                                <span class="header-locale-select__value">
-                                    <img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16">
-                                    <span class="header-locale-select__text">Espana</span>
+                                <span class="header-locale-select__inner">
+                                    <span id="locale-ubicacion-label" class="header-locale-select__field-label">Ubicación</span>
+                                    <span class="header-locale-select__value">
+                                        <img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16">
+                                        <span class="header-locale-select__text">España</span>
+                                    </span>
                                 </span>
                                 <svg class="header-locale-select__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                             </button>
                             <ul class="header-locale-select__menu" role="listbox" hidden data-locale-menu>
-                                <li role="presentation"><button type="button" class="header-locale-select__option is-selected" role="option" aria-selected="true" data-value="es" data-flag="../theme/Doro_theme_oficial/assets/images/flags/spain.png" data-label="Espana"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16"><span>Espana</span></button></li>
+                                <li role="presentation"><button type="button" class="header-locale-select__option is-selected" role="option" aria-selected="true" data-value="es" data-flag="../theme/Doro_theme_oficial/assets/images/flags/spain.png" data-label="España"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16"><span>España</span></button></li>
                                 <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="pt" data-flag="../theme/Doro_theme_oficial/assets/images/flags/ptg.png" data-label="Portugal"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/ptg.png" alt="" width="16" height="16"><span>Portugal</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="fr" data-flag="../theme/Doro_theme_oficial/assets/images/flags/francia.png" data-label="Francia"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/francia.png" alt="" width="16" height="16"><span>Francia</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="de" data-flag="../theme/Doro_theme_oficial/assets/images/flags/alemania.png" data-label="Alemania"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/alemania.png" alt="" width="16" height="16"><span>Alemania</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="it" data-flag="../theme/Doro_theme_oficial/assets/images/flags/italia.png" data-label="Italia"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/italia.png" alt="" width="16" height="16"><span>Italia</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="uk" data-flag="../theme/Doro_theme_oficial/assets/images/flags/reino-unido.png" data-label="Reino Unido"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/reino-unido.png" alt="" width="16" height="16"><span>Reino Unido</span></button></li>
                             </ul>
                         </div>
-                        <label id="locale-lengua-label">Lengua</label>
                         <div class="header-locale-select" data-locale-select="lengua">
                             <input type="hidden" name="lengua" id="locale-lengua" value="es">
                             <button type="button" class="header-locale-select__toggle" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="locale-lengua-label" data-locale-toggle>
-                                <span class="header-locale-select__value">
-                                    <img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16">
-                                    <span class="header-locale-select__text">Espanol</span>
+                                <span class="header-locale-select__inner">
+                                    <span id="locale-lengua-label" class="header-locale-select__field-label">Lengua</span>
+                                    <span class="header-locale-select__value">
+                                        <img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16">
+                                        <span class="header-locale-select__text">Español</span>
+                                    </span>
                                 </span>
                                 <svg class="header-locale-select__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                             </button>
                             <ul class="header-locale-select__menu" role="listbox" hidden data-locale-menu>
-                                <li role="presentation"><button type="button" class="header-locale-select__option is-selected" role="option" aria-selected="true" data-value="es" data-flag="../theme/Doro_theme_oficial/assets/images/flags/spain.png" data-label="Espanol"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16"><span>Espanol</span></button></li>
+                                <li role="presentation"><button type="button" class="header-locale-select__option is-selected" role="option" aria-selected="true" data-value="es" data-flag="../theme/Doro_theme_oficial/assets/images/flags/spain.png" data-label="Español"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/spain.png" alt="" width="16" height="16"><span>Español</span></button></li>
                                 <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="en" data-flag="../theme/Doro_theme_oficial/assets/images/flags/reino-unido.png" data-label="English"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/reino-unido.png" alt="" width="16" height="16"><span>English</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="de" data-flag="../theme/Doro_theme_oficial/assets/images/flags/alemania.png" data-label="Deutsch"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/alemania.png" alt="" width="16" height="16"><span>Deutsch</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="fr" data-flag="../theme/Doro_theme_oficial/assets/images/flags/francia.png" data-label="Francais"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/francia.png" alt="" width="16" height="16"><span>Francais</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="it" data-flag="../theme/Doro_theme_oficial/assets/images/flags/italia.png" data-label="Italiano"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/italia.png" alt="" width="16" height="16"><span>Italiano</span></button></li>
-                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="pt" data-flag="../theme/Doro_theme_oficial/assets/images/flags/ptg.png" data-label="Portugues"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/ptg.png" alt="" width="16" height="16"><span>Portugues</span></button></li>
                             </ul>
                         </div>
-                        <label for="locale-divisa">Divisa</label>
-                        <select id="locale-divisa" name="divisa">
-                            <option value="EUR" selected>Euro - EUR</option>
-                            <option value="USD">US Dollar - USD</option>
-                            <option value="GBP">Pound - GBP</option>
-                        </select>
+                        <div class="header-locale-select" data-locale-select="divisa">
+                            <input type="hidden" name="divisa" id="locale-divisa" value="EUR">
+                            <button type="button" class="header-locale-select__toggle" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="locale-divisa-label" data-locale-toggle>
+                                <span class="header-locale-select__inner">
+                                    <span id="locale-divisa-label" class="header-locale-select__field-label">Moneda</span>
+                                    <span class="header-locale-select__value">
+                                        <img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/euro.svg" alt="" width="16" height="16">
+                                        <span class="header-locale-select__text">Euro (€) - EUR</span>
+                                    </span>
+                                </span>
+                                <svg class="header-locale-select__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                            </button>
+                            <ul class="header-locale-select__menu" role="listbox" hidden data-locale-menu>
+                                <li role="presentation"><button type="button" class="header-locale-select__option is-selected" role="option" aria-selected="true" data-value="EUR" data-flag="../theme/Doro_theme_oficial/assets/images/flags/euro.svg" data-label="Euro (€) - EUR"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/euro.svg" alt="" width="16" height="16"><span>Euro (€) - EUR</span></button></li>
+                                <li role="presentation"><button type="button" class="header-locale-select__option" role="option" aria-selected="false" data-value="GBP" data-flag="../theme/Doro_theme_oficial/assets/images/flags/reino-unido.png" data-label="Libra (£) - GBP"><img class="header-locale-select__flag" src="../theme/Doro_theme_oficial/assets/images/flags/reino-unido.png" alt="" width="16" height="16"><span>Libra (£) - GBP</span></button></li>
+                            </ul>
+                        </div>
                         <button type="submit" class="header-dropdown__submit">Guardar</button>
                     </form>
                 </div>
@@ -613,7 +620,7 @@
                 <ul class="site-footer__links">
                     <li><a href="#">Pago</a></li>
                     <li><a href="#">Envio</a></li>
-                    <li><a href="#">Crear una cuenta</a></li>
+                    <li class="site-footer__link-create-account"><a href="account.html">Crear una cuenta</a></li>
                     <li><a href="#">Proteccion del Comprador</a></li>
                 </ul>
             </div>
@@ -692,6 +699,7 @@ window.doroshoppingSearch = {
 };
 </script>
 <script src="preview-data.js"></script>
+<script src="preview-session.js"></script>
 <script src="../theme/Doro_theme_oficial/assets/js/main.js"></script>
 </body>
 </html>

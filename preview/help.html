@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doroshopping - Centro de ayuda</title>
+    <link rel="icon" href="../theme/Doro_theme_oficial/assets/images/icon.png">
+    <link rel="stylesheet" href="../theme/Doro_theme_oficial/assets/css/main.css">
+</head>
+<body>
+
+<div data-include="partials/header-compact.html"></div>
+
+<main id="main-content" class="doro-support doro-help">
+	<div class="doro-support__hero">
+		<div class="doro-support__hero-inner">
+			<p class="doro-support__eyebrow">Soporte Doroshopping</p>
+			<h1 class="doro-support__title">Centro de ayuda</h1>
+			<p class="doro-support__lead">¿Tienes una duda sobre tu pedido, un pago o una devolución? Envíanos un mensaje y nuestro equipo te responderá lo antes posible.</p>
+		</div>
+	</div>
+
+	<div class="doro-support__container">
+		<div class="doro-help__layout">
+			<section class="doro-help__form-wrap">
+				<h2 class="doro-support__section-title">Formulario de soporte</h2>
+				<form class="doro-help__form" action="#" method="post">
+					<div class="doro-help__grid">
+						<p class="doro-help__field">
+							<label for="support_name">Nombre <span class="required">*</span></label>
+							<input type="text" id="support_name" name="support_name" required>
+						</p>
+						<p class="doro-help__field">
+							<label for="support_email">Correo electrónico <span class="required">*</span></label>
+							<input type="email" id="support_email" name="support_email" required>
+						</p>
+					</div>
+					<p class="doro-help__field">
+						<label for="support_order">Número de pedido (opcional)</label>
+						<input type="text" id="support_order" name="support_order" placeholder="Ej. 10452">
+					</p>
+					<p class="doro-help__field">
+						<label for="support_topic">Tema <span class="required">*</span></label>
+						<select id="support_topic" name="support_topic" required>
+							<option value="">Selecciona un tema</option>
+							<option value="pedido">Pedido / seguimiento</option>
+							<option value="pago">Pago / factura</option>
+							<option value="envio">Envío / entrega</option>
+							<option value="devolucion">Devolución / reembolso</option>
+							<option value="producto">Producto / calidad</option>
+							<option value="cuenta">Cuenta / acceso</option>
+							<option value="otro">Otro</option>
+						</select>
+					</p>
+					<p class="doro-help__field">
+						<label for="support_message">Mensaje <span class="required">*</span></label>
+						<textarea id="support_message" name="support_message" rows="6" required placeholder="Cuéntanos qué necesitas con el mayor detalle posible…"></textarea>
+					</p>
+					<p class="doro-help__actions">
+						<button type="submit" class="doro-support__btn">Enviar solicitud</button>
+					</p>
+					<p class="doro-help__meta">Tu mensaje se enviará a atencionalcliente@doroshopping.com</p>
+				</form>
+			</section>
+
+			<aside class="doro-help__aside">
+				<div class="doro-help__aside-card">
+					<h2>Ayuda rápida</h2>
+					<ul class="doro-help__links">
+						<li><a href="faq.html">Preguntas frecuentes</a></li>
+						<li><a href="account-logged.html">Rastrear mi pedido</a></li>
+						<li><a href="#">Devoluciones y reembolsos</a></li>
+						<li><a href="#">Información de envíos</a></li>
+						<li><a href="#">Métodos de pago</a></li>
+					</ul>
+				</div>
+				<div class="doro-help__aside-card">
+					<h2>Horario de atención</h2>
+					<p>Lunes a viernes, 9:00 – 18:00 (CET). Respondemos por correo en un plazo habitual de 24–48 h laborables.</p>
+				</div>
+			</aside>
+		</div>
+	</div>
+</main>
+
+<div data-include="partials/footer.html"></div>
+<script src="partials/load-partials.js"></script>
+<script src="preview-session.js"></script>
+<script src="../theme/Doro_theme_oficial/assets/js/main.js"></script>
+</body>
+</html>

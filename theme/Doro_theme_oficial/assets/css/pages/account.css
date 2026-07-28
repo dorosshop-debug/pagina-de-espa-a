@@ -60,12 +60,32 @@
     margin-bottom: var(--spacing-md);
 }
 
-/* Layout logueado */
+/* Layout logueado — anula floats de WooCommerce */
+.woocommerce-account .woocommerce::after,
+.woocommerce-account .woocommerce::before,
+.doro-account::after,
+.doro-account::before {
+    content: none !important;
+    display: none !important;
+}
+
 .doro-account {
-    display: grid;
-    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+    display: grid !important;
+    grid-template-columns: 260px minmax(0, 1fr);
     gap: var(--spacing-xl);
     align-items: start;
+    width: 100%;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation,
+.woocommerce-account .woocommerce-MyAccount-content,
+.doro-account > .woocommerce-MyAccount-navigation,
+.doro-account > .woocommerce-MyAccount-content {
+    float: none !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    clear: none !important;
 }
 
 .woocommerce-MyAccount-navigation,
@@ -75,6 +95,7 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    min-width: 0;
 }
 
 .woocommerce-MyAccount-navigation ul,
@@ -94,8 +115,10 @@
 
 .woocommerce-MyAccount-navigation li a,
 .doro-account__nav a {
-    display: block;
-    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--color-grey-border);
     border-left: 3px solid transparent;
     color: var(--color-dark);
@@ -103,6 +126,75 @@
     font-weight: 600;
     text-decoration: none;
     transition: background var(--transition), color var(--transition), border-color var(--transition);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doro-account__nav-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doro-account__nav-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px;
+    border-bottom: 1px solid var(--color-grey-border);
+    background: linear-gradient(180deg, #fff7ef 0%, #fff 100%);
+}
+
+.doro-account__nav-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-orange);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.doro-account__nav-user-label {
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-grey-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+}
+
+.doro-account__nav-user-name {
+    margin: 2px 0 0;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-dark);
+    line-height: 1.3;
+}
+
+.doro-account__nav-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--color-grey-text);
+    display: inline-flex;
+}
+
+.doro-account__nav-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.woocommerce-MyAccount-navigation li.is-active .doro-account__nav-icon,
+.woocommerce-MyAccount-navigation li a:hover .doro-account__nav-icon,
+.doro-account__nav a.is-active .doro-account__nav-icon,
+.doro-account__nav a:hover .doro-account__nav-icon {
+    color: var(--color-orange);
 }
 
 .woocommerce-MyAccount-navigation li:last-child a,
@@ -143,9 +235,45 @@
 
 /* Dashboard */
 .doro-account-dash__hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-lg);
     margin-bottom: var(--spacing-xl);
     padding-bottom: var(--spacing-lg);
     border-bottom: 1px solid var(--color-grey-border);
+}
+
+.doro-account-dash__hero-main {
+    min-width: 0;
+}
+
+.doro-account-dash__stat {
+    flex-shrink: 0;
+    min-width: 88px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    background: #fff7ef;
+    border: 1px solid #ffd8bf;
+    text-align: center;
+}
+
+.doro-account-dash__stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-orange);
+    line-height: 1.1;
+}
+
+.doro-account-dash__stat-label {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-grey-text);
 }
 
 .doro-account-dash__eyebrow {
@@ -174,26 +302,46 @@
 
 .doro-account-dash__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--spacing-md);
 }
 
 .doro-account-dash__card {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    min-height: 132px;
     padding: var(--spacing-lg);
     border: 1px solid var(--color-grey-border);
     border-radius: var(--radius-md);
     background: #fafafa;
     text-decoration: none !important;
-    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition), transform var(--transition);
+}
+
+.doro-account-dash__card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid var(--color-grey-border);
+    color: var(--color-orange);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+}
+
+.doro-account-dash__card-icon svg {
+    width: 18px;
+    height: 18px;
 }
 
 .doro-account-dash__card:hover {
     border-color: var(--color-orange);
     background: #fff7ef;
     box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
 }
 
 .doro-account-dash__card-label {
@@ -210,6 +358,146 @@
 
 .doro-account-dash__card--muted {
     background: var(--color-white);
+}
+
+.doro-account-dash__card--shop {
+    background: linear-gradient(180deg, #fff 0%, #fffaf5 100%);
+}
+
+body.doro-account-logged-view .doro-page {
+    background: #f3f4f6;
+}
+
+body.doro-account-logged-view .doro-page__header {
+    display: none;
+}
+
+/* Contraseña: recuperar / establecer */
+body.doro-password-view .doro-page__header {
+    display: none;
+}
+
+body.doro-password-view .woocommerce-account .woocommerce {
+    padding-top: 24px;
+    padding-bottom: 40px;
+}
+
+.doro-password-page {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 32px;
+}
+
+.doro-password-page__card {
+    width: min(460px, 100%);
+    background: #fff;
+    border: 1px solid var(--color-grey-border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+.doro-password-page__brand {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.doro-password-page__brand img {
+    max-height: 40px;
+    width: auto;
+}
+
+.doro-password-page__eyebrow {
+    margin: 0 0 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-orange);
+}
+
+.doro-password-page__title {
+    margin: 0 0 10px;
+    text-align: center;
+    font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+    color: var(--color-dark);
+}
+
+.doro-password-page__lead {
+    margin: 0 0 22px;
+    text-align: center;
+    color: var(--color-grey-text);
+    font-size: var(--font-size-sm);
+    line-height: 1.55;
+}
+
+.doro-password-page__form .form-row {
+    margin-bottom: 14px;
+}
+
+.doro-password-page__form label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-password-page__form input.input-text {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid var(--color-grey-border);
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.doro-password-page__form input.input-text:focus {
+    outline: none;
+    border-color: var(--color-orange);
+}
+
+.doro-password-page__submit {
+    width: 100%;
+    height: 48px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--color-orange);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.doro-password-page__submit:hover {
+    opacity: 0.92;
+}
+
+.doro-password-page__footer {
+    margin: 18px 0 0;
+    text-align: center;
+    font-size: 13px;
+}
+
+.doro-password-page__footer a {
+    color: var(--color-orange);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.woocommerce-MyAccount-content h2,
+.woocommerce-MyAccount-content h3 {
+    margin-top: 0;
+    color: var(--color-dark);
+}
+
+.woocommerce-MyAccount-content .woocommerce-message,
+.woocommerce-MyAccount-content .woocommerce-info,
+.woocommerce-MyAccount-content .woocommerce-error {
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
 }
 
 /* Tablas / formularios cuenta */
@@ -251,36 +539,247 @@
     cursor: pointer;
 }
 
-.woocommerce-MyAccount-content .woocommerce-Address,
-.woocommerce-MyAccount-content .u-columns {
+/* Direcciones (WC default + plantilla Doro) */
+.woocommerce-MyAccount-content .u-columns,
+.woocommerce-MyAccount-content .col2-set {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-lg);
+    width: 100% !important;
+    float: none !important;
+}
+
+.woocommerce-MyAccount-content .u-column1,
+.woocommerce-MyAccount-content .u-column2,
+.woocommerce-MyAccount-content .col-1,
+.woocommerce-MyAccount-content .col-2 {
+    float: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address {
+    display: block !important;
+    float: none !important;
+    width: 100% !important;
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    background: #fafafa;
+    box-sizing: border-box;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address header.title,
+.woocommerce-MyAccount-content .woocommerce-Address-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 12px;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address header.title h3,
+.woocommerce-MyAccount-content .woocommerce-Address-title h3 {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--color-dark);
+    float: none !important;
+    display: block;
+}
+
+.woocommerce-MyAccount-content .woocommerce-Address address {
+    display: block;
+    font-style: normal;
+    line-height: 1.55;
+    color: var(--color-grey-text);
+    margin: 0;
+}
+
+.doro-account-addresses__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--spacing-lg);
 }
 
-.woocommerce-MyAccount-content .woocommerce-Address {
+.doro-account-addresses__card {
     border: 1px solid var(--color-grey-border);
     border-radius: var(--radius-md);
     padding: var(--spacing-lg);
     background: #fafafa;
 }
 
-.woocommerce-MyAccount-content fieldset,
+.doro-account-addresses__card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.doro-account-addresses__card-title {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-account-addresses__edit {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-orange);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.doro-account-addresses__card-body address {
+    font-style: normal;
+    line-height: 1.55;
+    color: var(--color-grey-text);
+    margin: 0;
+}
+
+.doro-account-addresses__empty {
+    margin: 0;
+    color: var(--color-grey-text);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+/* Secciones comunes cuenta */
+.doro-account-section__header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-grey-border);
+}
+
+.doro-account-section__eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-orange);
+}
+
+.doro-account-section__title {
+    margin: 0 0 8px;
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-account-section__text {
+    margin: 0;
+    color: var(--color-grey-text);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    max-width: 56ch;
+}
+
+/* Detalles de cuenta */
+.doro-account-details__form {
+    max-width: 640px;
+}
+
+.doro-account-details__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 var(--spacing-md);
+}
+
+.doro-account-details__form .form-row,
 .woocommerce-MyAccount-content .woocommerce-form-row {
+    margin: 0 0 var(--spacing-md);
+    float: none !important;
+    width: 100% !important;
+}
+
+.doro-account-details__form label,
+.woocommerce-EditAccountForm label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-account-details__hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-grey-text);
+    font-style: normal;
+    line-height: 1.4;
+}
+
+.doro-account-details__password {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-grey-border);
+    border-radius: var(--radius-md);
+    background: #fafafa;
+}
+
+.doro-account-details__password legend {
+    padding: 0 8px;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.doro-account-details__actions {
+    margin: var(--spacing-lg) 0 0;
+}
+
+.doro-account-details__submit,
+.woocommerce-EditAccountForm .woocommerce-Button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 22px !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: var(--color-orange) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    opacity: 1 !important;
+}
+
+.doro-account-details__submit:hover,
+.woocommerce-EditAccountForm .woocommerce-Button:hover {
+    opacity: 0.92 !important;
+}
+
+.woocommerce-MyAccount-content fieldset {
     margin-bottom: var(--spacing-md);
 }
 
 .woocommerce-MyAccount-content input.input-text,
 .woocommerce-MyAccount-content select,
-.woocommerce-MyAccount-content textarea {
+.woocommerce-MyAccount-content textarea,
+.woocommerce-EditAccountForm input.input-text {
     width: 100%;
     max-width: 100%;
-    min-height: 44px;
+    min-height: 46px;
     padding: 0 14px;
     border: 1px solid var(--color-grey-border);
-    border-radius: var(--radius-md);
+    border-radius: 10px;
     box-sizing: border-box;
     font-family: inherit;
+    font-size: var(--font-size-base);
+    background: #fff;
+}
+
+.woocommerce-MyAccount-content input.input-text:focus,
+.woocommerce-EditAccountForm input.input-text:focus {
+    outline: none;
+    border-color: var(--color-orange);
 }
 
 /* Login / registro */
@@ -403,9 +902,15 @@
     display: block;
 }
 
+@media (max-width: 1100px) {
+    .doro-account-dash__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 900px) {
     .doro-account {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
     }
 
     .woocommerce-MyAccount-navigation ul {
@@ -420,6 +925,10 @@
         text-align: center;
         padding: 12px 10px;
         font-size: 12px;
+        white-space: normal;
+        justify-content: center;
+        flex-direction: column;
+        gap: 6px;
     }
 
     .woocommerce-MyAccount-navigation li.is-active a,
@@ -429,10 +938,20 @@
     }
 
     .doro-account-dash__grid,
-    .woocommerce-MyAccount-content .woocommerce-Address,
     .woocommerce-MyAccount-content .u-columns,
+    .woocommerce-MyAccount-content .col2-set,
+    .doro-account-addresses__grid,
+    .doro-account-details__grid,
     .doro-auth {
         grid-template-columns: 1fr;
+    }
+
+    .doro-account-dash__hero {
+        flex-direction: column;
+    }
+
+    .doro-account-dash__stat {
+        align-self: flex-start;
     }
 
     .doro-auth:not(:has(.doro-auth__card ~ .doro-auth__card)) {

@@ -381,6 +381,24 @@ function doroshopping_filter_shop_on_sale( $q ) {
 add_action( 'woocommerce_product_query', 'doroshopping_filter_shop_on_sale' );
 
 /**
+ * Estado vacío personalizado (ofertas sin productos).
+ */
+remove_action( 'woocommerce_no_products_found', 'wc_no_products_found' );
+add_action( 'woocommerce_no_products_found', 'doroshopping_no_products_found', 10 );
+
+/**
+ * Mensaje / sugerencias cuando no hay productos en el listado.
+ */
+function doroshopping_no_products_found() {
+    if ( function_exists( 'doroshopping_is_offers_view' ) && doroshopping_is_offers_view() ) {
+        get_template_part( 'template-parts/shop/offers-empty' );
+        return;
+    }
+
+    wc_get_template( 'loop/no-products-found.php' );
+}
+
+/**
  * Corrige enlaces "Ofertas" del menú principal si apuntan a # o home.
  *
  * @param WP_Post[] $items Menu items.

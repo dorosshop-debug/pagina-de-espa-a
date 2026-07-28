@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doroshopping - Cupones</title>
+    <link rel="icon" href="../theme/Doro_theme_oficial/assets/images/icon.png">
+    <link rel="stylesheet" href="../theme/Doro_theme_oficial/assets/css/main.css">
+</head>
+<body>
+
+<div data-include="partials/header-compact.html"></div>
+
+<main id="main-content" class="doro-support doro-coupons">
+	<div class="doro-support__hero">
+		<div class="doro-support__hero-inner">
+			<p class="doro-support__eyebrow">Ofertas y descuentos</p>
+			<h1 class="doro-support__title">Mis cupones</h1>
+			<p class="doro-support__lead">Aplica un código de descuento y ahorra en tu próxima compra. Los cupones se validan automáticamente en el carrito.</p>
+		</div>
+	</div>
+
+	<div class="doro-support__container">
+		<section class="doro-coupons__apply">
+			<h2 class="doro-support__section-title">Aplicar código</h2>
+			<form class="doro-coupons__form" action="#" method="post">
+				<label class="screen-reader-text" for="doro-coupon-code">Código de cupón</label>
+				<input id="doro-coupon-code" type="text" name="coupon_code" placeholder="Introduce tu código" autocomplete="off" required>
+				<button type="submit" class="doro-support__btn">Aplicar cupón</button>
+			</form>
+			<p class="doro-coupons__hint">También puedes aplicar cupones desde el <a href="cart.html">carrito</a> o el checkout.</p>
+		</section>
+
+		<section class="doro-coupons__howto">
+			<h2 class="doro-support__section-title">Cómo funcionan los cupones</h2>
+			<div class="doro-support__cards">
+				<article class="doro-support__card">
+					<span class="doro-support__card-num" aria-hidden="true">1</span>
+					<h3>Consigue un código</h3>
+					<p>Recibe cupones por email, campañas o promociones activas de Doroshopping.</p>
+				</article>
+				<article class="doro-support__card">
+					<span class="doro-support__card-num" aria-hidden="true">2</span>
+					<h3>Aplícalo aquí o en el carrito</h3>
+					<p>Introduce el código exacto. Distingue mayúsculas/minúsculas según indique la promoción.</p>
+				</article>
+				<article class="doro-support__card">
+					<span class="doro-support__card-num" aria-hidden="true">3</span>
+					<h3>Disfruta el descuento</h3>
+					<p>El descuento se refleja al instante si el cupón es válido y cumple las condiciones.</p>
+				</article>
+			</div>
+		</section>
+
+		<section class="doro-coupons__empty-panel">
+			<div class="doro-coupons__empty">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 9h16v2H4z"/><path d="M7 9V7a5 5 0 0 1 10 0v2"/><path d="M9 13h6"/></svg>
+				<h2>Aún no tienes cupones guardados</h2>
+				<p>Cuando tengamos promociones activas o recibas un código personalizado, podrás usarlo aquí.</p>
+				<div class="doro-coupons__actions">
+					<a class="doro-support__btn" href="shop.html">Ir a la tienda</a>
+					<a class="doro-support__btn doro-support__btn--ghost" href="account.html">Mi cuenta</a>
+				</div>
+			</div>
+		</section>
+	</div>
+</main>
+
+<div data-include="partials/footer.html"></div>
+<script src="partials/load-partials.js"></script>
+<script src="preview-session.js"></script>
+<script src="../theme/Doro_theme_oficial/assets/js/main.js"></script>
+</body>
+</html>

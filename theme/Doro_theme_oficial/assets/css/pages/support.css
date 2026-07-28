@@ -1,0 +1,635 @@
+/* Cupones, Centro de ayuda y FAQ */
+
+.doro-support {
+	width: 100%;
+	min-height: 50vh;
+	background:
+		radial-gradient(1200px 420px at 10% -10%, rgba(255, 106, 0, 0.1), transparent 60%),
+		radial-gradient(900px 380px at 90% 0%, rgba(46, 107, 255, 0.06), transparent 55%),
+		var(--color-grey-bg, #f3f4f6);
+}
+
+.doro-support__hero {
+	padding: clamp(2rem, 4vw, 3.25rem) 0 clamp(1.5rem, 3vw, 2rem);
+	border-bottom: 1px solid var(--color-grey-border, #e5e7eb);
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent);
+}
+
+.doro-support__hero-inner {
+	max-width: var(--container-max, 1280px);
+	margin: 0 auto;
+	padding: 0 var(--spacing-lg, 1.25rem);
+}
+
+.doro-support__eyebrow {
+	margin: 0 0 8px;
+	color: var(--color-orange, #ff6a00);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.doro-support__title {
+	margin: 0 0 10px;
+	font-size: clamp(1.65rem, 2.6vw, 2.15rem);
+	font-weight: 700;
+	line-height: 1.2;
+	color: var(--color-dark, #111);
+}
+
+.doro-support__lead {
+	margin: 0;
+	max-width: 42rem;
+	color: var(--color-grey-text, #6b7280);
+	font-size: var(--font-size-base, 1rem);
+	line-height: 1.55;
+}
+
+.doro-support__hero .doro-support__btn {
+	margin-top: 1.1rem;
+}
+
+.doro-support__container {
+	max-width: var(--container-max, 1280px);
+	margin: 0 auto;
+	padding: var(--spacing-xl, 2rem) var(--spacing-lg, 1.25rem) var(--spacing-2xl, 3rem);
+}
+
+.doro-support__section-title {
+	margin: 0 0 1rem;
+	font-size: 1.2rem;
+	font-weight: 700;
+	color: var(--color-dark, #111);
+}
+
+.doro-support__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 12px 18px;
+	border: none;
+	border-radius: var(--radius-md, 10px);
+	background: var(--color-orange, #ff6a00);
+	color: #fff;
+	font-weight: 700;
+	font-size: var(--font-size-sm, 0.875rem);
+	text-decoration: none;
+	cursor: pointer;
+	transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.doro-support__btn:hover {
+	opacity: 0.94;
+	color: #fff;
+}
+
+.doro-support__btn--ghost {
+	background: transparent;
+	color: var(--color-dark, #111);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+}
+
+.doro-support__btn--ghost:hover {
+	border-color: var(--color-dark, #111);
+	color: var(--color-dark, #111);
+	opacity: 1;
+}
+
+.doro-support__notice {
+	margin: 0 0 1.25rem;
+	padding: 12px 14px;
+	border-radius: var(--radius-md, 10px);
+	font-size: var(--font-size-sm, 0.875rem);
+	line-height: 1.45;
+}
+
+.doro-support__notice--success {
+	background: #ecfdf5;
+	border: 1px solid #a7f3d0;
+	color: #065f46;
+}
+
+.doro-support__notice--error {
+	background: #fef2f2;
+	border: 1px solid #fecaca;
+	color: #991b1b;
+}
+
+.doro-support__cards {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.doro-support__card {
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 14px;
+	padding: 1.15rem 1.2rem 1.25rem;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+}
+
+.doro-support__card-num {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	margin-bottom: 10px;
+	border-radius: 999px;
+	background: rgba(255, 106, 0, 0.12);
+	color: var(--color-orange, #ff6a00);
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+
+.doro-support__card h3 {
+	margin: 0 0 6px;
+	font-size: 1rem;
+	color: var(--color-dark, #111);
+}
+
+.doro-support__card p {
+	margin: 0;
+	font-size: var(--font-size-sm, 0.875rem);
+	line-height: 1.5;
+	color: var(--color-grey-text, #6b7280);
+}
+
+/* Cupones */
+.doro-coupons__apply,
+.doro-coupons__howto,
+.doro-coupons__empty-panel {
+	margin-bottom: 1.75rem;
+}
+
+.doro-coupons__apply,
+.doro-coupons__empty-panel {
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 16px;
+	padding: 1.35rem 1.4rem;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+}
+
+.doro-coupons__form {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: stretch;
+}
+
+.doro-coupons__form input[type="text"] {
+	flex: 1 1 220px;
+	min-height: 46px;
+	padding: 10px 14px;
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: var(--radius-md, 10px);
+	font: inherit;
+	background: #fff;
+}
+
+.doro-coupons__form input[type="text"]:focus {
+	outline: none;
+	border-color: var(--color-orange, #ff6a00);
+	box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+}
+
+.doro-coupons__hint {
+	margin: 0.85rem 0 0;
+	font-size: var(--font-size-sm, 0.875rem);
+	color: var(--color-grey-text, #6b7280);
+}
+
+.doro-coupons__hint a {
+	color: var(--color-orange, #ff6a00);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.doro-coupons__hint a:hover {
+	text-decoration: underline;
+}
+
+.doro-coupons__empty {
+	text-align: center;
+	padding: 1.25rem 0.5rem 0.5rem;
+}
+
+.doro-coupons__empty svg {
+	width: 48px;
+	height: 48px;
+	color: var(--color-orange, #ff6a00);
+	margin-bottom: 0.75rem;
+}
+
+.doro-coupons__empty h2 {
+	margin: 0 0 8px;
+	font-size: 1.2rem;
+}
+
+.doro-coupons__empty p {
+	margin: 0 auto 1.15rem;
+	max-width: 34rem;
+	color: var(--color-grey-text, #6b7280);
+	font-size: var(--font-size-sm, 0.875rem);
+}
+
+.doro-coupons__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+}
+
+/* Centro de ayuda */
+.doro-help__layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.9fr);
+	gap: 1.25rem;
+	align-items: start;
+}
+
+.doro-help__form-wrap,
+.doro-help__aside-card {
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 16px;
+	padding: 1.35rem 1.4rem;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+}
+
+.doro-help__aside {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.doro-help__aside-card h2 {
+	margin: 0 0 0.75rem;
+	font-size: 1.05rem;
+}
+
+.doro-help__aside-card p {
+	margin: 0;
+	font-size: var(--font-size-sm, 0.875rem);
+	line-height: 1.55;
+	color: var(--color-grey-text, #6b7280);
+}
+
+.doro-help__links {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.doro-help__links li + li {
+	margin-top: 8px;
+}
+
+.doro-help__links a {
+	color: var(--color-dark, #111);
+	text-decoration: none;
+	font-size: var(--font-size-sm, 0.875rem);
+	font-weight: 600;
+}
+
+.doro-help__links a:hover {
+	color: var(--color-orange, #ff6a00);
+}
+
+.doro-help__grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.85rem 1rem;
+}
+
+.doro-help__field {
+	margin: 0 0 0.95rem;
+}
+
+.doro-help__field label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: var(--font-size-sm, 0.875rem);
+	font-weight: 600;
+	color: var(--color-dark, #111);
+}
+
+.doro-help__field .required {
+	color: var(--color-red-accent, #e11d48);
+}
+
+.doro-help__field input,
+.doro-help__field select,
+.doro-help__field textarea {
+	width: 100%;
+	padding: 11px 13px;
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: var(--radius-md, 10px);
+	font: inherit;
+	background: #fff;
+	color: var(--color-dark, #111);
+}
+
+.doro-help__field input:focus,
+.doro-help__field select:focus,
+.doro-help__field textarea:focus {
+	outline: none;
+	border-color: var(--color-orange, #ff6a00);
+	box-shadow: 0 0 0 3px rgba(255, 106, 0, 0.15);
+}
+
+.doro-help__field textarea {
+	resize: vertical;
+	min-height: 140px;
+}
+
+.doro-help__actions {
+	margin: 0.35rem 0 0.65rem;
+}
+
+.doro-help__meta {
+	margin: 0;
+	font-size: 0.8rem;
+	color: var(--color-grey-text, #6b7280);
+}
+
+.doro-help__honeypot {
+	position: absolute !important;
+	left: -9999px !important;
+	width: 1px !important;
+	height: 1px !important;
+	overflow: hidden !important;
+}
+
+/* FAQ */
+.doro-faq__section {
+	margin-bottom: 1.75rem;
+}
+
+.doro-faq__list {
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 16px;
+	overflow: hidden;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+}
+
+.doro-faq__item {
+	border-bottom: 1px solid var(--color-grey-border, #e5e7eb);
+}
+
+.doro-faq__item:last-child {
+	border-bottom: none;
+}
+
+.doro-faq__question {
+	cursor: pointer;
+	list-style: none;
+	padding: 1rem 1.2rem;
+	font-weight: 700;
+	font-size: 0.98rem;
+	color: var(--color-dark, #111);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.doro-faq__question::-webkit-details-marker {
+	display: none;
+}
+
+.doro-faq__question::after {
+	content: "+";
+	flex: 0 0 auto;
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 999px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 106, 0, 0.1);
+	color: var(--color-orange, #ff6a00);
+	font-size: 1.1rem;
+	line-height: 1;
+}
+
+.doro-faq__item[open] .doro-faq__question::after {
+	content: "–";
+}
+
+.doro-faq__item[open] .doro-faq__question {
+	color: var(--color-orange, #ff6a00);
+}
+
+.doro-faq__answer {
+	padding: 0 1.2rem 1.1rem;
+}
+
+.doro-faq__answer p {
+	margin: 0;
+	font-size: var(--font-size-sm, 0.875rem);
+	line-height: 1.65;
+	color: var(--color-grey-text, #6b7280);
+}
+
+.doro-faq__cta {
+	text-align: center;
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 16px;
+	padding: 1.75rem 1.4rem;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+}
+
+.doro-faq__cta h2 {
+	margin: 0 0 8px;
+	font-size: 1.25rem;
+}
+
+.doro-faq__cta p {
+	margin: 0 0 1.1rem;
+	color: var(--color-grey-text, #6b7280);
+	font-size: var(--font-size-sm, 0.875rem);
+}
+
+@media (max-width: 900px) {
+	.doro-support__cards,
+	.doro-help__layout,
+	.doro-help__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 600px) {
+	.doro-coupons__form .doro-support__btn {
+		width: 100%;
+	}
+}
+
+/* —— Páginas info (pagos / envíos / protección) —— */
+.doro-info__panel {
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 16px;
+	padding: 1.35rem 1.4rem 1.5rem;
+	margin-bottom: 1.75rem;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+}
+
+.doro-info__panel--accent {
+	background:
+		linear-gradient(135deg, rgba(255, 106, 0, 0.07), rgba(255, 255, 255, 0.95)),
+		#fff;
+	border-color: rgba(255, 106, 0, 0.18);
+}
+
+.doro-info__panel-head {
+	margin-bottom: 1.1rem;
+}
+
+.doro-info__panel-head p {
+	margin: 0;
+	max-width: 44rem;
+	color: var(--color-grey-text, #6b7280);
+	font-size: var(--font-size-sm, 0.875rem);
+	line-height: 1.55;
+}
+
+.doro-info__methods {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.doro-info__method {
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 14px;
+	padding: 1.15rem 1.2rem 1.25rem;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
+}
+
+.doro-info__method-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 42px;
+	height: 42px;
+	margin-bottom: 12px;
+	border-radius: 12px;
+	background: rgba(255, 106, 0, 0.1);
+	color: var(--color-orange, #ff6a00);
+}
+
+.doro-info__method-icon svg {
+	width: 22px;
+	height: 22px;
+}
+
+.doro-info__method h3 {
+	margin: 0 0 6px;
+	font-size: 1rem;
+	color: var(--color-dark, #111);
+}
+
+.doro-info__method p {
+	margin: 0;
+	font-size: var(--font-size-sm, 0.875rem);
+	line-height: 1.5;
+	color: var(--color-grey-text, #6b7280);
+}
+
+.doro-info__payments-visual {
+	margin-top: 1.25rem;
+	padding-top: 1.1rem;
+	border-top: 1px solid var(--color-grey-border, #e5e7eb);
+}
+
+.doro-info__payments-visual img {
+	display: block;
+	max-width: min(100%, 420px);
+	height: auto;
+}
+
+.doro-info__split {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.1rem;
+	margin-bottom: 1.75rem;
+}
+
+.doro-info__split--spaced {
+	margin-top: 1.75rem;
+}
+
+.doro-info__card {
+	background: var(--color-white, #fff);
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	border-radius: 16px;
+	padding: 1.35rem 1.4rem;
+	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+}
+
+.doro-info__card h2 {
+	margin: 0 0 0.85rem;
+	font-size: 1.1rem;
+}
+
+.doro-info__checklist {
+	margin: 0 0 1.1rem;
+	padding: 0;
+	list-style: none;
+}
+
+.doro-info__checklist li {
+	position: relative;
+	padding: 0 0 0 1.45rem;
+	margin: 0 0 0.55rem;
+	font-size: var(--font-size-sm, 0.875rem);
+	line-height: 1.5;
+	color: var(--color-grey-text, #6b7280);
+}
+
+.doro-info__checklist li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0.35rem;
+	width: 0.7rem;
+	height: 0.7rem;
+	border-radius: 999px;
+	background: rgba(255, 106, 0, 0.18);
+	box-shadow: inset 0 0 0 3px var(--color-orange, #ff6a00);
+}
+
+.doro-info__note {
+	margin: 0 0 0.5rem;
+	padding: 10px 12px;
+	border-radius: 10px;
+	background: #f8fafc;
+	border: 1px solid var(--color-grey-border, #e5e7eb);
+	font-size: 0.8rem;
+	line-height: 1.5;
+	color: var(--color-grey-text, #6b7280);
+}
+
+.doro-info__actions {
+	justify-content: flex-start;
+}
+
+.doro-info__actions--center {
+	justify-content: center;
+}
+
+@media (max-width: 900px) {
+	.doro-info__methods,
+	.doro-info__split {
+		grid-template-columns: 1fr;
+	}
+}
+

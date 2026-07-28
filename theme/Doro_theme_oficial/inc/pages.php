@@ -62,24 +62,79 @@ function doroshopping_essential_pages() {
         . '<p>' . esc_html__( 'Puedes solicitar acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a la dirección de contacto de la tienda. También puedes reclamar ante la AEPD (www.aepd.es).', 'doroshopping' ) . '</p>'
         . $placeholder;
 
-    $seguridad = '<p>' . esc_html( sprintf( __( 'En %s protegemos tu compra con medidas técnicas y de proceso para que pagues y recibas con tranquilidad.', 'doroshopping' ), $site_name ) ) . '</p>'
-        . '<h2>' . esc_html__( 'Pagos seguros', 'doroshopping' ) . '</h2>'
-        . '<p>' . esc_html__( 'Las transacciones se procesan mediante pasarelas de pago con cifrado SSL/TLS. No almacenamos los datos completos de tu tarjeta en nuestros servidores.', 'doroshopping' ) . '</p>'
-        . '<h2>' . esc_html__( 'Protección del comprador', 'doroshopping' ) . '</h2>'
+    $content_marker = "\n<!-- doro-content:1.7.9 -->\n";
+
+    $aviso = '<p>' . esc_html( sprintf( __( 'Este aviso legal regula el uso del sitio web de %s. Al navegar por la web aceptas las condiciones aquí descritas.', 'doroshopping' ), $site_name ) ) . '</p>'
+        . '<h2>' . esc_html__( '1. Datos identificativos', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Titular del sitio: completa razón social, CIF/NIF, domicilio social y datos de inscripción registral (si aplica).', 'doroshopping' ) . '</p>'
         . '<ul>'
-        . '<li>' . esc_html__( 'Confirmación de pedido y seguimiento del envío.', 'doroshopping' ) . '</li>'
-        . '<li>' . esc_html__( 'Soporte ante incidencias de entrega o producto.', 'doroshopping' ) . '</li>'
-        . '<li>' . esc_html__( 'Derecho de desistimiento según la normativa de consumo de la UE (consulta la Política de devoluciones).', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Email de contacto: atencionalcliente@doroshopping.com', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Sitio web: doroshopping.com y dominios asociados.', 'doroshopping' ) . '</li>'
         . '</ul>'
-        . '<h2>' . esc_html__( 'Privacidad y datos', 'doroshopping' ) . '</h2>'
-        . '<p>' . esc_html__( 'Tratamos tus datos conforme a la Política de privacidad. Usa siempre la web por HTTPS y no compartas tus credenciales.', 'doroshopping' ) . '</p>'
-        . '<h2>' . esc_html__( 'Consejos prácticos', 'doroshopping' ) . '</h2>'
+        . '<h2>' . esc_html__( '2. Objeto', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'La web ofrece información comercial y la posibilidad de adquirir productos a través de la tienda online. El titular se reserva el derecho de modificar contenidos, precios y disponibilidad sin previo aviso, sin perjuicio de los pedidos ya confirmados.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '3. Condiciones de uso', 'doroshopping' ) . '</h2>'
         . '<ul>'
-        . '<li>' . esc_html__( 'Revisa la dirección de entrega antes de confirmar el pedido.', 'doroshopping' ) . '</li>'
-        . '<li>' . esc_html__( 'Guarda el email de confirmación y el número de pedido.', 'doroshopping' ) . '</li>'
-        . '<li>' . esc_html__( 'Contacta con nosotros si detectas un cargo no reconocido.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Debes usar la web de forma lícita y respetuosa con la normativa vigente.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'No está permitido alterar, dañar o interferir en el funcionamiento del sitio o de sistemas asociados.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Eres responsable de la veracidad de los datos que facilites en pedidos y registro.', 'doroshopping' ) . '</li>'
         . '</ul>'
-        . $placeholder;
+        . '<h2>' . esc_html__( '4. Propiedad intelectual', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Textos, diseños, logotipos, imágenes y código de la web están protegidos. Queda prohibida su reproducción, distribución o transformación sin autorización, salvo usos permitidos por ley.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '5. Responsabilidad', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'No garantizamos la ausencia total de interrupciones o errores técnicos. No respondemos de daños derivados del uso indebido de la web ni de contenidos de terceros enlazados, sin perjuicio de las obligaciones legales de consumo aplicables a la venta de productos.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '6. Legislación aplicable', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Este aviso se rige por la legislación española y europea aplicable. Para controversias, serán competentes los juzgados correspondientes conforme a la normativa de consumidores cuando proceda.', 'doroshopping' ) . '</p>'
+        . $content_marker;
+
+    $terminos = '<p>' . esc_html( sprintf( __( 'Estas condiciones generales regulan la compra en %s. Al realizar un pedido aceptas estas condiciones junto con la Política de privacidad y, en su caso, la Política de cookies.', 'doroshopping' ), $site_name ) ) . '</p>'
+        . '<h2>' . esc_html__( '1. Ámbito y aceptación', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Las condiciones se aplican a todos los pedidos realizados a través de la tienda online. Si no estás de acuerdo, no uses el servicio de compra.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '2. Productos e información', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Las fichas de producto incluyen descripción, precio e información orientativa de envío cuando esté disponible. Las imágenes son ilustrativas. Nos esforzamos por mantener la información actualizada; ante discrepancias relevantes, contacta con soporte.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '3. Precios y pagos', 'doroshopping' ) . '</h2>'
+        . '<ul>'
+        . '<li>' . esc_html__( 'Los precios se muestran en la moneda indicada en la tienda e incluyen impuestos cuando así se indique.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'El coste de envío se calcula antes de confirmar el pedido.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'El pago se realiza mediante las pasarelas habilitadas en el checkout.', 'doroshopping' ) . '</li>'
+        . '</ul>'
+        . '<h2>' . esc_html__( '4. Pedidos y contrato', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'El pedido constituye una oferta de compra. La aceptación se confirma por email y/o cambio de estado del pedido. Nos reservamos el derecho de rechazar pedidos por error manifiesto de precio, falta de stock, sospecha de fraude o datos incompletos.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '5. Envíos y entrega', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Los plazos de entrega son estimados. El riesgo de pérdida o deterioro se transmite conforme a la normativa aplicable. Debes facilitar una dirección de entrega correcta y accesible.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '6. Desistimiento y devoluciones', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Si eres consumidor en la UE, dispones del derecho de desistimiento en los términos legales (normalmente 14 días desde la recepción), con las excepciones previstas. Consulta la Política de devoluciones para el procedimiento.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '7. Garantía', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Los productos gozan de la garantía legal de conformidad. Conserva la factura o confirmación de pedido para gestionar cualquier reclamación.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '8. Uso de la cuenta', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Eres responsable de custodiar tus credenciales. Notifícanos cualquier uso no autorizado de tu cuenta.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '9. Modificaciones', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Podemos actualizar estas condiciones. La versión vigente es la publicada en esta página en la fecha de la compra.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '10. Contacto', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Para dudas contractuales o de pedidos: atencionalcliente@doroshopping.com o el Centro de ayuda.', 'doroshopping' ) . '</p>'
+        . $content_marker;
+
+    $cookies = '<p>' . esc_html__( 'Esta Política de cookies explica qué son las cookies, cuáles usamos y cómo puedes gestionarlas.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '1. ¿Qué son las cookies?', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Son pequeños archivos que el sitio o terceros guardan en tu dispositivo para recordar preferencias, mantener la sesión, analizar el uso o personalizar contenidos.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '2. Tipos de cookies que podemos usar', 'doroshopping' ) . '</h2>'
+        . '<ul>'
+        . '<li>' . esc_html__( 'Técnicas / necesarias: permiten navegar, usar el carrito, el checkout y la seguridad del sitio.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Preferencias: recuerdan idioma, ubicación o moneda cuando aplique.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Analíticas: ayudan a entender el uso de la web de forma agregada.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Marketing: solo si las aceptas y están activadas, para medir campañas.', 'doroshopping' ) . '</li>'
+        . '</ul>'
+        . '<h2>' . esc_html__( '3. Base legal', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Las cookies necesarias se basan en el interés legítimo / ejecución del servicio. El resto requieren tu consentimiento cuando la normativa lo exija.', 'doroshopping' ) . '</p>'
+        . '<h2>' . esc_html__( '4. Cómo gestionar las cookies', 'doroshopping' ) . '</h2>'
+        . '<ul>'
+        . '<li>' . esc_html__( 'Puedes configurar tu navegador para bloquear o eliminar cookies.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Si usamos un banner de consentimiento, podrás aceptar, rechazar o configurar categorías no esenciales.', 'doroshopping' ) . '</li>'
+        . '<li>' . esc_html__( 'Bloquear cookies necesarias puede impedir el funcionamiento del carrito o del login.', 'doroshopping' ) . '</li>'
+        . '</ul>'
+        . '<h2>' . esc_html__( '5. Más información', 'doroshopping' ) . '</h2>'
+        . '<p>' . esc_html__( 'Para el tratamiento de datos personales, consulta la Política de privacidad. Contacto: atencionalcliente@doroshopping.com.', 'doroshopping' ) . '</p>'
+        . $content_marker;
 
     return array(
         'nosotros'                  => array(
@@ -87,8 +142,9 @@ function doroshopping_essential_pages() {
             'content' => $nosotros,
         ),
         'aviso-legal'               => array(
-            'title'   => __( 'Aviso legal', 'doroshopping' ),
-            'content' => '<p>' . __( 'Datos identificativos del titular del sitio web, CIF/NIF, domicilio social y datos de contacto. Completa esta página con la información legal de tu empresa.', 'doroshopping' ) . '</p>' . $placeholder,
+            'title'         => __( 'Aviso legal', 'doroshopping' ),
+            'content'       => $aviso,
+            'force_refresh' => true,
         ),
         'politica-de-privacidad'    => array(
             'title'     => __( 'Política de privacidad', 'doroshopping' ),
@@ -96,37 +152,58 @@ function doroshopping_essential_pages() {
             'wc_option' => 'woocommerce_privacy_policy_page_id',
         ),
         'terminos-y-condiciones'    => array(
-            'title'     => __( 'Términos y condiciones', 'doroshopping' ),
-            'content'   => '<p>' . __( 'Condiciones generales de uso y de contratación de la tienda: aceptación, pedidos, precios, pagos, propiedad intelectual y legislación aplicable.', 'doroshopping' ) . '</p>' . $placeholder,
-            'wc_option' => 'woocommerce_terms_page_id',
+            'title'         => __( 'Términos y condiciones', 'doroshopping' ),
+            'content'       => $terminos,
+            'wc_option'     => 'woocommerce_terms_page_id',
+            'force_refresh' => true,
         ),
         'politica-de-cookies'       => array(
-            'title'   => __( 'Política de cookies', 'doroshopping' ),
-            'content' => '<p>' . __( 'Qué cookies utilizamos, con qué finalidad y cómo puedes gestionar tus preferencias de consentimiento.', 'doroshopping' ) . '</p>' . $placeholder,
+            'title'         => __( 'Política de cookies', 'doroshopping' ),
+            'content'       => $cookies,
+            'force_refresh' => true,
         ),
         'politica-de-devoluciones'  => array(
             'title'   => __( 'Política de devoluciones y reembolsos', 'doroshopping' ),
             'content' => '<p>' . __( 'Plazos, condiciones y proceso para devoluciones, cambios y reembolsos. Derecho de desistimiento (14 días en la UE) y excepciones.', 'doroshopping' ) . '</p>' . $placeholder,
         ),
         'envios'                    => array(
-            'title'   => __( 'Envíos', 'doroshopping' ),
-            'content' => '<p>' . __( 'Zonas de envío, plazos estimados, costes, seguimiento del pedido y posibles gastos de aduana.', 'doroshopping' ) . '</p>' . $placeholder,
+            'title'    => __( 'Envíos', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-shipping.php',
         ),
         'contacto'                  => array(
             'title'   => __( 'Contacto', 'doroshopping' ),
             'content' => '<p>' . __( '¿Necesitas ayuda? Escríbenos y te responderemos lo antes posible. Añade aquí el formulario de contacto, email y horarios de atención.', 'doroshopping' ) . '</p>' . $placeholder,
         ),
+        'centro-de-ayuda'           => array(
+            'title'    => __( 'Centro de ayuda', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-help.php',
+        ),
+        'preguntas-frecuentes'      => array(
+            'title'    => __( 'Preguntas frecuentes', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-faq.php',
+        ),
         'ayuda-faq'                 => array(
-            'title'   => __( 'Ayuda y preguntas frecuentes', 'doroshopping' ),
-            'content' => '<p>' . __( 'Respuestas a las dudas más habituales sobre pedidos, pagos, envíos, devoluciones y tu cuenta.', 'doroshopping' ) . '</p>' . $placeholder,
+            'title'    => __( 'Ayuda y preguntas frecuentes', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-faq.php',
+        ),
+        'cupones'                   => array(
+            'title'    => __( 'Cupones', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-coupons.php',
         ),
         'proteccion-del-comprador'  => array(
-            'title'   => __( 'Seguridad y protección del comprador', 'doroshopping' ),
-            'content' => $seguridad,
+            'title'    => __( 'Seguridad y protección del comprador', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-buyer-protection.php',
         ),
         'metodos-de-pago'           => array(
-            'title'   => __( 'Métodos de pago', 'doroshopping' ),
-            'content' => '<p>' . __( 'Formas de pago aceptadas, seguridad de las transacciones y consejos para comprar con tranquilidad.', 'doroshopping' ) . '</p>' . $placeholder,
+            'title'    => __( 'Métodos de pago', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-payments.php',
         ),
         'lista-de-deseos'           => array(
             'title'    => __( 'Lista de deseos', 'doroshopping' ),
@@ -348,7 +425,7 @@ function doroshopping_maybe_assign_wc_page( $page_id, $data ) {
 }
 
 /**
- * Actualiza el contenido si la página sigue con el placeholder corto del tema.
+ * Actualiza el contenido si la página sigue con placeholder o marcador antiguo.
  *
  * @param int   $page_id ID.
  * @param array $data    Definición.
@@ -362,28 +439,49 @@ function doroshopping_maybe_refresh_page_content( $page_id, $data ) {
     if ( ! $post instanceof WP_Post ) {
         return;
     }
-    $current = (string) $post->post_content;
-    $marker  = '<!-- Edita este contenido en Paginas o con Elementor. -->';
-    // Solo refrescar páginas cortas / aún no editadas a fondo.
-    if ( false === strpos( $current, $marker ) && strlen( wp_strip_all_tags( $current ) ) > 280 ) {
+
+    $current       = (string) $post->post_content;
+    $marker_old    = '<!-- Edita este contenido en Paginas o con Elementor. -->';
+    $marker_new    = '<!-- doro-content:1.7.9 -->';
+    $force         = ! empty( $data['force_refresh'] );
+    $has_new       = false !== strpos( $current, $marker_new );
+    $has_old_ph    = false !== strpos( $current, $marker_old );
+    $plain_len     = strlen( wp_strip_all_tags( $current ) );
+
+    // Contenido custom largo sin marcadores del tema: no tocar.
+    if ( ! $has_new && ! $has_old_ph && $plain_len > 500 && ! $force ) {
         return;
     }
-    if ( false === strpos( $current, $marker ) && strlen( wp_strip_all_tags( $current ) ) > 120 && false === strpos( $current, 'Quiénes somos' ) && false === strpos( $current, 'RGPD' ) && false === strpos( $current, 'Pagos seguros' ) ) {
-        // Contenido custom sin marker: no tocar.
-        if ( strlen( wp_strip_all_tags( $current ) ) > 200 ) {
+    if ( $force && ! $has_new && ! $has_old_ph && $plain_len > 800 && false === strpos( $current, 'doro-content:' ) ) {
+        // Posible contenido manual extenso: no sobrescribir.
+        return;
+    }
+    if ( $has_new ) {
+        return;
+    }
+
+    $refresh_slugs = array(
+        'nosotros',
+        'politica-de-privacidad',
+        'proteccion-del-comprador',
+        'aviso-legal',
+        'terminos-y-condiciones',
+        'politica-de-cookies',
+        'metodos-de-pago',
+        'envios',
+    );
+    $slug = $post->post_name;
+    if ( ! $force && ! in_array( $slug, $refresh_slugs, true ) ) {
+        return;
+    }
+    if ( ! $force && ! $has_old_ph && $plain_len > 280 ) {
+        // Legacy: solo refrescar si aún es placeholder corto o falta contenido nuevo conocido.
+        $known = ( false !== strpos( $current, 'Quiénes somos' ) )
+            || ( false !== strpos( $current, 'Responsable del tratamiento' ) )
+            || ( false !== strpos( $current, 'Pagos seguros' ) );
+        if ( $known ) {
             return;
         }
-    }
-
-    $refresh_slugs = array( 'nosotros', 'politica-de-privacidad', 'proteccion-del-comprador' );
-    $slug          = $post->post_name;
-    if ( ! in_array( $slug, $refresh_slugs, true ) ) {
-        return;
-    }
-
-    // Evitar reescribir si ya tiene el contenido nuevo.
-    if ( false !== strpos( $current, 'Quiénes somos' ) || false !== strpos( $current, 'Responsable del tratamiento' ) || false !== strpos( $current, 'Pagos seguros' ) ) {
-        return;
     }
 
     wp_update_post(
@@ -435,6 +533,31 @@ function doroshopping_maybe_create_essential_pages_admin() {
             && ! doroshopping_get_page_by_slug( 'shop' );
         $need = $need || ( ! doroshopping_get_page_by_slug( 'carrito' ) && ! doroshopping_get_page_by_slug( 'cart' ) );
         $need = $need || ( ! doroshopping_get_page_by_slug( 'finalizar-compra' ) && ! doroshopping_get_page_by_slug( 'checkout' ) );
+        $need = $need || ! doroshopping_get_page_by_slug( 'cupones' );
+        $need = $need || ! doroshopping_get_page_by_slug( 'centro-de-ayuda' );
+        $need = $need || ! doroshopping_get_page_by_slug( 'preguntas-frecuentes' );
+        // Reasignar plantillas / refrescar legales aunque las páginas ya existan.
+        if ( ! $need ) {
+            $defs = doroshopping_essential_pages();
+            foreach ( array( 'metodos-de-pago', 'envios', 'proteccion-del-comprador', 'aviso-legal', 'terminos-y-condiciones', 'politica-de-cookies' ) as $slug_check ) {
+                $p = doroshopping_get_page_by_slug( $slug_check );
+                if ( ! $p instanceof WP_Post ) {
+                    $need = true;
+                    break;
+                }
+                if ( ! empty( $defs[ $slug_check ]['template'] ) ) {
+                    $want = sanitize_file_name( $defs[ $slug_check ]['template'] );
+                    if ( (string) get_page_template_slug( $p->ID ) !== $want ) {
+                        $need = true;
+                        break;
+                    }
+                }
+                if ( ! empty( $defs[ $slug_check ]['force_refresh'] ) && false === strpos( (string) $p->post_content, '<!-- doro-content:1.7.9 -->' ) ) {
+                    $need = true;
+                    break;
+                }
+            }
+        }
         if ( $need ) {
             doroshopping_create_essential_pages();
         }

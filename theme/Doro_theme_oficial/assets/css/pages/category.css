@@ -79,6 +79,7 @@
 }
 
 .doro-category__sub {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -93,6 +94,23 @@
 
 .doro-category__sub:hover {
     color: var(--color-orange);
+}
+
+.doro-category__sub-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 22px;
+    padding: 0 7px;
+    margin-bottom: -4px;
+    border-radius: 999px;
+    background: var(--color-orange);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    z-index: 1;
 }
 
 .doro-category__sub-circle {
@@ -132,18 +150,22 @@
     align-items: start;
 }
 
+.doro-category__filters {
+    position: sticky;
+    top: 88px;
+    align-self: start;
+    z-index: 5;
+    max-height: calc(100vh - 104px);
+}
+
 .doro-category__filters-card {
     background: linear-gradient(180deg, #fff8f1 0%, #ffffff 40px);
     border: 1px solid #f0e0d0;
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
-    position: sticky;
-    top: 88px;
     max-height: calc(100vh - 104px);
     overflow-x: hidden;
     overflow-y: auto;
-    align-self: start;
-    z-index: 5;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -227,8 +249,14 @@
         grid-template-columns: 1fr;
     }
 
-    .doro-category__filters-card {
+    .doro-category__filters {
         position: static;
+        max-height: none;
+    }
+
+    .doro-category__filters-card {
+        max-height: none;
+        overflow: visible;
     }
 
     .doro-category__subs-grid {

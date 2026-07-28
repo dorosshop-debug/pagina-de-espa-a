@@ -25,6 +25,7 @@ function doroshoppingBoot() {
     initShopLoadMore();
     initShopCategoryFilter();
     initHomeLoadMore();
+    initLegalPageToc();
 }
 
 function doroshoppingStart() {
@@ -1259,7 +1260,7 @@ function initCategoryCarousels() {
 }
 
 function initRelatedProductsCarousel() {
-    var roots = document.querySelectorAll('[data-related-carousel]');
+    var roots = document.querySelectorAll('[data-product-carousel], [data-related-carousel]');
     if (!roots.length) return;
 
     var intervalMs = 4500;
@@ -2778,4 +2779,44 @@ function initBigBuyShipping() {
 
     refresh();
     window.doroshoppingRefreshShipping = refresh;
+}
+
+function initLegalPageToc() {
+    var nav = document.querySelector('[data-doro-toc]');
+    var list = document.querySelector('[data-doro-toc-list]');
+    var content = document.querySelector('[data-doro-page-content]');
+    if (!nav || !list || !content) return;
+
+    var headings = content.querySelectorAll('h2');
+    if (!headings.length) return;
+
+    list.innerHTML = '';
+    headings.forEach(function (h, i) {
+        var id = h.id;
+        if (!id) {
+            id = 'doro-section-' + (i + 1);
+            h.id = id;
+        }
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = '#' + id;
+        a.textContent = h.textContent || ('Sección ' + (i + 1));
+        li.appendChild(a);
+        list.appendChild(li);
+    });
+    nav.hidden = false;
+
+    var links = list.querySelectorAll('a');
+    function onScroll() {
+        var active = null;
+        headings.forEach(function (h) {
+            if (h.getBoundingClientRect().top <= 130) active = h;
+        });
+        links.forEach(function (a) {
+            var match = active && a.getAttribute('href') === '#' + active.id;
+            a.classList.toggle('is-active', !!match);
+        });
+    }
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
 }
