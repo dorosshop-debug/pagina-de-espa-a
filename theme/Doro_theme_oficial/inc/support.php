@@ -24,6 +24,42 @@ function doroshopping_get_support_email() {
 }
 
 /**
+ * URL de WhatsApp (solo usado en Centro de ayuda).
+ *
+ * Orden: constante DORO_WHATSAPP → Personalizar → filtro.
+ * Número internacional sin espacios (ej. 34600000000) o URL wa.me.
+ *
+ * @return string
+ */
+function doroshopping_get_whatsapp_url() {
+	$raw = '';
+	if ( defined( 'DORO_WHATSAPP' ) && DORO_WHATSAPP ) {
+		$raw = (string) DORO_WHATSAPP;
+	}
+	if ( '' === trim( $raw ) ) {
+		$raw = trim( (string) get_theme_mod( 'doroshopping_whatsapp', '' ) );
+	}
+	/**
+	 * Filtro del enlace/número de WhatsApp.
+	 *
+	 * @param string $raw Valor actual.
+	 */
+	$raw = (string) apply_filters( 'doroshopping_whatsapp', $raw );
+	$raw = trim( $raw );
+	if ( '' === $raw ) {
+		return '';
+	}
+	if ( preg_match( '#^https?://#i', $raw ) ) {
+		return esc_url_raw( $raw );
+	}
+	$digits = preg_replace( '/\D+/', '', $raw );
+	if ( ! $digits ) {
+		return '';
+	}
+	return 'https://wa.me/' . $digits;
+}
+
+/**
  * Procesar formulario del Centro de ayuda.
  *
  * @return void
@@ -46,11 +82,12 @@ function doroshopping_handle_support_form() {
 
 	$name    = isset( $_POST['support_name'] ) ? sanitize_text_field( wp_unslash( $_POST['support_name'] ) ) : '';
 	$email   = isset( $_POST['support_email'] ) ? sanitize_email( wp_unslash( $_POST['support_email'] ) ) : '';
+	$phone   = isset( $_POST['support_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['support_phone'] ) ) : '';
 	$order   = isset( $_POST['support_order'] ) ? sanitize_text_field( wp_unslash( $_POST['support_order'] ) ) : '';
 	$topic   = isset( $_POST['support_topic'] ) ? sanitize_text_field( wp_unslash( $_POST['support_topic'] ) ) : '';
 	$message = isset( $_POST['support_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['support_message'] ) ) : '';
 
-	if ( '' === $name || ! is_email( $email ) || '' === $topic || '' === $message ) {
+	if ( '' === $name || ! is_email( $email ) || '' === $phone || '' === $topic || '' === $message ) {
 		wp_safe_redirect( add_query_arg( 'support', 'error', $redirect ) );
 		exit;
 	}
@@ -76,6 +113,7 @@ function doroshopping_handle_support_form() {
 
 	$body  = "Nombre: {$name}\n";
 	$body .= "Email: {$email}\n";
+	$body .= "Teléfono: {$phone}\n";
 	$body .= 'Pedido: ' . ( $order ? $order : '—' ) . "\n";
 	$body .= "Tema: {$topic_label}\n\n";
 	$body .= "Mensaje:\n{$message}\n";

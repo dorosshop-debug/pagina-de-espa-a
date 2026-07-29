@@ -40,6 +40,20 @@ function doroshopping_get_account_url() {
  * @return string
  */
 function doroshopping_detect_google_login_url() {
+    // Login with Google (rtCamp) – free, no WooCommerce Pro.
+    if ( function_exists( 'google_login_url' ) ) {
+        $url = google_login_url();
+        if ( is_string( $url ) && $url ) {
+            return esc_url( $url );
+        }
+    }
+    if ( class_exists( 'WP_Google_Login', false ) && method_exists( 'WP_Google_Login', 'get_login_url' ) ) {
+        $url = WP_Google_Login::get_login_url();
+        if ( is_string( $url ) && $url ) {
+            return esc_url( $url );
+        }
+    }
+
     // Nextend Social Login / Nextend Social Login Pro.
     if ( class_exists( 'NextendSocialLogin', false ) ) {
         if ( is_callable( array( 'NextendSocialLogin', 'getLoginUrl' ) ) ) {

@@ -163,6 +163,20 @@ function doroshopping_enqueue_assets() {
 
     wp_localize_script(
         'doroshopping-main',
+        'doroshoppingProductMore',
+        array(
+            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+            'nonce'   => wp_create_nonce( 'doroshopping_product_more' ),
+            'i18n'    => array(
+                'loading'  => __( 'Cargando…', 'doroshopping' ),
+                'viewMore' => __( 'Ver más', 'doroshopping' ),
+                'viewShop' => __( 'Ver más en la tienda', 'doroshopping' ),
+            ),
+        )
+    );
+
+    wp_localize_script(
+        'doroshopping-main',
         'doroshoppingCart',
         array(
             'ajaxUrl'      => admin_url( 'admin-ajax.php' ),

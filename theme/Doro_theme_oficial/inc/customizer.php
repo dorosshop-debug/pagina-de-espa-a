@@ -479,6 +479,23 @@ function doroshopping_customize_register( $wp_customize ) {
         );
     }
 
+    $wp_customize->add_setting(
+        'doroshopping_whatsapp',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_whatsapp',
+        array(
+            'label'       => __( 'WhatsApp (Centro de ayuda)', 'doroshopping' ),
+            'description' => __( 'Número internacional sin espacios (ej. 34600000000) o URL completa de wa.me. Solo se muestra en Centro de ayuda.', 'doroshopping' ),
+            'section'     => 'doroshopping_social',
+            'type'        => 'text',
+        )
+    );
+
     /* ---- BigBuy envío ---- */
     $wp_customize->add_section(
         'doroshopping_bigbuy',

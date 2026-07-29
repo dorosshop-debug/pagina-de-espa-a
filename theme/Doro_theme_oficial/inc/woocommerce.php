@@ -143,6 +143,29 @@ function doroshopping_single_rating() {
 }
 
 /**
+ * Wishlist, compartir, SKU/categorías e info adicional bajo el precio.
+ */
+function doroshopping_single_summary_tools() {
+    if ( ! is_product() ) {
+        return;
+    }
+    get_template_part( 'template-parts/product/summary', 'tools' );
+}
+add_action( 'woocommerce_single_product_summary', 'doroshopping_single_summary_tools', 15 );
+
+/**
+ * Quitar pestaña "Información adicional" (ya va en columna central).
+ *
+ * @param array $tabs Tabs.
+ * @return array
+ */
+function doroshopping_remove_additional_info_tab( $tabs ) {
+    unset( $tabs['additional_information'] );
+    return $tabs;
+}
+add_filter( 'woocommerce_product_tabs', 'doroshopping_remove_additional_info_tab', 98 );
+
+/**
  * Abrir/cerrar contenedor de relacionados.
  */
 function doroshopping_related_wrap_start() {
@@ -188,42 +211,79 @@ function doroshopping_upsell_limit( $limit ) {
 add_filter( 'woocommerce_upsells_total', 'doroshopping_upsell_limit' );
 
 /**
- * Sección extra de productos debajo de relacionados (upsells / recientes).
+ * Sección extra de productos debajo de relacionados (con Ver más hasta 240).
  */
 function doroshopping_more_products_section() {
     if ( ! is_product() ) {
         return;
     }
 
+    $exclude_id = (int) get_the_ID();
+    $batch      = 20;
+    $max_limit  = 240;
+    $shop_url   = function_exists( 'doroshopping_get_wc_page_url' )
+        ? doroshopping_get_wc_page_url( 'shop' )
+        : ( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ) );
+
     $ids = wc_get_products(
         array(
             'status'  => 'publish',
-            'limit'   => 10,
-            'orderby' => 'rand',
+            'limit'   => $batch,
+            'page'    => 1,
+            'orderby' => 'date',
+            'order'   => 'DESC',
             'return'  => 'ids',
-            'exclude' => array( get_the_ID() ),
+            'exclude' => array( $exclude_id ),
         )
     );
 
     if ( empty( $ids ) ) {
         return;
     }
+
+    $shown         = count( $ids );
+    $can_load_more = $shown >= $batch && $shown < $max_limit;
     ?>
-    <section id="doro-more-products" class="doro-product__more-wrap">
+    <section
+        id="doro-more-products"
+        class="doro-product__more-wrap"
+        data-product-more
+        data-exclude="<?php echo esc_attr( (string) $exclude_id ); ?>"
+        data-page="1"
+        data-shown="<?php echo esc_attr( (string) $shown ); ?>"
+        data-batch="30"
+        data-max="<?php echo esc_attr( (string) $max_limit ); ?>"
+        data-shop-url="<?php echo esc_url( $shop_url ); ?>"
+    >
         <h2 class="doro-product__more-title"><?php esc_html_e( 'Más productos para ti', 'doroshopping' ); ?></h2>
-        <?php
-        woocommerce_product_loop_start();
-        foreach ( $ids as $product_id ) {
-            $post_object = get_post( $product_id );
-            if ( ! $post_object ) {
-                continue;
+        <ul class="products columns-5" data-product-more-grid>
+            <?php
+            foreach ( $ids as $product_id ) {
+                $post_object = get_post( $product_id );
+                if ( ! $post_object ) {
+                    continue;
+                }
+                setup_postdata( $GLOBALS['post'] = $post_object ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+                wc_get_template_part( 'content', 'product' );
             }
-            setup_postdata( $GLOBALS['post'] = $post_object ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-            wc_get_template_part( 'content', 'product' );
-        }
-        woocommerce_product_loop_end();
-        wp_reset_postdata();
-        ?>
+            wp_reset_postdata();
+            ?>
+        </ul>
+        <div class="doro-load-more" data-product-more-wrap>
+            <?php if ( $can_load_more ) : ?>
+                <button
+                    type="button"
+                    class="doro-load-more__btn"
+                    data-product-more-btn
+                >
+                    <?php esc_html_e( 'Ver más', 'doroshopping' ); ?>
+                </button>
+            <?php else : ?>
+                <a class="doro-load-more__btn" href="<?php echo esc_url( $shop_url ); ?>">
+                    <?php esc_html_e( 'Ver más en la tienda', 'doroshopping' ); ?>
+                </a>
+            <?php endif; ?>
+        </div>
     </section>
     <?php
 }

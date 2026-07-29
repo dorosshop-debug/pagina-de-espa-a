@@ -15,9 +15,11 @@ if ( function_exists( 'elementor_theme_do_location' ) && elementor_theme_do_loca
     get_footer();
     return;
 }
+
+$is_offers = function_exists( 'doroshopping_is_offers_view' ) && doroshopping_is_offers_view();
 ?>
 
-<main id="main-content" class="doro-shop">
+<main id="main-content" class="doro-shop<?php echo $is_offers ? ' doro-shop--offers' : ''; ?>">
     <div class="doro-shop__container">
         <?php
         /**
@@ -26,13 +28,27 @@ if ( function_exists( 'elementor_theme_do_location' ) && elementor_theme_do_loca
         do_action( 'doroshopping_shop_before_content' );
         ?>
 
-        <header class="doro-shop__header">
-            <?php if ( apply_filters( 'woocommerce_show_page_title', true ) ) : ?>
-                <h1 class="doro-shop__title woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
-            <?php endif; ?>
-
-            <?php do_action( 'woocommerce_archive_description' ); ?>
-        </header>
+        <?php if ( $is_offers ) : ?>
+            <section class="doro-offers-hero" aria-label="<?php esc_attr_e( 'Ofertas', 'doroshopping' ); ?>">
+                <div class="doro-offers-hero__badge"><?php esc_html_e( 'Super Ofertas', 'doroshopping' ); ?></div>
+                <h1 class="doro-offers-hero__title"><?php esc_html_e( 'Ofertas', 'doroshopping' ); ?></h1>
+                <p class="doro-offers-hero__text">
+                    <?php esc_html_e( 'Descuentos flash, precios bajos y novedades. Filtra a la izquierda y encuentra tu próxima compra.', 'doroshopping' ); ?>
+                </p>
+                <ul class="doro-offers-hero__tags" aria-hidden="true">
+                    <li><?php esc_html_e( 'Envío rápido', 'doroshopping' ); ?></li>
+                    <li><?php esc_html_e( 'Pago seguro', 'doroshopping' ); ?></li>
+                    <li><?php esc_html_e( 'Devoluciones fáciles', 'doroshopping' ); ?></li>
+                </ul>
+            </section>
+        <?php else : ?>
+            <header class="doro-shop__header">
+                <?php if ( apply_filters( 'woocommerce_show_page_title', true ) ) : ?>
+                    <h1 class="doro-shop__title woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
+                <?php endif; ?>
+                <?php do_action( 'woocommerce_archive_description' ); ?>
+            </header>
+        <?php endif; ?>
 
         <div class="doro-shop__layout">
             <aside class="doro-shop__sidebar" aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">

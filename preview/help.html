@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doroshopping - Centro de ayuda</title>
     <link rel="icon" href="../theme/Doro_theme_oficial/assets/images/icon.png">
-    <link rel="stylesheet" href="../theme/Doro_theme_oficial/assets/css/main.css">
+    <link rel="stylesheet" href="../theme/Doro_theme_oficial/assets/css/main.css?v=186">
 </head>
 <body>
 
@@ -35,10 +35,16 @@
 							<input type="email" id="support_email" name="support_email" required>
 						</p>
 					</div>
-					<p class="doro-help__field">
-						<label for="support_order">Número de pedido (opcional)</label>
-						<input type="text" id="support_order" name="support_order" placeholder="Ej. 10452">
-					</p>
+					<div class="doro-help__grid">
+						<p class="doro-help__field">
+							<label for="support_phone">Teléfono <span class="required">*</span></label>
+							<input type="tel" id="support_phone" name="support_phone" required placeholder="Ej. +34 600 000 000">
+						</p>
+						<p class="doro-help__field">
+							<label for="support_order">Número de pedido (opcional)</label>
+							<input type="text" id="support_order" name="support_order" placeholder="Ej. 10452">
+						</p>
+					</div>
 					<p class="doro-help__field">
 						<label for="support_topic">Tema <span class="required">*</span></label>
 						<select id="support_topic" name="support_topic" required>
@@ -64,6 +70,14 @@
 			</section>
 
 			<aside class="doro-help__aside">
+				<div class="doro-help__aside-card doro-help__aside-card--whatsapp">
+					<h2>WhatsApp</h2>
+					<p>Si prefieres escribirnos por chat, contáctanos por WhatsApp.</p>
+					<a class="doro-help__whatsapp" href="https://wa.me/34600000000" target="_blank" rel="noopener noreferrer">
+						<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 2.1 17.3L1 23l5.9-1.5A11 11 0 1 0 20.5 3.5zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-3.5.9.9-3.4-.2-.3A9 9 0 1 1 12 20.5zm5.2-6.7c-.3-.1-1.7-.8-1.9-.9s-.5-.1-.7.1-.8.9-1 .9-.5.1-.9-.1a7.4 7.4 0 0 1-2.2-1.4 8.2 8.2 0 0 1-1.5-1.9c-.2-.3 0-.5.1-.6l.4-.5c.1-.1.2-.3.3-.5s0-.3 0-.5-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.4 1.1 2.8 1.2 3 .2.4 2.1 3.2a12.4 12.4 0 0 0 3.4 2.5c.5.2.9.2 1.2.1s1-.4 1.1-.8.1-.7.1-.8-.1-.2-.4-.3z"/></svg>
+						Escribir por WhatsApp
+					</a>
+				</div>
 				<div class="doro-help__aside-card">
 					<h2>Ayuda rápida</h2>
 					<ul class="doro-help__links">

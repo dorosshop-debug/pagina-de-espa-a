@@ -25,7 +25,10 @@ function doroshoppingBoot() {
     initShopLoadMore();
     initShopCategoryFilter();
     initHomeLoadMore();
+    initProductMoreLoadMore();
     initLegalPageToc();
+    initProductShare();
+    initSecurePaymentsModal();
 }
 
 function doroshoppingStart() {
@@ -81,7 +84,7 @@ function initAddressModal() {
     }
 
     /**
-     * Select2/SelectWoo en el modal se rompe (desplegable abajo / países en Departamento).
+     * Select2/SelectWoo en el modal se rompe (desplegable abajo / pa?ses en Departamento).
      * Usamos <select> nativo; country_to_state de WooCommerce sigue funcionando.
      */
     function useNativeSelects() {
@@ -147,7 +150,7 @@ function initAddressModal() {
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('doro-modal-open');
         if (titleEl) {
-            titleEl.textContent = mode === 'edit' ? 'Editar dirección de entrega' : 'Añadir nueva dirección';
+            titleEl.textContent = mode === 'edit' ? 'Editar direcci?n de entrega' : 'A?adir nueva direcci?n';
         }
         clearFieldErrors();
         if (bodyEl) {
@@ -286,7 +289,7 @@ function initAddressModal() {
         if (!name && !address) {
             var emptyMsg = (window.doroshoppingShipping && window.doroshoppingShipping.i18n && window.doroshoppingShipping.i18n.emptyAddress)
                 ? window.doroshoppingShipping.i18n.emptyAddress
-                : 'Aún no has añadido una dirección de entrega.';
+                : 'A?n no has a?adido una direcci?n de entrega.';
             preview.innerHTML = '<p class="doro-checkout-address__empty">' + esc(emptyMsg) + '</p>';
             syncEditButton();
             return;
@@ -374,7 +377,7 @@ function initAddressModal() {
 }
 
 /**
- * Franja login/cupón del checkout (sustituye avisos WC).
+ * Franja login/cup?n del checkout (sustituye avisos WC).
  */
 function initCheckoutHelpers() {
     var buttons = document.querySelectorAll('[data-doro-checkout-toggle]');
@@ -409,7 +412,7 @@ function initCheckoutHelpers() {
 }
 
 /**
- * Prefija país de facturación/envío desde cookie (Klarna / Stripe locales).
+ * Prefija pa?s de facturaci?n/env?o desde cookie (Klarna / Stripe locales).
  */
 function initCheckoutCountrySeed() {
     if (!document.body.classList.contains('woocommerce-checkout') && !document.querySelector('.doro-checkout-form')) {
@@ -444,7 +447,7 @@ function initCheckoutCountrySeed() {
 }
 
 /**
- * Oculta el aviso técnico de zona de coincidencia si el filtro PHP no llega a tiempo.
+ * Oculta el aviso t?cnico de zona de coincidencia si el filtro PHP no llega a tiempo.
  */
 function hideTechnicalCheckoutNotices() {
     function scrub() {
@@ -463,7 +466,7 @@ function hideTechnicalCheckoutNotices() {
 }
 
 /**
- * Tienda: botón «Ver más» carga la siguiente página y añade productos al grid.
+ * Tienda: bot?n ?Ver m?s? carga la siguiente p?gina y a?ade productos al grid.
  */
 function initShopLoadMore() {
     var wrap = document.querySelector('[data-doro-load-more]');
@@ -484,7 +487,7 @@ function initShopLoadMore() {
         loading = true;
         btn.classList.add('is-loading');
         btn.disabled = true;
-        btn.textContent = (window.doroshoppingI18n && window.doroshoppingI18n.loading) ? window.doroshoppingI18n.loading : 'Cargando…';
+        btn.textContent = (window.doroshoppingI18n && window.doroshoppingI18n.loading) ? window.doroshoppingI18n.loading : 'Cargando?';
 
         fetch(nextUrl, { credentials: 'same-origin' })
             .then(function (res) { return res.text(); })
@@ -522,7 +525,7 @@ function initShopLoadMore() {
 }
 
 /**
- * Filtro de categorías: desplegar / plegar subcategorías.
+ * Filtro de categor?as: desplegar / plegar subcategor?as.
  */
 function initShopCategoryFilter() {
     var root = document.querySelector('.doro-shop__filter-list--cats');
@@ -556,7 +559,7 @@ function initShopCategoryFilter() {
 }
 
 /**
- * Home: Ver más carga lotes de 30 hasta el máximo del Customizer; luego → tienda.
+ * Home: Ver m?s carga lotes de 30 hasta el m?ximo del Customizer; luego ? tienda.
  */
 function initHomeLoadMore() {
     var section = document.querySelector('[data-home-products]');
@@ -579,7 +582,7 @@ function initHomeLoadMore() {
         var link = document.createElement('a');
         link.className = 'doro-load-more__btn';
         link.href = shopUrl;
-        link.textContent = i18n.viewShop || 'Ver más en la tienda';
+        link.textContent = i18n.viewShop || 'Ver m?s en la tienda';
         wrap.appendChild(link);
     }
 
@@ -602,7 +605,7 @@ function initHomeLoadMore() {
         loading = true;
         btn.disabled = true;
         btn.classList.add('is-loading');
-        btn.textContent = i18n.loading || 'Cargando…';
+        btn.textContent = i18n.loading || 'Cargando?';
 
         var body = new FormData();
         body.append('action', 'doroshopping_home_load_more');
@@ -638,7 +641,7 @@ function initHomeLoadMore() {
 
                 btn.disabled = false;
                 btn.classList.remove('is-loading');
-                btn.textContent = i18n.viewMore || 'Ver más';
+                btn.textContent = i18n.viewMore || 'Ver m?s';
             })
             .catch(function () {
                 switchToShop();
@@ -712,7 +715,7 @@ function initAuthModal() {
         if (!googleBtn) return;
         e.preventDefault();
         e.stopPropagation();
-        window.alert('Configura el login con Google: activa Nextend Social Login (o pega la URL en Apariencia â†’ Personalizar â†’ DoroTheme â†’ Login / Google).');
+        window.alert('Configura el login con Google: activa Nextend Social Login (o pega la URL en Apariencia ??? Personalizar ??? DoroTheme ??? Login / Google).');
     }, true);
 }
 
@@ -871,7 +874,7 @@ function initLocaleFlagOptions() {
         // CURCY enlaces data-currency.
         var link = slot.querySelector('[data-currency="' + code + '"], a[href*="wmc-currency=' + code + '"]');
         if (link && typeof link.click === 'function' && !link.classList.contains('wmc-active')) {
-            // No auto-click al elegir ubicación (evitar navegación doble); Guardar aplica ?wmc-currency=.
+            // No auto-click al elegir ubicaci?n (evitar navegaci?n doble); Guardar aplica ?wmc-currency=.
         }
     }
 
@@ -969,7 +972,7 @@ function initLocaleFlagOptions() {
             var btn = form.querySelector('.header-dropdown__submit');
             if (btn) {
                 btn.disabled = true;
-                btn.textContent = 'Guardando…';
+                btn.textContent = 'Guardando?';
             }
         });
     }
@@ -1039,7 +1042,7 @@ function initMegaMenu() {
 
         btn.addEventListener('click', function (e) {
             var href = btn.getAttribute('href');
-            // Si es enlace real a la categoría, permitir navegación.
+            // Si es enlace real a la categor?a, permitir navegaci?n.
             if (href && href !== '#' && href.indexOf('javascript:') !== 0) {
                 return;
             }
@@ -1263,7 +1266,7 @@ function initRelatedProductsCarousel() {
     var roots = document.querySelectorAll('[data-product-carousel], [data-related-carousel]');
     if (!roots.length) return;
 
-    var intervalMs = 4500;
+    var intervalMs = 2800;
 
     function getVisibleCount() {
         if (window.innerWidth <= 480) return 2;
@@ -1325,6 +1328,7 @@ function initRelatedProductsCarousel() {
 
         var current = 0;
         var timer = null;
+        var maxIndex = 0;
         var pageCount = 1;
 
         function rebuildDots() {
@@ -1332,21 +1336,21 @@ function initRelatedProductsCarousel() {
             for (var i = 0; i < pageCount; i++) {
                 var dot = document.createElement('button');
                 dot.type = 'button';
-                dot.className = 'doro-related-carousel__dot' + (i === current ? ' is-active' : '');
-                dot.setAttribute('aria-label', 'Página ' + (i + 1));
+                dot.className = 'doro-related-carousel__dot' + (Math.floor(current / getVisibleCount()) === i ? ' is-active' : '');
+                dot.setAttribute('aria-label', 'Pagina ' + (i + 1));
                 dot.setAttribute('data-page', String(i));
                 dotsWrap.appendChild(dot);
             }
             dotsWrap.querySelectorAll('.doro-related-carousel__dot').forEach(function (dot) {
                 dot.addEventListener('click', function () {
-                    goTo(parseInt(dot.getAttribute('data-page'), 10));
+                    goTo(parseInt(dot.getAttribute('data-page'), 10) * getVisibleCount());
                     startAuto();
                 });
             });
         }
 
         function updateButtons() {
-            var multi = pageCount > 1;
+            var multi = maxIndex > 0;
             prevBtn.disabled = !multi;
             nextBtn.disabled = !multi;
             dotsWrap.style.display = multi ? '' : 'none';
@@ -1354,19 +1358,21 @@ function initRelatedProductsCarousel() {
             nextBtn.style.display = multi ? '' : 'none';
         }
 
-        function goTo(page) {
+        function goTo(index) {
             var visible = getVisibleCount();
             var gap = getGap(list);
+            maxIndex = Math.max(0, items.length - visible);
             pageCount = Math.max(1, Math.ceil(items.length / visible));
-            current = ((page % pageCount) + pageCount) % pageCount;
+            current = ((index % (maxIndex + 1)) + (maxIndex + 1)) % (maxIndex + 1);
 
             var productWidth = items[0].getBoundingClientRect().width;
-            var shift = current * visible * (productWidth + gap);
+            var shift = current * (productWidth + gap);
             list.style.transform = shift > 0 ? 'translateX(-' + shift + 'px)' : 'translateX(0)';
 
             if (dotsWrap.children.length !== pageCount) rebuildDots();
+            var activePage = Math.min(pageCount - 1, Math.floor(current / visible));
             dotsWrap.querySelectorAll('.doro-related-carousel__dot').forEach(function (dot, i) {
-                dot.classList.toggle('is-active', i === current);
+                dot.classList.toggle('is-active', i === activePage);
             });
             updateButtons();
         }
@@ -1381,7 +1387,7 @@ function initRelatedProductsCarousel() {
 
         function startAuto() {
             stopAuto();
-            if (pageCount < 2) return;
+            if (maxIndex < 1) return;
             timer = setInterval(next, intervalMs);
         }
 
@@ -1417,7 +1423,7 @@ function initRelatedProductsCarousel() {
             touchDelta = e.touches[0].clientX - touchStartX;
         }, { passive: true });
         viewport.addEventListener('touchend', function () {
-            if (Math.abs(touchDelta) > 40) {
+            if (Math.abs(touchDelta) > 36) {
                 if (touchDelta < 0) next();
                 else prev();
             }
@@ -1429,7 +1435,7 @@ function initRelatedProductsCarousel() {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(function () {
                 goTo(current);
-            }, 120);
+            }, 100);
         });
 
         goTo(0);
@@ -1566,7 +1572,7 @@ function initCartModal() {
         updateCounts(data.count || 0);
 
         if (subtotalEl) {
-            subtotalEl.innerHTML = data.subtotal_html || 'â€”';
+            subtotalEl.innerHTML = data.subtotal_html || '???';
         }
 
         if (checkoutEl) {
@@ -1592,7 +1598,7 @@ function initCartModal() {
                             '</div>' +
                             '<div class="cart-modal__item-bottom">' +
                                 '<div class="cart-modal__qty">' +
-                                    '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="-1" aria-label="' + escapeHtml(i18n('decrease', 'Reducir cantidad')) + '">âˆ’</button>' +
+                                    '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="-1" aria-label="' + escapeHtml(i18n('decrease', 'Reducir cantidad')) + '">???</button>' +
                                     '<span class="cart-modal__qty-value">' + escapeHtml(item.quantity) + '</span>' +
                                     '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="1" aria-label="' + escapeHtml(i18n('increase', 'Aumentar cantidad')) + '">+</button>' +
                                 '</div>' +
@@ -1633,7 +1639,7 @@ function initCartModal() {
             return Promise.resolve({
                 items: [],
                 count: 0,
-                subtotal_html: 'â€”',
+                subtotal_html: '???',
                 checkout_url: cfg.checkoutUrl || '#',
                 recommendations: [],
                 empty_message: i18n('empty', 'Tu carrito esta vacio.')
@@ -1914,7 +1920,7 @@ function initAjaxAddToCart() {
     }
 
     function addViaWoo(productId, quantity, btn) {
-        // Preferir endpoint del tema (sesión controlada) si hay nonce.
+        // Preferir endpoint del tema (sesi?n controlada) si hay nonce.
         if (cfg.ajaxUrl && cfg.nonce) {
             var body = new FormData();
             body.append('action', 'doroshopping_add_to_cart');
@@ -2104,7 +2110,7 @@ function initProductBuybox() {
         });
     });
 
-    // Preview: interceptar submit del form (action #) solo en HTML estático.
+    // Preview: interceptar submit del form (action #) solo en HTML est?tico.
     form.addEventListener('submit', function (e) {
         var isPreview = !!(
             window.doroshoppingShipping &&
@@ -2124,7 +2130,7 @@ function initProductBuybox() {
         form.removeAttribute('data-buy-now');
     });
 
-    // Por si el botón buy-now es <a> en preview antiguo.
+    // Por si el bot?n buy-now es <a> en preview antiguo.
     buybox.querySelectorAll('.doro-buybox__buy-now').forEach(function (btn) {
         if (btn.tagName === 'A') {
             btn.addEventListener('click', function (e) {
@@ -2136,7 +2142,7 @@ function initProductBuybox() {
         }
     });
 
-    // Feedback visual breve tras add (también útil si algún plugin hace AJAX).
+    // Feedback visual breve tras add (tambi?n ?til si alg?n plugin hace AJAX).
     document.body.addEventListener('added_to_cart', function () {
         var addBtn = form.querySelector('.single_add_to_cart_button');
         if (!addBtn) return;
@@ -2215,7 +2221,7 @@ function initProductDescriptionClamp() {
     if (!panels.length) {
         document.querySelectorAll('.doro-product__below .woocommerce-Tabs-panel').forEach(function (panel) {
             var heading = panel.querySelector('h2');
-            if (heading && /descripci[oó]n/i.test(heading.textContent || '')) {
+            if (heading && /descripci[o?]n/i.test(heading.textContent || '')) {
                 panels.push(panel);
             }
         });
@@ -2238,7 +2244,7 @@ function initProductDescriptionClamp() {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'doro-desc-clamp__toggle';
-        btn.textContent = 'Leer más';
+        btn.textContent = 'Leer m?s';
         btn.setAttribute('aria-expanded', 'false');
 
         wrap.appendChild(inner);
@@ -2256,7 +2262,7 @@ function initProductDescriptionClamp() {
             btn.addEventListener('click', function () {
                 var collapsed = wrap.classList.toggle('is-collapsed');
                 // toggle returns true if class was added (= collapsed)
-                btn.textContent = collapsed ? 'Leer más' : 'Leer menos';
+                btn.textContent = collapsed ? 'Leer m?s' : 'Leer menos';
                 btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
             });
         });
@@ -2800,7 +2806,7 @@ function initLegalPageToc() {
         var li = document.createElement('li');
         var a = document.createElement('a');
         a.href = '#' + id;
-        a.textContent = h.textContent || ('Secci�n ' + (i + 1));
+        a.textContent = h.textContent || ('Secci?n ' + (i + 1));
         li.appendChild(a);
         list.appendChild(li);
     });
@@ -2819,4 +2825,172 @@ function initLegalPageToc() {
     }
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+}
+
+function initProductMoreLoadMore() {
+    var section = document.querySelector('[data-product-more]');
+    if (!section) return;
+
+    var grid = section.querySelector('[data-product-more-grid]');
+    var wrap = section.querySelector('[data-product-more-wrap]');
+    var btn = section.querySelector('[data-product-more-btn]');
+    if (!grid || !wrap) return;
+
+    var cfg = window.doroshoppingProductMore || {};
+    var ajaxUrl = cfg.ajaxUrl || '';
+    var nonce = cfg.nonce || '';
+    var i18n = cfg.i18n || {};
+    var loading = false;
+
+    function switchToShop() {
+        var shopUrl = section.getAttribute('data-shop-url') || '/';
+        wrap.innerHTML = '';
+        var link = document.createElement('a');
+        link.className = 'doro-load-more__btn';
+        link.href = shopUrl;
+        link.textContent = i18n.viewShop || 'Ver más en la tienda';
+        wrap.appendChild(link);
+    }
+
+    if (!btn) return;
+
+    btn.addEventListener('click', function () {
+        if (loading || !ajaxUrl) return;
+
+        var page = parseInt(section.getAttribute('data-page') || '1', 10) + 1;
+        var shown = parseInt(section.getAttribute('data-shown') || '0', 10);
+        var max = parseInt(section.getAttribute('data-max') || '240', 10);
+        var batch = parseInt(section.getAttribute('data-batch') || '30', 10);
+        var exclude = section.getAttribute('data-exclude') || '0';
+
+        if (shown >= max) {
+            switchToShop();
+            return;
+        }
+
+        loading = true;
+        btn.disabled = true;
+        btn.classList.add('is-loading');
+        btn.textContent = i18n.loading || 'Cargando…';
+
+        var body = new FormData();
+        body.append('action', 'doroshopping_product_more_load');
+        body.append('nonce', nonce);
+        body.append('page', String(page));
+        body.append('shown', String(shown));
+        body.append('max', String(max));
+        body.append('batch', String(batch));
+        body.append('exclude', String(exclude));
+
+        fetch(ajaxUrl, { method: 'POST', credentials: 'same-origin', body: body })
+            .then(function (res) { return res.json(); })
+            .then(function (json) {
+                if (!json || !json.success || !json.data) {
+                    throw new Error('bad response');
+                }
+                var data = json.data;
+                if (data.html) {
+                    var tmp = document.createElement('div');
+                    tmp.innerHTML = data.html;
+                    while (tmp.firstChild) {
+                        grid.appendChild(tmp.firstChild);
+                    }
+                    if (window.jQuery) {
+                        window.jQuery(document.body).trigger('doro_products_loaded');
+                    }
+                }
+
+                section.setAttribute('data-page', String(data.page || page));
+                section.setAttribute('data-shown', String(data.shown != null ? data.shown : shown));
+
+                if (data.go_to_shop || data.done || !data.count) {
+                    switchToShop();
+                    return;
+                }
+
+                btn.disabled = false;
+                btn.classList.remove('is-loading');
+                btn.textContent = i18n.viewMore || 'Ver más';
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.classList.remove('is-loading');
+                btn.textContent = i18n.viewMore || 'Ver más';
+            })
+            .finally(function () {
+                loading = false;
+            });
+    });
+}
+
+function initProductShare() {
+    document.querySelectorAll('[data-share-product]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var url = btn.getAttribute('data-share-url') || window.location.href;
+            var title = btn.getAttribute('data-share-title') || document.title;
+            if (navigator.share) {
+                navigator.share({ title: title, url: url }).catch(function () {});
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function () {
+                    btn.classList.add('is-copied');
+                    var prev = btn.innerHTML;
+                    btn.setAttribute('data-prev-html', prev);
+                    btn.textContent = 'Enlace copiado';
+                    setTimeout(function () {
+                        var old = btn.getAttribute('data-prev-html');
+                        if (old) btn.innerHTML = old;
+                        btn.classList.remove('is-copied');
+                    }, 1600);
+                }).catch(function () {
+                    window.prompt('Copia el enlace:', url);
+                });
+                return;
+            }
+            window.prompt('Copia el enlace:', url);
+        });
+    });
+}
+
+function initSecurePaymentsModal() {
+    var modal = document.querySelector('[data-secure-payments-modal]');
+    if (!modal) return;
+
+    var openers = document.querySelectorAll('[data-secure-payments-open]');
+    if (!openers.length) return;
+
+    var lastFocus = null;
+
+    function openModal() {
+        lastFocus = document.activeElement;
+        modal.hidden = false;
+        document.body.classList.add('doro-modal-open');
+        var closeBtn = modal.querySelector('[data-secure-payments-close]');
+        if (closeBtn) closeBtn.focus();
+    }
+
+    function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove('doro-modal-open');
+        if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+    }
+
+    openers.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            openModal();
+        });
+    });
+
+    modal.querySelectorAll('[data-secure-payments-close]').forEach(function (el) {
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            closeModal();
+        });
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !modal.hidden) closeModal();
+    });
 }

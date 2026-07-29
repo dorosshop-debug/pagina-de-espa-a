@@ -40,15 +40,17 @@ if ( ! $elementor_footer ) :
                         'doroshopping.uk',
                     );
                     $current_host = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
-                    $current_host = is_string( $current_host ) ? strtolower( $current_host ) : '';
+                    $current_host = is_string( $current_host ) ? strtolower( preg_replace( '/^www\./', '', $current_host ) ) : '';
                     foreach ( $stores as $store_host ) :
-                        $is_current = ( $current_host === $store_host ) || ( 'www.' . $store_host === $current_host );
-                        $href       = $is_current ? home_url( '/' ) : 'https://' . $store_host;
+                        $is_current = ( $current_host === $store_host );
+                        $href       = 'https://' . $store_host . '/';
                         ?>
                         <li>
                             <a
                                 href="<?php echo esc_url( $href ); ?>"
-                                <?php echo $is_current ? 'aria-current="page"' : 'target="_blank" rel="noopener noreferrer"'; ?>
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                <?php echo $is_current ? 'aria-current="page"' : ''; ?>
                                 class="<?php echo $is_current ? 'is-current' : ''; ?>"
                             ><?php echo esc_html( $store_host ); ?></a>
                         </li>

@@ -30,11 +30,21 @@ $is_variable = $product && $product->is_type( 'variable' );
     }
     ?>
 
-    <nav class="doro-product__anchors" aria-label="<?php esc_attr_e( 'Secciones del producto', 'doroshopping' ); ?>">
-        <a href="#doro-reviews"><?php esc_html_e( 'Valoraciones', 'doroshopping' ); ?></a>
-        <a href="#doro-details"><?php esc_html_e( 'Detalles', 'doroshopping' ); ?></a>
-        <a href="#doro-description"><?php esc_html_e( 'Descripción', 'doroshopping' ); ?></a>
-        <a href="#doro-related"><?php esc_html_e( 'Artículos similares', 'doroshopping' ); ?></a>
+    <nav class="doro-product__breadcrumb woocommerce-breadcrumb" aria-label="<?php esc_attr_e( 'Migas de pan', 'doroshopping' ); ?>">
+        <?php
+        if ( function_exists( 'woocommerce_breadcrumb' ) ) {
+            woocommerce_breadcrumb(
+                array(
+                    'delimiter'   => ' <span class="doro-product__breadcrumb-sep" aria-hidden="true">/</span> ',
+                    'wrap_before' => '',
+                    'wrap_after'  => '',
+                    'before'      => '',
+                    'after'       => '',
+                    'home'        => _x( 'Inicio', 'breadcrumb', 'doroshopping' ),
+                )
+            );
+        }
+        ?>
     </nav>
 
     <div class="doro-product__top<?php echo $is_variable ? ' doro-product__top--variable' : ''; ?>">
@@ -53,8 +63,8 @@ $is_variable = $product && $product->is_type( 'variable' );
             /**
              * @hooked woocommerce_template_single_title - 5
              * @hooked doroshopping_single_rating - 8
-             * @hooked doroshopping_single_meta_line - 9
              * @hooked woocommerce_template_single_price - 10
+             * @hooked doroshopping_single_summary_tools - 15
              * @hooked woocommerce_template_single_excerpt - 20
              */
             do_action( 'woocommerce_single_product_summary' );

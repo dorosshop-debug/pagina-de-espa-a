@@ -1,6 +1,6 @@
 <?php
 /**
- * Ofertas vacías: mensaje + carrusel de sugerencias + funnel de categorías.
+ * Ofertas vacías: banner + sugerencias + funnel.
  *
  * @package Doroshopping
  */
@@ -31,18 +31,22 @@ if ( taxonomy_exists( 'product_cat' ) ) {
 ?>
 
 <section class="doro-shop-offers-empty" aria-labelledby="doro-offers-empty-title">
-	<div class="doro-shop-offers-empty__intro">
+	<div class="doro-shop-offers-empty__banner">
+		<span class="doro-shop-offers-empty__chip"><?php esc_html_e( 'Ofertas del momento', 'doroshopping' ); ?></span>
 		<h2 id="doro-offers-empty-title" class="doro-shop-offers-empty__title">
 			<?php esc_html_e( 'Ahora mismo no hay ofertas activas', 'doroshopping' ); ?>
 		</h2>
 		<p class="doro-shop-offers-empty__text">
-			<?php esc_html_e( 'Te mostramos productos populares que podrían interesarte. Vuelve pronto para ver nuevas promociones.', 'doroshopping' ); ?>
+			<?php esc_html_e( 'Estamos preparando nuevas promociones. Mientras tanto, mira estos productos populares o usa los filtros de la izquierda.', 'doroshopping' ); ?>
 		</p>
 	</div>
 
 	<?php if ( ! empty( $products ) ) : ?>
 		<div class="doro-shop-offers-empty__carousel-wrap" data-product-carousel>
-			<h3 class="doro-shop-offers-empty__subtitle"><?php esc_html_e( 'Productos recomendados para ti', 'doroshopping' ); ?></h3>
+			<div class="doro-shop-offers-empty__section-head">
+				<h3 class="doro-shop-offers-empty__subtitle"><?php esc_html_e( 'Productos recomendados para ti', 'doroshopping' ); ?></h3>
+				<span class="doro-shop-offers-empty__hot"><?php esc_html_e( 'Tendencia', 'doroshopping' ); ?></span>
+			</div>
 			<ul class="products columns-5">
 				<?php
 				foreach ( $products as $product ) {

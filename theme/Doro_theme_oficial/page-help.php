@@ -19,6 +19,7 @@ $orders_url = ( function_exists( 'wc_get_endpoint_url' ) && function_exists( 'do
 $sent       = isset( $_GET['support'] ) && 'sent' === sanitize_key( wp_unslash( $_GET['support'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $error      = isset( $_GET['support'] ) && 'error' === sanitize_key( wp_unslash( $_GET['support'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $user       = wp_get_current_user();
+$whatsapp   = function_exists( 'doroshopping_get_whatsapp_url' ) ? doroshopping_get_whatsapp_url() : '';
 ?>
 
 <main id="main-content" class="doro-support doro-help">
@@ -65,10 +66,16 @@ $user       = wp_get_current_user();
 						</p>
 					</div>
 
-					<p class="doro-help__field">
-						<label for="support_order"><?php esc_html_e( 'Número de pedido (opcional)', 'doroshopping' ); ?></label>
-						<input type="text" id="support_order" name="support_order" placeholder="<?php esc_attr_e( 'Ej. 10452', 'doroshopping' ); ?>">
-					</p>
+					<div class="doro-help__grid">
+						<p class="doro-help__field">
+							<label for="support_phone"><?php esc_html_e( 'Teléfono', 'doroshopping' ); ?> <span class="required">*</span></label>
+							<input type="tel" id="support_phone" name="support_phone" required autocomplete="tel" placeholder="<?php esc_attr_e( 'Ej. +34 600 000 000', 'doroshopping' ); ?>" value="">
+						</p>
+						<p class="doro-help__field">
+							<label for="support_order"><?php esc_html_e( 'Número de pedido (opcional)', 'doroshopping' ); ?></label>
+							<input type="text" id="support_order" name="support_order" placeholder="<?php esc_attr_e( 'Ej. 10452', 'doroshopping' ); ?>">
+						</p>
+					</div>
 
 					<p class="doro-help__field">
 						<label for="support_topic"><?php esc_html_e( 'Tema', 'doroshopping' ); ?> <span class="required">*</span></label>
@@ -91,6 +98,12 @@ $user       = wp_get_current_user();
 
 					<p class="doro-help__actions">
 						<button type="submit" class="doro-support__btn"><?php esc_html_e( 'Enviar solicitud', 'doroshopping' ); ?></button>
+						<?php if ( $whatsapp ) : ?>
+							<a class="doro-help__whatsapp doro-help__whatsapp--inline" href="<?php echo esc_url( $whatsapp ); ?>" target="_blank" rel="noopener noreferrer">
+								<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 2.1 17.3L1 23l5.9-1.5A11 11 0 1 0 20.5 3.5zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-3.5.9.9-3.4-.2-.3A9 9 0 1 1 12 20.5zm5.2-6.7c-.3-.1-1.7-.8-1.9-.9s-.5-.1-.7.1-.8.9-1 .9-.5.1-.9-.1a7.4 7.4 0 0 1-2.2-1.4 8.2 8.2 0 0 1-1.5-1.9c-.2-.3 0-.5.1-.6l.4-.5c.1-.1.2-.3.3-.5s0-.3 0-.5-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.4 1.1 2.8 1.2 3 .2.4 2.1 3.2a12.4 12.4 0 0 0 3.4 2.5c.5.2.9.2 1.2.1s1-.4 1.1-.8.1-.7.1-.8-.1-.2-.4-.3z"/></svg>
+								<?php esc_html_e( 'WhatsApp', 'doroshopping' ); ?>
+							</a>
+						<?php endif; ?>
 					</p>
 					<p class="doro-help__meta">
 						<?php esc_html_e( 'Tu mensaje se enviará a atencionalcliente@doroshopping.com', 'doroshopping' ); ?>
@@ -99,6 +112,31 @@ $user       = wp_get_current_user();
 			</section>
 
 			<aside class="doro-help__aside">
+				<div class="doro-help__aside-card doro-help__aside-card--whatsapp">
+					<h2><?php esc_html_e( 'WhatsApp', 'doroshopping' ); ?></h2>
+					<?php if ( $whatsapp ) : ?>
+						<p><?php esc_html_e( 'Si prefieres escribirnos por chat, contáctanos por WhatsApp.', 'doroshopping' ); ?></p>
+						<a class="doro-help__whatsapp" href="<?php echo esc_url( $whatsapp ); ?>" target="_blank" rel="noopener noreferrer">
+							<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 2.1 17.3L1 23l5.9-1.5A11 11 0 1 0 20.5 3.5zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-3.5.9.9-3.4-.2-.3A9 9 0 1 1 12 20.5zm5.2-6.7c-.3-.1-1.7-.8-1.9-.9s-.5-.1-.7.1-.8.9-1 .9-.5.1-.9-.1a7.4 7.4 0 0 1-2.2-1.4 8.2 8.2 0 0 1-1.5-1.9c-.2-.3 0-.5.1-.6l.4-.5c.1-.1.2-.3.3-.5s0-.3 0-.5-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4s-1 1-1 2.4 1.1 2.8 1.2 3 .2.4 2.1 3.2a12.4 12.4 0 0 0 3.4 2.5c.5.2.9.2 1.2.1s1-.4 1.1-.8.1-.7.1-.8-.1-.2-.4-.3z"/></svg>
+							<?php esc_html_e( 'Escribir por WhatsApp', 'doroshopping' ); ?>
+						</a>
+					<?php else : ?>
+						<p><?php esc_html_e( 'Pronto podrás escribirnos también por WhatsApp.', 'doroshopping' ); ?></p>
+						<?php if ( current_user_can( 'edit_theme_options' ) ) : ?>
+							<p class="doro-help__admin-hint">
+								<?php
+								echo wp_kses_post(
+									sprintf(
+										/* translators: %s: customizer link */
+										__( 'Admin: configura el número en %s (Redes sociales → WhatsApp).', 'doroshopping' ),
+										'<a href="' . esc_url( admin_url( 'customize.php?autofocus[control]=doroshopping_whatsapp' ) ) . '">' . esc_html__( 'Personalizar', 'doroshopping' ) . '</a>'
+									)
+								);
+								?>
+							</p>
+						<?php endif; ?>
+					<?php endif; ?>
+				</div>
 				<div class="doro-help__aside-card">
 					<h2><?php esc_html_e( 'Ayuda rápida', 'doroshopping' ); ?></h2>
 					<ul class="doro-help__links">

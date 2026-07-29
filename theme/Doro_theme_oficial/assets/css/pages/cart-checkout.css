@@ -295,6 +295,70 @@
     cursor: default;
 }
 
+.doro-cesta-trust__item--btn {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.doro-cesta-trust__item--btn:hover {
+    background: #fafafa;
+}
+
+.doro-cesta-trust__item--btn:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: -2px;
+}
+
+.doro-secure-payments__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.doro-secure-payments__list li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.doro-secure-payments__list strong {
+    font-size: 14px;
+    color: var(--color-dark);
+}
+
+.doro-secure-payments__list span {
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--color-grey-text);
+}
+
+.doro-secure-payments__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-grey-border);
+}
+
+.doro-secure-payments__links a {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-orange);
+    text-decoration: none;
+}
+
+.doro-secure-payments__links a:hover {
+    text-decoration: underline;
+}
+
 .doro-cesta-trust__icon {
     flex-shrink: 0;
     color: var(--color-dark);
