@@ -114,6 +114,18 @@ ul.products li.product.home-product-card:hover {
 .home-product-card__cart-btn.added {
     border-color: var(--color-orange);
     background: #fff7ed;
+    color: var(--color-orange);
+}
+
+/* WooCommerce AJAX: ocultar enlace "Ver carrito" en cards */
+.home-product-card a.added_to_cart,
+.home-product-card .added_to_cart.wc-forward {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    pointer-events: none !important;
 }
 
 .home-product-card__cart-btn:hover {

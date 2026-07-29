@@ -383,32 +383,47 @@ function doroshopping_checkout_posted_country_fallback( $posted_data ) {
 add_action( 'woocommerce_checkout_update_order_review', 'doroshopping_checkout_posted_country_fallback', 5 );
 
 /**
- * Evita que plugins de autocomplete (AGA) tumben el checkout con querySelectorAll('').
- * El InvalidKey de Google Maps se corrige en el propio plugin (API key válida).
+ * Evita que Advanced Google Address (AGA) tumbe carrito/checkout con querySelectorAll('').
  *
  * @return void
  */
-function doroshopping_checkout_guard_empty_selectors() {
-    if ( ! function_exists( 'is_checkout' ) || ! is_checkout() ) {
+function doroshopping_guard_empty_selectors() {
+    $is_cart     = function_exists( 'is_cart' ) && is_cart();
+    $is_checkout = function_exists( 'is_checkout' ) && is_checkout();
+    if ( ! $is_cart && ! $is_checkout ) {
         return;
     }
     ?>
     <script>
     (function () {
         try {
-            var proto = Document.prototype;
-            var orig = proto.querySelectorAll;
-            if (!orig || orig.__doroPatched) return;
-            proto.querySelectorAll = function (sel) {
-                if (sel == null || String(sel).trim() === '') {
-                    return orig.call(this, '*:not(*)');
-                }
-                return orig.apply(this, arguments);
-            };
-            proto.querySelectorAll.__doroPatched = true;
+            function patch(proto) {
+                if (!proto || !proto.querySelectorAll || proto.querySelectorAll.__doroPatched) return;
+                var orig = proto.querySelectorAll;
+                proto.querySelectorAll = function (sel) {
+                    if (sel == null || String(sel).trim() === '') {
+                        return orig.call(this, '*:not(*)');
+                    }
+                    try {
+                        return orig.apply(this, arguments);
+                    } catch (err) {
+                        return orig.call(this, '*:not(*)');
+                    }
+                };
+                proto.querySelectorAll.__doroPatched = true;
+            }
+            patch(Document.prototype);
+            patch(Element.prototype);
+            patch(DocumentFragment && DocumentFragment.prototype);
         } catch (e) { /* ignore */ }
     })();
     </script>
     <?php
 }
-add_action( 'wp_head', 'doroshopping_checkout_guard_empty_selectors', 1 );
+add_action( 'wp_head', 'doroshopping_guard_empty_selectors', 0 );
+
+// Compat: nombre antiguo del hook.
+function doroshopping_checkout_guard_empty_selectors() {
+    doroshopping_guard_empty_selectors();
+}
+

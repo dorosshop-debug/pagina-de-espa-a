@@ -408,6 +408,12 @@
     padding: 0;
 }
 
+.doro-cesta-recs__grid.products::before,
+.doro-cesta-recs__grid.products::after {
+    display: none !important;
+    content: none !important;
+}
+
 .doro-cesta-recs__grid .home-product-card {
     width: auto;
 }

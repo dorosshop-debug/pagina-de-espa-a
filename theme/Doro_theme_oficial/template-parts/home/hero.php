@@ -11,7 +11,7 @@ $defaults = array(
         'image'    => $uri . '/hero1.png',
         'title'    => __( 'Tecnologia para tu hogar.', 'doroshopping' ),
         'subtitle' => __( 'Descubre gadgets inteligentes y accesorios esenciales.', 'doroshopping' ),
-        'cta'      => __( 'Ver Ofertas', 'doroshopping' ),
+        'cta'      => __( 'Ultimos productos', 'doroshopping' ),
         'url'      => function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ),
         'align'    => 'left',
     ),

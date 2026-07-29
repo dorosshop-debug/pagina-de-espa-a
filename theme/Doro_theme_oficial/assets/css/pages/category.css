@@ -216,6 +216,14 @@
     padding: 0;
 }
 
+.doro-category .products::before,
+.doro-category .products::after,
+.doro-category ul.products::before,
+.doro-category ul.products::after {
+    display: none !important;
+    content: none !important;
+}
+
 .doro-category .home-product-card {
     height: 100%;
 }

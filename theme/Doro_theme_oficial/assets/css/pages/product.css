@@ -250,7 +250,10 @@
     color: var(--color-orange);
 }
 
-.doro-gallery-thumbs__btn[hidden],
+.doro-gallery-thumbs__btn[hidden] {
+    display: none !important;
+}
+
 .doro-gallery-thumbs__btn:disabled {
     opacity: 0.35;
     cursor: default;
@@ -1153,10 +1156,29 @@
 }
 
 @media (max-width: 768px) {
+    .doro-product,
+    .doro-product__container,
+    .doro-product__inner {
+        overflow-x: clip;
+        max-width: 100%;
+    }
+
     .woocommerce.single-product div.product .doro-product__top,
     .single-product .doro-product__top,
     .doro-product__top {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .doro-product__container,
+    .doro-product__gallery,
+    .doro-product__summary,
+    .doro-product__buybox {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .doro-product__buybox {
@@ -1167,17 +1189,23 @@
     .doro-product__gallery {
         position: static;
         padding: 8px;
+        overflow: hidden;
     }
 
     .doro-product__gallery .woocommerce-product-gallery.doro-gallery {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         grid-template-rows: auto auto;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
     }
 
     .doro-gallery__stage {
         grid-column: 1;
         grid-row: 1;
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
         min-height: 0;
         aspect-ratio: 1 / 1;
         height: auto;
@@ -1199,25 +1227,35 @@
         grid-row: 2;
         max-height: none;
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
         flex-direction: row;
+        flex-wrap: nowrap;
         align-items: center;
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
     .doro-gallery__thumbs {
         flex-direction: row;
         width: auto;
+        max-width: 100%;
         max-height: none;
-        flex: 1 1 auto;
+        flex: 1 1 0;
+        min-width: 0;
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
         gap: 8px;
+        scrollbar-width: thin;
     }
 
     .doro-gallery__thumb {
         width: 64px;
         height: 64px;
         flex: 0 0 64px;
+        max-width: 64px;
     }
 
     .doro-gallery-thumbs__btn {

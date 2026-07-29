@@ -117,7 +117,7 @@ class Hero_Carousel_Widget extends \Elementor\Widget_Base {
                     array(
                         'title'      => __( 'Tecnologia para tu hogar.', 'doroshopping' ),
                         'subtitle'   => __( 'Descubre gadgets inteligentes y accesorios esenciales.', 'doroshopping' ),
-                        'cta_text'   => __( 'Ver Ofertas', 'doroshopping' ),
+                        'cta_text'   => __( 'Ultimos productos', 'doroshopping' ),
                         'text_align' => 'left',
                     ),
                     array(

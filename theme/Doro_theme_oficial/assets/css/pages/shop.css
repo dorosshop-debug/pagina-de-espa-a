@@ -430,6 +430,15 @@
     padding: 0;
 }
 
+/* WooCommerce clearfix (::before/::after) ocupa la 1ª celda del grid */
+.doro-shop ul.products::before,
+.doro-shop ul.products::after,
+.woocommerce ul.products::before,
+.woocommerce ul.products::after {
+    display: none !important;
+    content: none !important;
+}
+
 /* Cards: ver components/product-card.css (.home-product-card) */
 .doro-shop ul.products li.product,
 .woocommerce ul.products li.product {

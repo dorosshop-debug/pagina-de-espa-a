@@ -34,7 +34,7 @@ $count       = WC()->cart->get_cart_contents_count();
 			</header>
 
 			<?php if ( $is_empty ) : ?>
-				<?php wc_get_template( 'cart/cart-empty.php' ); ?>
+				<?php get_template_part( 'template-parts/cart/empty', 'state' ); ?>
 			<?php else : ?>
 				<form class="woocommerce-cart-form" action="<?php echo esc_url( wc_get_cart_url() ); ?>" method="post">
 					<?php do_action( 'woocommerce_before_cart_table' ); ?>

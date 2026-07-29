@@ -29,6 +29,7 @@ function doroshoppingBoot() {
     initLegalPageToc();
     initProductShare();
     initSecurePaymentsModal();
+    initCartPageEmptyReload();
 }
 
 function doroshoppingStart() {
@@ -715,7 +716,7 @@ function initAuthModal() {
         if (!googleBtn) return;
         e.preventDefault();
         e.stopPropagation();
-        window.alert('Configura el login con Google: activa Nextend Social Login (o pega la URL en Apariencia ??? Personalizar ??? DoroTheme ??? Login / Google).');
+        window.alert('Configura el login con Google: activa Nextend Social Login (o pega la URL en Apariencia > Personalizar > DoroTheme > Login / Google).');
     }, true);
 }
 
@@ -1572,7 +1573,7 @@ function initCartModal() {
         updateCounts(data.count || 0);
 
         if (subtotalEl) {
-            subtotalEl.innerHTML = data.subtotal_html || '???';
+            subtotalEl.innerHTML = data.subtotal_html || '&mdash;';
         }
 
         if (checkoutEl) {
@@ -1598,7 +1599,7 @@ function initCartModal() {
                             '</div>' +
                             '<div class="cart-modal__item-bottom">' +
                                 '<div class="cart-modal__qty">' +
-                                    '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="-1" aria-label="' + escapeHtml(i18n('decrease', 'Reducir cantidad')) + '">???</button>' +
+                                    '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="-1" aria-label="' + escapeHtml(i18n('decrease', 'Reducir cantidad')) + '">&minus;</button>' +
                                     '<span class="cart-modal__qty-value">' + escapeHtml(item.quantity) + '</span>' +
                                     '<button type="button" class="cart-modal__qty-btn" data-cart-qty="' + escapeHtml(item.key) + '" data-delta="1" aria-label="' + escapeHtml(i18n('increase', 'Aumentar cantidad')) + '">+</button>' +
                                 '</div>' +
@@ -1639,7 +1640,7 @@ function initCartModal() {
             return Promise.resolve({
                 items: [],
                 count: 0,
-                subtotal_html: '???',
+                subtotal_html: '&mdash;',
                 checkout_url: cfg.checkoutUrl || '#',
                 recommendations: [],
                 empty_message: i18n('empty', 'Tu carrito esta vacio.')
@@ -1905,6 +1906,13 @@ function initAjaxAddToCart() {
     function finish(btn, ok) {
         btn.classList.remove('loading');
         btn.removeAttribute('aria-busy');
+        // WooCommerce inserta "Ver carrito" junto al boton; no lo queremos en cards.
+        var card = btn.closest('.home-product-card') || btn.parentNode;
+        if (card) {
+            card.querySelectorAll('a.added_to_cart').forEach(function (link) {
+                link.remove();
+            });
+        }
         if (ok) {
             btn.classList.add('added');
             setTimeout(function () { btn.classList.remove('added'); }, 1800);
@@ -1944,10 +1952,13 @@ function initAjaxAddToCart() {
                     }
                     finish(btn, true);
                     if (typeof jQuery !== 'undefined') {
-                        jQuery(document.body).trigger('added_to_cart', [data.fragments || {}, data.cart_hash || '', jQuery(btn)]);
+                        // No pasar el boton: WC insertaria el enlace "Ver carrito".
+                        jQuery(document.body).trigger('added_to_cart', [data.fragments || {}, data.cart_hash || '']);
                     } else {
                         document.body.dispatchEvent(new CustomEvent('added_to_cart', { detail: { product_id: productId } }));
                     }
+                    // Por si otro script ya inserto el enlace.
+                    setTimeout(function () { finish(btn, true); }, 0);
                 })
                 .catch(function () { finish(btn, false); });
             return;
@@ -1988,7 +1999,8 @@ function initAjaxAddToCart() {
                 }
                 applyFragments(response.fragments || {});
                 finish(btn, true);
-                jQuery(document.body).trigger('added_to_cart', [response.fragments, response.cart_hash, jQuery(btn)]);
+                jQuery(document.body).trigger('added_to_cart', [response.fragments, response.cart_hash]);
+                setTimeout(function () { finish(btn, true); }, 0);
             }).fail(function () {
                 finish(btn, false);
             });
@@ -2004,6 +2016,7 @@ function initAjaxAddToCart() {
 
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
 
         if (btn.classList.contains('loading')) return;
 
@@ -2405,7 +2418,10 @@ function buildGallery(gallery, figures) {
     }
 
     function updateNav() {
-        if (items.length <= 5) {
+        var needsNav = isHorizontal()
+            ? thumbs.scrollWidth > thumbs.clientWidth + 4
+            : thumbs.scrollHeight > thumbs.clientHeight + 4;
+        if (!needsNav) {
             btnPrev.hidden = true;
             btnNext.hidden = true;
             return;
@@ -2455,6 +2471,7 @@ function buildGallery(gallery, figures) {
     });
 
     updateNav();
+    requestAnimationFrame(updateNav);
     setActive(0);
 }
 
@@ -2993,4 +3010,72 @@ function initSecurePaymentsModal() {
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && !modal.hidden) closeModal();
     });
+}
+
+/**
+ * Al vaciar el carrito, el AJAX de WC + AGA (querySelectorAll vacío) deja la página en blanco.
+ * El último producto se elimina con navegación completa (sin AJAX).
+ */
+function initCartPageEmptyReload() {
+    var onCartPage = document.body.classList.contains('woocommerce-cart')
+        || document.body.classList.contains('doro-cart-page');
+    if (!onCartPage) return;
+
+    var recovering = false;
+
+    function cartUrl() {
+        if (window.wc_cart_params && window.wc_cart_params.cart_url) {
+            return window.wc_cart_params.cart_url;
+        }
+        return window.location.pathname;
+    }
+
+    function hasFullEmptyLayout() {
+        return !!(document.querySelector('.doro-cesta__aside') && document.querySelector('.doro-cesta-empty'));
+    }
+
+    function hasCartItems() {
+        return !!document.querySelector('.doro-cesta-item, .woocommerce-cart-form__cart-item, tr.cart_item');
+    }
+
+    function unblockCart() {
+        if (typeof jQuery === 'undefined') return;
+        try {
+            jQuery('.woocommerce, .woocommerce-cart-form, .doro-cesta').unblock();
+        } catch (e) { /* ignore */ }
+    }
+
+    function recoverEmpty() {
+        if (recovering || hasCartItems() || hasFullEmptyLayout()) {
+            unblockCart();
+            return;
+        }
+        recovering = true;
+        unblockCart();
+        window.location.replace(cartUrl());
+    }
+
+    // Último ítem: navegación real al enlace remove (evita AJAX + AGA).
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('a.doro-cesta-item__remove-btn, .product-remove a.remove, a.remove');
+        if (!btn || !btn.getAttribute('href')) return;
+        if (!btn.closest('.doro-cesta, .woocommerce-cart-form, form.woocommerce-cart-form, .woocommerce')) return;
+
+        var items = document.querySelectorAll('.doro-cesta-item, .woocommerce-cart-form__cart-item, tr.cart_item');
+        if (items.length > 1) return;
+
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        window.location.href = btn.href;
+    }, true);
+
+    document.body.addEventListener('removed_from_cart', function () {
+        setTimeout(recoverEmpty, 100);
+    });
+
+    if (typeof jQuery !== 'undefined') {
+        jQuery(document.body).on('updated_wc_div wc_fragments_refreshed updated_cart_totals wc_cart_emptied', function () {
+            setTimeout(recoverEmpty, 100);
+        });
+    }
 }
