@@ -76,7 +76,9 @@ $tile_3 = absint( get_theme_mod( 'doroshopping_home_tile_3_cat', 0 ) );
 $tile_4 = absint( get_theme_mod( 'doroshopping_home_tile_4_cat', 0 ) );
 
 $block_left = array(
-    'title'      => get_theme_mod( 'doroshopping_home_block_1_title', __( 'Tecnologia para tu hogar', 'doroshopping' ) ),
+    'title'      => function_exists( 'doroshopping_get_theme_mod' )
+        ? doroshopping_get_theme_mod( 'doroshopping_home_block_1_title', __( 'Tecnologia para tu hogar', 'doroshopping' ) )
+        : get_theme_mod( 'doroshopping_home_block_1_title', __( 'Tecnologia para tu hogar', 'doroshopping' ) ),
     'products'   => ! empty( $products_left ) ? doroshopping_map_wc_products_for_carousel( $products_left ) : $fallback_left,
     'categories' => array(
         array(
@@ -95,7 +97,9 @@ $block_left = array(
 );
 
 $block_right = array(
-    'title'      => get_theme_mod( 'doroshopping_home_block_2_title', __( 'Promociones de Lanzamiento', 'doroshopping' ) ),
+    'title'      => function_exists( 'doroshopping_get_theme_mod' )
+        ? doroshopping_get_theme_mod( 'doroshopping_home_block_2_title', __( 'Promociones de Lanzamiento', 'doroshopping' ) )
+        : get_theme_mod( 'doroshopping_home_block_2_title', __( 'Promociones de Lanzamiento', 'doroshopping' ) ),
     'products'   => ! empty( $products_right ) ? doroshopping_map_wc_products_for_carousel( $products_right ) : $fallback_right,
     'categories' => array(
         array(

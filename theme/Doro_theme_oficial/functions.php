@@ -20,6 +20,7 @@ require_once DOROSHOPPING_DIR . '/inc/auth.php';
 require_once DOROSHOPPING_DIR . '/inc/pages.php';
 require_once DOROSHOPPING_DIR . '/inc/support.php';
 require_once DOROSHOPPING_DIR . '/inc/mega-menu.php';
+require_once DOROSHOPPING_DIR . '/inc/i18n-mods.php';
 require_once DOROSHOPPING_DIR . '/inc/customizer.php';
 require_once DOROSHOPPING_DIR . '/inc/enqueue.php';
 require_once DOROSHOPPING_DIR . '/inc/ajax-cart.php';

@@ -15,7 +15,9 @@ if ( $max_limit < 30 ) {
 }
 $batch     = 30;
 $initial   = min( $batch, $max_limit );
-$title     = get_theme_mod( 'doroshopping_home_featured_title', __( 'Descubre productos únicos.', 'doroshopping' ) );
+$title     = function_exists( 'doroshopping_get_theme_mod' )
+	? doroshopping_get_theme_mod( 'doroshopping_home_featured_title', __( 'Descubre productos únicos.', 'doroshopping' ) )
+	: get_theme_mod( 'doroshopping_home_featured_title', __( 'Descubre productos únicos.', 'doroshopping' ) );
 $products  = function_exists( 'doroshopping_get_products_by_category' )
 	? doroshopping_get_products_by_category( $cat_id, $initial, 'popularity', 1 )
 	: array();

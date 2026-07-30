@@ -95,7 +95,7 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
         <?php endif; ?>
 
         <div class="doro-category__layout">
-            <aside class="doro-category__filters" aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">
+            <aside class="doro-category__filters" data-doro-filters aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">
                 <div class="doro-category__filters-card">
                     <h2 class="doro-category__filters-title"><?php esc_html_e( 'Filtros', 'doroshopping' ); ?></h2>
                     <?php

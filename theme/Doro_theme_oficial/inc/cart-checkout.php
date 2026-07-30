@@ -390,7 +390,9 @@ add_action( 'woocommerce_checkout_update_order_review', 'doroshopping_checkout_p
 function doroshopping_guard_empty_selectors() {
     $is_cart     = function_exists( 'is_cart' ) && is_cart();
     $is_checkout = function_exists( 'is_checkout' ) && is_checkout();
-    if ( ! $is_cart && ! $is_checkout ) {
+    $is_shop     = function_exists( 'is_shop' ) && is_shop();
+    $is_tax      = function_exists( 'is_product_taxonomy' ) && is_product_taxonomy();
+    if ( ! $is_cart && ! $is_checkout && ! $is_shop && ! $is_tax ) {
         return;
     }
     ?>

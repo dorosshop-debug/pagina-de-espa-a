@@ -51,7 +51,7 @@ $is_offers = function_exists( 'doroshopping_is_offers_view' ) && doroshopping_is
         <?php endif; ?>
 
         <div class="doro-shop__layout">
-            <aside class="doro-shop__sidebar" aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">
+            <aside class="doro-shop__sidebar" data-doro-filters aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">
                 <?php doroshopping_shop_sidebar(); ?>
             </aside>
 

@@ -372,21 +372,6 @@ function doroshopping_apply_attribute_filters( $q ) {
         }
         $q->set( 'tax_query', $tax_query );
     }
-
-    // Valoración mínima.
-    if ( ! empty( $_GET['min_rating'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $min_rating = absint( $_GET['min_rating'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if ( $min_rating > 0 ) {
-            $meta_query   = (array) $q->get( 'meta_query' );
-            $meta_query[] = array(
-                'key'     => '_wc_average_rating',
-                'value'   => $min_rating,
-                'compare' => '>=',
-                'type'    => 'DECIMAL',
-            );
-            $q->set( 'meta_query', $meta_query );
-        }
-    }
 }
 add_action( 'woocommerce_product_query', 'doroshopping_apply_attribute_filters' );
 

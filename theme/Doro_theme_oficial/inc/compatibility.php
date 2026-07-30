@@ -585,6 +585,74 @@ function doroshopping_prefs_redirect_url() {
 }
 
 /**
+ * URL de la página/contenido actual en otro idioma (Polylang).
+ * Si no hay traducción (p. ej. producto solo en ES), va al home de ese idioma.
+ *
+ * @param string $lang     Slug idioma destino.
+ * @param string $fallback URL de respaldo (p. ej. la actual).
+ * @return string
+ */
+function doroshopping_url_for_language( $lang, $fallback = '' ) {
+    $lang = sanitize_key( $lang );
+    $home = function_exists( 'pll_home_url' ) ? pll_home_url( $lang ) : home_url( '/' );
+    if ( ! $lang || ! doroshopping_has_polylang() ) {
+        return $fallback ? $fallback : $home;
+    }
+
+    $from_id   = isset( $_POST['doroshopping_from_id'] ) ? absint( $_POST['doroshopping_from_id'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $from_type = isset( $_POST['doroshopping_from_type'] ) ? sanitize_key( wp_unslash( $_POST['doroshopping_from_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+    if ( 'home' === $from_type ) {
+        if ( $from_id && function_exists( 'pll_get_post' ) ) {
+            $tr = pll_get_post( $from_id, $lang );
+            if ( $tr ) {
+                $link = get_permalink( (int) $tr );
+                if ( $link ) {
+                    return $link;
+                }
+            }
+        }
+        return $home;
+    }
+
+    if ( $from_id && 'term' === $from_type && function_exists( 'pll_get_term' ) ) {
+        $tr = pll_get_term( $from_id, $lang );
+        if ( $tr ) {
+            $link = get_term_link( (int) $tr );
+            if ( ! is_wp_error( $link ) ) {
+                return $link;
+            }
+        }
+        // Sin categoría traducida → home del idioma.
+        return $home;
+    }
+
+    if ( $from_id && in_array( $from_type, array( 'post', 'page', 'product' ), true ) && function_exists( 'pll_get_post' ) ) {
+        $tr = pll_get_post( $from_id, $lang );
+        if ( $tr ) {
+            $link = get_permalink( (int) $tr );
+            if ( $link ) {
+                return $link;
+            }
+        }
+        // Producto/página sin traducción → home del idioma elegido.
+        return $home;
+    }
+
+    // Sin contexto claro: intentar switcher Polylang; si apunta a la misma URL, home.
+    $langs = doroshopping_get_header_languages();
+    if ( ! empty( $langs[ $lang ]['url'] ) ) {
+        $candidate = (string) $langs[ $lang ]['url'];
+        $current   = $fallback ? $fallback : ( ! empty( $_POST['doroshopping_redirect'] ) ? esc_url_raw( wp_unslash( $_POST['doroshopping_redirect'] ) ) : '' ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if ( $candidate && $current && untrailingslashit( $candidate ) !== untrailingslashit( $current ) ) {
+            return $candidate;
+        }
+    }
+
+    return $home;
+}
+
+/**
  * Guardar preferencias del dropdown (idioma / país / moneda).
  */
 function doroshopping_handle_locale_preferences() {
@@ -599,7 +667,7 @@ function doroshopping_handle_locale_preferences() {
         exit;
     }
 
-    // País → cookie + cliente WooCommerce + idioma/moneda sugeridos.
+    // País → solo envío / cookie. NO cambia el idioma.
     if ( isset( $_POST['ubicacion'] ) ) {
         $country = strtoupper( sanitize_text_field( wp_unslash( $_POST['ubicacion'] ) ) );
         if ( strlen( $country ) >= 2 ) {
@@ -618,6 +686,7 @@ function doroshopping_handle_locale_preferences() {
                 WC()->customer->save();
             }
 
+            // País sugiere idioma/moneda por defecto (el usuario puede cambiar lengua luego).
             $locale_map = doroshopping_get_location_locale_map();
             if ( empty( $_POST['lengua'] ) && isset( $locale_map[ $country ]['lang'] ) ) {
                 $_POST['lengua'] = $locale_map[ $country ]['lang'];
@@ -628,21 +697,18 @@ function doroshopping_handle_locale_preferences() {
         }
     }
 
-    // Idioma Polylang → redirigir a URL del idioma.
+    // Idioma → misma página/producto traducido (no forzar home).
     if ( ! empty( $_POST['lengua'] ) && doroshopping_has_polylang() ) {
-        $lang  = sanitize_key( wp_unslash( $_POST['lengua'] ) );
-        $langs = doroshopping_get_header_languages();
-        if ( isset( $langs[ $lang ]['url'] ) && $langs[ $lang ]['url'] ) {
-            $redirect = $langs[ $lang ]['url'];
-        } elseif ( function_exists( 'pll_home_url' ) ) {
-            $redirect = pll_home_url( $lang );
+        $lang     = sanitize_key( wp_unslash( $_POST['lengua'] ) );
+        $current  = function_exists( 'pll_current_language' ) ? sanitize_key( (string) pll_current_language( 'slug' ) ) : '';
+        if ( $lang && $lang !== $current ) {
+            $redirect = doroshopping_url_for_language( $lang, $redirect );
         }
     }
 
     if ( ! empty( $_POST['divisa'] ) ) {
         $currency = strtoupper( sanitize_text_field( wp_unslash( $_POST['divisa'] ) ) );
         doroshopping_apply_currency( $currency );
-        // CURCY + YayCurrency cambian moneda por query arg.
         $redirect = add_query_arg(
             array(
                 'wmc-currency' => $currency,
@@ -652,7 +718,6 @@ function doroshopping_handle_locale_preferences() {
         );
     }
 
-    // Evitar caché del navegador en el redirect inmediato.
     nocache_headers();
     wp_safe_redirect( $redirect );
     exit;

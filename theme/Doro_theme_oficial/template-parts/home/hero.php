@@ -38,10 +38,10 @@ foreach ( $defaults as $i => $default ) {
     $image = function_exists( 'doroshopping_get_theme_image_url' )
         ? doroshopping_get_theme_image_url( 'hero_' . $i . '_image', $default['image'] )
         : $default['image'];
-    $title = get_theme_mod( 'doroshopping_hero_' . $i . '_title', '' );
-    $sub   = get_theme_mod( 'doroshopping_hero_' . $i . '_subtitle', '' );
-    $url   = get_theme_mod( 'doroshopping_hero_' . $i . '_url', '' );
-    $align = get_theme_mod( 'doroshopping_hero_' . $i . '_align', $default['align'] );
+    $title = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_title', '' ) : get_theme_mod( 'doroshopping_hero_' . $i . '_title', '' );
+    $sub   = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_subtitle', '' ) : get_theme_mod( 'doroshopping_hero_' . $i . '_subtitle', '' );
+    $url   = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_url', '' ) : get_theme_mod( 'doroshopping_hero_' . $i . '_url', '' );
+    $align = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_align', $default['align'] ) : get_theme_mod( 'doroshopping_hero_' . $i . '_align', $default['align'] );
     if ( ! in_array( $align, array( 'left', 'right' ), true ) ) {
         $align = $default['align'];
     }

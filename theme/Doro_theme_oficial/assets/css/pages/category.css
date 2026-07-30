@@ -252,6 +252,10 @@
     }
 }
 
+.doro-filter-chip {
+    display: none;
+}
+
 @media (max-width: 900px) {
     .doro-category__layout {
         grid-template-columns: 1fr;
@@ -260,11 +264,11 @@
     .doro-category__filters {
         position: static;
         max-height: none;
+        z-index: 20;
     }
 
     .doro-category__filters-card {
         max-height: none;
-        overflow: visible;
     }
 
     .doro-category__subs-grid {

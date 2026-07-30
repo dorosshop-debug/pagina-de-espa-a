@@ -24,6 +24,7 @@ function doroshoppingBoot() {
     hideTechnicalCheckoutNotices();
     initShopLoadMore();
     initShopCategoryFilter();
+    initShopMobileFilters();
     initHomeLoadMore();
     initProductMoreLoadMore();
     initLegalPageToc();
@@ -526,7 +527,7 @@ function initShopLoadMore() {
 }
 
 /**
- * Filtro de categor?as: desplegar / plegar subcategor?as.
+ * Filtro de categorías: desplegar / plegar subcategorías.
  */
 function initShopCategoryFilter() {
     var root = document.querySelector('.doro-shop__filter-list--cats');
@@ -556,6 +557,119 @@ function initShopCategoryFilter() {
             item.classList.remove('is-open');
             btn.setAttribute('aria-expanded', 'false');
         }
+    });
+}
+
+/**
+ * Móvil: filtros en barra horizontal con desplegables (estilo AliExpress).
+ */
+function initShopMobileFilters() {
+    var roots = Array.prototype.slice.call(document.querySelectorAll('[data-doro-filters]'));
+    if (!roots.length) return;
+
+    var mq = window.matchMedia('(max-width: 900px)');
+    var chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+    function closeAll(except) {
+        roots.forEach(function (root) {
+            root.querySelectorAll('.doro-shop__widget.is-open, .doro-filter-sort.is-open').forEach(function (el) {
+                if (except && el === except) return;
+                el.classList.remove('is-open');
+                var chip = el.querySelector('.doro-filter-chip');
+                if (chip) chip.setAttribute('aria-expanded', 'false');
+            });
+        });
+    }
+
+    function ensureChip(widget) {
+        if (widget.querySelector(':scope > .doro-filter-chip')) return;
+        var title = widget.querySelector(':scope > .doro-shop__widget-title');
+        var label = widget.getAttribute('data-filter-label')
+            || (title ? title.textContent.trim() : 'Filtro');
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'doro-filter-chip';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = '<span>' + label + '</span>' + chevron;
+        widget.insertBefore(btn, widget.firstChild);
+
+        if (widget.querySelector('a.is-active, a[aria-current="true"], a[aria-current="page"]')) {
+            btn.classList.add('is-active');
+        }
+    }
+
+    function ensureSortChip(root) {
+        if (root.querySelector('.doro-filter-sort')) return;
+        var ordering = document.querySelector('.doro-shop__toolbar .woocommerce-ordering, .woocommerce-ordering');
+        if (!ordering) return;
+
+        var host = root.querySelector('.doro-shop__sidebar, .doro-category__filters-card') || root;
+        var wrap = document.createElement('div');
+        wrap.className = 'doro-shop__widget doro-filter-sort';
+        wrap.setAttribute('data-doro-filter-widget', '');
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'doro-filter-chip';
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = '<span>Ordenar por</span>' + chevron;
+
+        var panel = document.createElement('div');
+        panel.className = 'doro-filter-panel';
+        var clone = ordering.cloneNode(true);
+        clone.classList.add('doro-filter-ordering');
+        panel.appendChild(clone);
+
+        wrap.appendChild(btn);
+        wrap.appendChild(panel);
+        host.insertBefore(wrap, host.firstChild);
+
+        var select = panel.querySelector('select');
+        if (select) {
+            select.addEventListener('change', function () {
+                var original = ordering.querySelector('select');
+                if (original) {
+                    original.value = select.value;
+                    if (typeof jQuery !== 'undefined') {
+                        jQuery(original).val(select.value).trigger('change');
+                    } else if (original.form) {
+                        original.form.submit();
+                    }
+                }
+            });
+        }
+    }
+
+    function setupRoot(root) {
+        var widgets = Array.prototype.slice.call(root.querySelectorAll('.doro-shop__widget'));
+        widgets.forEach(ensureChip);
+        ensureSortChip(root);
+
+        root.addEventListener('click', function (e) {
+            if (!mq.matches) return;
+            var chip = e.target.closest('.doro-filter-chip');
+            if (!chip || !root.contains(chip)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var widget = chip.closest('.doro-shop__widget, .doro-filter-sort');
+            if (!widget) return;
+            var willOpen = !widget.classList.contains('is-open');
+            closeAll(widget);
+            widget.classList.toggle('is-open', willOpen);
+            chip.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+    }
+
+    roots.forEach(setupRoot);
+
+    document.addEventListener('click', function (e) {
+        if (!mq.matches) return;
+        if (e.target.closest('[data-doro-filters] .doro-shop__widget, [data-doro-filters] .doro-filter-sort')) return;
+        closeAll();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAll();
     });
 }
 
@@ -885,6 +999,7 @@ function initLocaleFlagOptions() {
         var fromBtnLang = btn ? btn.getAttribute('data-lang') : '';
         var fromBtnCur = btn ? btn.getAttribute('data-currency') : '';
         var mapped = localeMap[code] || {};
+        // Ubicación sugiere idioma + moneda; el usuario puede cambiar el idioma después.
         var lang = fromBtnLang || mapped.lang || '';
         var currency = fromBtnCur || mapped.currency || '';
         if (lang) setSelectValue('lengua', lang);

@@ -104,7 +104,7 @@ function doroshopping_customize_register( $wp_customize ) {
         'doroshopping_home_images',
         array(
             'title'       => __( 'Home: banners e imagenes', 'doroshopping' ),
-            'description' => __( 'Hero, banner de la seccion 3 y productos flotantes. Los flotantes se configuran mas abajo (imagen + enlace).', 'doroshopping' ),
+            'description' => __( 'Hero, banner de la seccion 3 y productos flotantes. Usa «Idioma a editar» para EN/DE/FR/IT/PT. Los flotantes se configuran mas abajo (imagen + enlace).', 'doroshopping' ),
             'panel'       => 'doroshopping_panel',
         )
     );
@@ -409,6 +409,8 @@ function doroshopping_customize_register( $wp_customize ) {
         )
     );
 
+    doroshopping_customize_register_i18n( $wp_customize );
+
     /* ---- Tienda: anuncio sidebar ---- */
     $wp_customize->add_section(
         'doroshopping_shop',
@@ -613,6 +615,223 @@ function doroshopping_customize_register( $wp_customize ) {
 add_action( 'customize_register', 'doroshopping_customize_register' );
 
 /**
+ * Personalizar: selector de idioma + settings por lengua (hero / títulos home).
+ *
+ * @param WP_Customize_Manager $wp_customize Manager.
+ */
+function doroshopping_customize_register_i18n( $wp_customize ) {
+	if ( ! function_exists( 'doroshopping_i18n_language_slugs' ) ) {
+		return;
+	}
+
+	$langs   = doroshopping_i18n_language_slugs();
+	$default = doroshopping_i18n_default_lang();
+	$choices = array();
+
+	if ( function_exists( 'pll_the_languages' ) ) {
+		$pll = pll_the_languages( array( 'raw' => 1, 'hide_if_empty' => 0 ) );
+		if ( is_array( $pll ) ) {
+			foreach ( $pll as $row ) {
+				if ( empty( $row['slug'] ) ) {
+					continue;
+				}
+				$slug             = sanitize_key( $row['slug'] );
+				$choices[ $slug ] = ! empty( $row['name'] ) ? $row['name'] : strtoupper( $slug );
+			}
+		}
+	}
+	if ( empty( $choices ) ) {
+		$labels = array(
+			'es' => 'Español',
+			'en' => 'English',
+			'de' => 'Deutsch',
+			'fr' => 'Français',
+			'it' => 'Italiano',
+			'pt' => 'Português',
+		);
+		foreach ( $langs as $slug ) {
+			$choices[ $slug ] = isset( $labels[ $slug ] ) ? $labels[ $slug ] : strtoupper( $slug );
+		}
+	}
+
+	$wp_customize->add_setting(
+		'doroshopping_i18n_edit_lang',
+		array(
+			'default'           => $default,
+			'sanitize_callback' => 'sanitize_key',
+			'transport'         => 'postMessage',
+		)
+	);
+
+	$lang_control_args = array(
+		'label'       => __( 'Idioma a editar', 'doroshopping' ),
+		'description' => __( 'Elige el idioma y rellena imagen/títulos de ese idioma. Si dejas vacío, hereda el español.', 'doroshopping' ),
+		'type'        => 'select',
+		'choices'     => $choices,
+		'priority'    => 1,
+	);
+
+	$wp_customize->add_control(
+		'doroshopping_i18n_edit_lang',
+		array_merge( $lang_control_args, array( 'section' => 'doroshopping_home_images' ) )
+	);
+	$wp_customize->add_control(
+		'doroshopping_i18n_edit_lang_grids',
+		array_merge(
+			$lang_control_args,
+			array(
+				'settings' => 'doroshopping_i18n_edit_lang',
+				'section'  => 'doroshopping_home_grids',
+			)
+		)
+	);
+
+	$defs = function_exists( 'doroshopping_i18n_home_setting_defs' ) ? doroshopping_i18n_home_setting_defs() : array();
+
+	foreach ( $langs as $lang ) {
+		$lang = sanitize_key( $lang );
+		if ( ! $lang || $lang === $default ) {
+			continue;
+		}
+
+		foreach ( $defs as $base_id => $type ) {
+			$setting_id = $base_id . '__' . $lang;
+			$section    = ( false !== strpos( $base_id, 'doroshopping_home_block_' ) || false !== strpos( $base_id, 'doroshopping_home_featured_' ) )
+				? 'doroshopping_home_grids'
+				: 'doroshopping_home_images';
+
+			$base_setting = $wp_customize->get_setting( $base_id );
+			$default_val  = $base_setting ? $base_setting->default : ( 'media' === $type ? 0 : '' );
+			$sanitize     = ( $base_setting && is_callable( $base_setting->sanitize_callback ) )
+				? $base_setting->sanitize_callback
+				: ( 'media' === $type ? 'absint' : ( 'url' === $type ? 'esc_url_raw' : 'sanitize_text_field' ) );
+
+			$wp_customize->add_setting(
+				$setting_id,
+				array(
+					'default'           => $default_val,
+					'sanitize_callback' => $sanitize,
+				)
+			);
+
+			$base_control = $wp_customize->get_control( $base_id );
+			$label        = $base_control ? $base_control->label : $base_id;
+			$label        = sprintf(
+				/* translators: 1: field label 2: language code */
+				__( '%1$s (%2$s)', 'doroshopping' ),
+				$label,
+				strtoupper( $lang )
+			);
+
+			$control_args = array(
+				'label'           => $label,
+				'section'         => $section,
+				'active_callback' => static function () use ( $lang ) {
+					$edit = get_theme_mod( 'doroshopping_i18n_edit_lang', '' );
+					if ( ! $edit && function_exists( 'doroshopping_i18n_default_lang' ) ) {
+						$edit = doroshopping_i18n_default_lang();
+					}
+					return sanitize_key( (string) $edit ) === $lang;
+				},
+			);
+
+			if ( 'media' === $type ) {
+				$wp_customize->add_control(
+					new WP_Customize_Media_Control(
+						$wp_customize,
+						$setting_id,
+						array_merge( $control_args, array( 'mime_type' => 'image' ) )
+					)
+				);
+			} else {
+				$choices_ctrl = array();
+				$input_type   = 'text';
+				if ( $base_control ) {
+					if ( ! empty( $base_control->type ) ) {
+						$input_type = $base_control->type;
+					}
+					if ( ! empty( $base_control->choices ) && is_array( $base_control->choices ) ) {
+						$choices_ctrl = $base_control->choices;
+					}
+				}
+				$wp_customize->add_control(
+					$setting_id,
+					array_merge(
+						$control_args,
+						array(
+							'type'    => $input_type,
+							'choices' => $choices_ctrl,
+						)
+					)
+				);
+			}
+		}
+	}
+
+	foreach ( array_keys( $defs ) as $base_id ) {
+		$control = $wp_customize->get_control( $base_id );
+		if ( ! $control ) {
+			continue;
+		}
+		$control->active_callback = static function () use ( $default ) {
+			$edit = get_theme_mod( 'doroshopping_i18n_edit_lang', $default );
+			if ( ! $edit ) {
+				$edit = $default;
+			}
+			return sanitize_key( (string) $edit ) === $default;
+		};
+	}
+}
+
+/**
+ * JS: mostrar/ocultar controles al cambiar “Idioma a editar”.
+ */
+function doroshopping_customize_i18n_controls_js() {
+	$default = function_exists( 'doroshopping_i18n_default_lang' ) ? doroshopping_i18n_default_lang() : 'es';
+	$defs    = function_exists( 'doroshopping_i18n_home_setting_defs' ) ? array_keys( doroshopping_i18n_home_setting_defs() ) : array();
+	?>
+	<script>
+	(function (api) {
+		if (!api) return;
+		var defaultLang = <?php echo wp_json_encode( $default ); ?>;
+		var baseIds = <?php echo wp_json_encode( array_values( $defs ) ); ?>;
+
+		function syncLangVisibility() {
+			var setting = api( 'doroshopping_i18n_edit_lang' );
+			if ( ! setting ) return;
+			var lang = setting.get() || defaultLang;
+			baseIds.forEach( function ( baseId ) {
+				var defCtrl = api.control( baseId );
+				if ( defCtrl ) {
+					defCtrl.active.set( lang === defaultLang );
+				}
+				api.control.each( function ( control ) {
+					if ( control.id.indexOf( baseId + '__' ) === 0 ) {
+						var suffix = control.id.slice( ( baseId + '__' ).length );
+						control.active.set( suffix === lang );
+					}
+				} );
+			} );
+		}
+
+		api.bind( 'ready', function () {
+			var setting = api( 'doroshopping_i18n_edit_lang' );
+			if ( ! setting ) return;
+			setting.bind( function () {
+				syncLangVisibility();
+				if ( api.previewer ) {
+					api.previewer.refresh();
+				}
+			} );
+			syncLangVisibility();
+		} );
+	})( window.wp && window.wp.customize );
+	</script>
+	<?php
+}
+add_action( 'customize_controls_print_footer_scripts', 'doroshopping_customize_i18n_controls_js' );
+
+/**
  * Choices de categorias de producto.
  *
  * @return array
@@ -657,7 +876,12 @@ function doroshopping_get_product_category_choices() {
  * @return string
  */
 function doroshopping_get_theme_image_url( $mod_key, $fallback = '' ) {
-    $id = absint( get_theme_mod( 'doroshopping_' . $mod_key, 0 ) );
+    $setting = 'doroshopping_' . $mod_key;
+    $id      = absint(
+        function_exists( 'doroshopping_get_theme_mod' )
+            ? doroshopping_get_theme_mod( $setting, 0 )
+            : get_theme_mod( $setting, 0 )
+    );
     if ( $id ) {
         $url = wp_get_attachment_image_url( $id, 'full' );
         if ( $url ) {

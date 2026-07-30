@@ -190,7 +190,13 @@ function doroshopping_mega_menu_is_hidden_nav_item( $item ) {
  * @return array
  */
 function doroshopping_get_mega_menu_panels() {
-    $cached = get_transient( 'doroshopping_mega_menu_panels' );
+    $lang = function_exists( 'pll_current_language' ) ? sanitize_key( (string) pll_current_language( 'slug' ) ) : 'default';
+    if ( ! $lang ) {
+        $lang = 'default';
+    }
+    $cache_key = 'doroshopping_mega_menu_panels_' . $lang;
+
+    $cached = get_transient( $cache_key );
     if ( false !== $cached && is_array( $cached ) ) {
         return $cached;
     }
@@ -210,23 +216,35 @@ function doroshopping_get_mega_menu_panels() {
      */
     $panels = apply_filters( 'doroshopping_mega_menu_panels', $panels );
 
-    set_transient( 'doroshopping_mega_menu_panels', $panels, HOUR_IN_SECONDS );
+    set_transient( $cache_key, $panels, HOUR_IN_SECONDS );
 
     return $panels;
 }
 
 /**
- * Invalida cache del mega menú.
+ * Invalida cache del mega menú (todos los idiomas).
  */
 function doroshopping_flush_mega_menu_cache() {
     delete_transient( 'doroshopping_mega_menu_panels' );
     delete_transient( 'doroshopping_product_cat_choices' );
+
+    $langs = array( 'default' );
+    if ( function_exists( 'pll_languages_list' ) ) {
+        $list = pll_languages_list( array( 'fields' => 'slug' ) );
+        if ( is_array( $list ) ) {
+            $langs = array_merge( $langs, $list );
+        }
+    }
+    foreach ( array_unique( $langs ) as $slug ) {
+        delete_transient( 'doroshopping_mega_menu_panels_' . sanitize_key( (string) $slug ) );
+    }
 }
 add_action( 'edited_product_cat', 'doroshopping_flush_mega_menu_cache' );
 add_action( 'created_product_cat', 'doroshopping_flush_mega_menu_cache' );
 add_action( 'delete_product_cat', 'doroshopping_flush_mega_menu_cache' );
 add_action( 'wp_update_nav_menu', 'doroshopping_flush_mega_menu_cache' );
 add_action( 'after_switch_theme', 'doroshopping_flush_mega_menu_cache' );
+add_action( 'pll_save_term', 'doroshopping_flush_mega_menu_cache' );
 
 /**
  * Vaciar cache del mega menú al actualizar versión del tema.

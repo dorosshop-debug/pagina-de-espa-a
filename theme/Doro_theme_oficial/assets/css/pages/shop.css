@@ -147,6 +147,10 @@
     color: var(--color-grey-text);
 }
 
+.doro-filter-chip {
+    display: none;
+}
+
 /* Categorías desplegables */
 .doro-shop__filter-list--cats > .doro-shop__cat-item {
     margin-bottom: 4px;
@@ -505,20 +509,146 @@
         grid-column: 1;
     }
 
-    .doro-shop__sidebar {
+    .doro-shop__sidebar,
+    .doro-category__filters-card {
         position: static;
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: var(--spacing-md);
-        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        gap: 8px;
+        z-index: 20;
         max-height: none;
-        overflow: visible;
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 10px 8px;
+        margin: 0 0 12px;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .doro-shop__sidebar::-webkit-scrollbar,
+    .doro-category__filters-card::-webkit-scrollbar {
+        display: none;
+    }
+
+    .doro-shop__ad,
+    .doro-category__filters-title {
+        display: none !important;
+    }
+
+    .doro-shop__widget,
+    .doro-category__filters-card .doro-shop__widget {
+        position: relative;
+        flex: 0 0 auto;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        min-width: 0;
     }
 
     .doro-shop__widget + .doro-shop__widget {
         margin-top: 0;
         padding-top: 0;
         border-top: none;
+    }
+
+    .doro-shop__widget-title {
+        display: none !important;
+    }
+
+    .doro-filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 36px;
+        padding: 0 12px;
+        border: 1px solid #e5e5e5;
+        border-radius: 999px;
+        background: #fff;
+        color: #222;
+        font-size: 13px;
+        font-weight: 600;
+        font-family: inherit;
+        white-space: nowrap;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .doro-filter-chip svg {
+        width: 12px;
+        height: 12px;
+        flex: 0 0 auto;
+        opacity: 0.7;
+    }
+
+    .doro-filter-chip.is-active,
+    .doro-shop__widget.is-open > .doro-filter-chip {
+        border-color: var(--color-orange);
+        color: var(--color-orange);
+        background: #fff7ed;
+    }
+
+    .doro-shop__widget > .doro-shop__filter-list,
+    .doro-shop__widget > .doro-filter-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        z-index: 40;
+        min-width: min(280px, 78vw);
+        max-width: min(320px, 86vw);
+        max-height: min(58vh, 420px);
+        overflow: auto;
+        margin: 0;
+        padding: 8px;
+        list-style: none;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .doro-shop__widget.is-open > .doro-shop__filter-list,
+    .doro-shop__widget.is-open > .doro-filter-panel {
+        display: block;
+    }
+
+    .doro-filter-panel .woocommerce-ordering {
+        margin: 0;
+    }
+
+    .doro-filter-panel .woocommerce-ordering select {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 0 10px;
+        font: inherit;
+        font-size: 13px;
+        background: #fff;
+    }
+
+    .doro-shop__toolbar .woocommerce-ordering {
+        display: none;
+    }
+
+    .doro-shop__filter-list li {
+        margin: 0;
+    }
+
+    .doro-shop__filter-list a {
+        padding: 10px 8px;
+        border-radius: 8px;
+    }
+
+    .doro-shop__filter-list a.is-active,
+    .doro-shop__filter-list a[aria-current="true"] {
+        background: #fff7ed;
     }
 }
 
@@ -527,10 +657,6 @@
     .woocommerce ul.products {
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
-    }
-
-    .doro-shop__sidebar {
-        grid-template-columns: 1fr;
     }
 
     .doro-shop__container {
