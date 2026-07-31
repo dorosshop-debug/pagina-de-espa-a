@@ -109,6 +109,12 @@ function doroshopping_customize_register( $wp_customize ) {
         )
     );
 
+    $hero_cta_defaults = array(
+        1 => __( 'Ultimos productos', 'doroshopping' ),
+        2 => __( 'Comprar ahora', 'doroshopping' ),
+        3 => __( 'Ver Ofertas', 'doroshopping' ),
+    );
+
     for ( $i = 1; $i <= 3; $i++ ) {
         $wp_customize->add_setting(
             'doroshopping_hero_' . $i . '_image',
@@ -154,6 +160,21 @@ function doroshopping_customize_register( $wp_customize ) {
             'doroshopping_hero_' . $i . '_subtitle',
             array(
                 'label'   => sprintf( __( 'Hero slide %d - subtitulo', 'doroshopping' ), $i ),
+                'section' => 'doroshopping_home_images',
+                'type'    => 'text',
+            )
+        );
+        $wp_customize->add_setting(
+            'doroshopping_hero_' . $i . '_cta',
+            array(
+                'default'           => isset( $hero_cta_defaults[ $i ] ) ? $hero_cta_defaults[ $i ] : '',
+                'sanitize_callback' => 'sanitize_text_field',
+            )
+        );
+        $wp_customize->add_control(
+            'doroshopping_hero_' . $i . '_cta',
+            array(
+                'label'   => sprintf( __( 'Hero slide %d - texto CTA', 'doroshopping' ), $i ),
                 'section' => 'doroshopping_home_images',
                 'type'    => 'text',
             )
@@ -208,10 +229,57 @@ function doroshopping_customize_register( $wp_customize ) {
             $wp_customize,
             'doroshopping_promo_image',
             array(
-                'label'     => __( 'Banner promocional (seccion media)', 'doroshopping' ),
+                'label'     => __( 'Banner promocional (seccion 3)', 'doroshopping' ),
                 'section'   => 'doroshopping_home_images',
                 'mime_type' => 'image',
             )
+        )
+    );
+    $wp_customize->add_setting(
+        'doroshopping_promo_title',
+        array(
+            'default'           => __( 'Gadgets de Ultima Generacion que no sabias que necesitabas.', 'doroshopping' ),
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_promo_title',
+        array(
+            'label'       => __( 'Seccion 3 - titulo', 'doroshopping' ),
+            'description' => __( 'Texto sobre el banner promocional del home.', 'doroshopping' ),
+            'section'     => 'doroshopping_home_images',
+            'type'        => 'text',
+        )
+    );
+    $wp_customize->add_setting(
+        'doroshopping_promo_cta',
+        array(
+            'default'           => __( 'Comprar', 'doroshopping' ),
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_promo_cta',
+        array(
+            'label'   => __( 'Seccion 3 - texto CTA', 'doroshopping' ),
+            'section' => 'doroshopping_home_images',
+            'type'    => 'text',
+        )
+    );
+    $wp_customize->add_setting(
+        'doroshopping_promo_cta_url',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'esc_url_raw',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_promo_cta_url',
+        array(
+            'label'       => __( 'Seccion 3 - enlace CTA', 'doroshopping' ),
+            'description' => __( 'Vacio = enlace a la tienda.', 'doroshopping' ),
+            'section'     => 'doroshopping_home_images',
+            'type'        => 'url',
         )
     );
 
@@ -265,6 +333,24 @@ function doroshopping_customize_register( $wp_customize ) {
     );
 
     $cat_choices = doroshopping_get_product_category_choices();
+
+    $wp_customize->add_setting(
+        'doroshopping_home_categories_title',
+        array(
+            'default'           => __( 'Categorias & Ofertas', 'doroshopping' ),
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_home_categories_title',
+        array(
+            'label'       => __( 'Titulo seccion Categorias & Ofertas', 'doroshopping' ),
+            'description' => __( 'Encabezado H2 encima de los dos bloques y tiles.', 'doroshopping' ),
+            'section'     => 'doroshopping_home_grids',
+            'type'        => 'text',
+            'priority'    => 5,
+        )
+    );
 
     $wp_customize->add_setting(
         'doroshopping_home_block_1_title',
@@ -331,23 +417,55 @@ function doroshopping_customize_register( $wp_customize ) {
     );
 
     $tile_defs = array(
-        'doroshopping_home_tile_1_cat' => __( 'Tile 1 (Microfonos y auriculares)', 'doroshopping' ),
-        'doroshopping_home_tile_2_cat' => __( 'Tile 2 (Gaming)', 'doroshopping' ),
-        'doroshopping_home_tile_3_cat' => __( 'Tile 3 (Deportes)', 'doroshopping' ),
-        'doroshopping_home_tile_4_cat' => __( 'Tile 4 (Hogar y Gadgets)', 'doroshopping' ),
+        1 => array(
+            'cat_label'     => __( 'Tile 1 - categoria', 'doroshopping' ),
+            'label_default' => __( 'Microfonos y auriculares', 'doroshopping' ),
+        ),
+        2 => array(
+            'cat_label'     => __( 'Tile 2 - categoria', 'doroshopping' ),
+            'label_default' => __( 'Gaming', 'doroshopping' ),
+        ),
+        3 => array(
+            'cat_label'     => __( 'Tile 3 - categoria', 'doroshopping' ),
+            'label_default' => __( 'Deportes', 'doroshopping' ),
+        ),
+        4 => array(
+            'cat_label'     => __( 'Tile 4 - categoria', 'doroshopping' ),
+            'label_default' => __( 'Hogar y Gadgets', 'doroshopping' ),
+        ),
     );
-    foreach ( $tile_defs as $setting_id => $label ) {
+    foreach ( $tile_defs as $tile_n => $tile_meta ) {
+        $label_id = 'doroshopping_home_tile_' . $tile_n . '_label';
+        $cat_id   = 'doroshopping_home_tile_' . $tile_n . '_cat';
+
         $wp_customize->add_setting(
-            $setting_id,
+            $label_id,
+            array(
+                'default'           => $tile_meta['label_default'],
+                'sanitize_callback' => 'sanitize_text_field',
+            )
+        );
+        $wp_customize->add_control(
+            $label_id,
+            array(
+                'label'       => sprintf( __( 'Tile %d - texto', 'doroshopping' ), $tile_n ),
+                'description' => __( 'Etiqueta visible sobre la imagen del tile.', 'doroshopping' ),
+                'section'     => 'doroshopping_home_grids',
+                'type'        => 'text',
+            )
+        );
+
+        $wp_customize->add_setting(
+            $cat_id,
             array(
                 'default'           => 0,
                 'sanitize_callback' => 'absint',
             )
         );
         $wp_customize->add_control(
-            $setting_id,
+            $cat_id,
             array(
-                'label'       => $label,
+                'label'       => $tile_meta['cat_label'],
                 'description' => __( 'Categoria de WooCommerce al hacer clic en la imagen.', 'doroshopping' ),
                 'section'     => 'doroshopping_home_grids',
                 'type'        => 'select',
@@ -409,7 +527,55 @@ function doroshopping_customize_register( $wp_customize ) {
         )
     );
 
+    doroshopping_customize_register_ui_texts( $wp_customize );
     doroshopping_customize_register_i18n( $wp_customize );
+
+    /* ---- Ubicación / Geo ---- */
+    $wp_customize->add_section(
+        'doroshopping_geo',
+        array(
+            'title'       => __( 'Ubicación / Geo', 'doroshopping' ),
+            'description' => __( 'Aviso suave al detectar el país por IP. Un plugin puede sustituir la detección con el filtro doroshopping_detect_country.', 'doroshopping' ),
+            'panel'       => 'doroshopping_panel',
+            'priority'    => 46,
+        )
+    );
+    $wp_customize->add_setting(
+        'doroshopping_geo_suggest',
+        array(
+            'default'           => true,
+            'sanitize_callback' => static function ( $value ) {
+                return (bool) $value;
+            },
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_geo_suggest',
+        array(
+            'label'       => __( 'Mostrar aviso de ubicación detectada', 'doroshopping' ),
+            'description' => __( 'Si el país por IP difiere del actual, se sugiere confirmar. No usa GPS del navegador.', 'doroshopping' ),
+            'section'     => 'doroshopping_geo',
+            'type'        => 'checkbox',
+        )
+    );
+    $wp_customize->add_setting(
+        'doroshopping_geo_apply_locale',
+        array(
+            'default'           => true,
+            'sanitize_callback' => static function ( $value ) {
+                return (bool) $value;
+            },
+        )
+    );
+    $wp_customize->add_control(
+        'doroshopping_geo_apply_locale',
+        array(
+            'label'       => __( 'Al aceptar: sugerir idioma y moneda del país', 'doroshopping' ),
+            'description' => __( 'Usa el mapa país → idioma/moneda del tema (Polylang / CURCY).', 'doroshopping' ),
+            'section'     => 'doroshopping_geo',
+            'type'        => 'checkbox',
+        )
+    );
 
     /* ---- Tienda: anuncio sidebar ---- */
     $wp_customize->add_section(
@@ -615,7 +781,107 @@ function doroshopping_customize_register( $wp_customize ) {
 add_action( 'customize_register', 'doroshopping_customize_register' );
 
 /**
- * Personalizar: selector de idioma + settings por lengua (hero / títulos home).
+ * Secciones Customizer: textos UI header / cuenta / footer.
+ *
+ * @param WP_Customize_Manager $wp_customize Manager.
+ */
+function doroshopping_customize_register_ui_texts( $wp_customize ) {
+	if ( ! function_exists( 'doroshopping_i18n_ui_defaults' ) ) {
+		return;
+	}
+
+	$sections = array(
+		'doroshopping_ui_header'        => array(
+			'title'       => __( 'Textos UI: Header y mega menu', 'doroshopping' ),
+			'description' => __( 'Header, busqueda y boton mega menu. Categorias del mega: Menus/Polylang.', 'doroshopping' ),
+			'priority'    => 35,
+		),
+		'doroshopping_ui_account'       => array(
+			'title'       => __( 'Textos UI: Dropdown cuenta', 'doroshopping' ),
+			'description' => __( 'Menu de cuenta del header.', 'doroshopping' ),
+			'priority'    => 36,
+		),
+		'doroshopping_ui_footer'        => array(
+			'title'       => __( 'Textos UI: Footer', 'doroshopping' ),
+			'description' => __( 'Footer (fallback sin menu).', 'doroshopping' ),
+			'priority'    => 37,
+		),
+		'doroshopping_ui_locale'        => array(
+			'title'       => __( 'Textos UI: Idioma / moneda', 'doroshopping' ),
+			'description' => __( 'Dropdown locale (pais, lengua, moneda).', 'doroshopping' ),
+			'priority'    => 38,
+		),
+		'doroshopping_ui_shipping'      => array(
+			'title'       => __( 'Textos UI: Envio (header)', 'doroshopping' ),
+			'description' => __( 'Dropdown direccion de envio.', 'doroshopping' ),
+			'priority'    => 39,
+		),
+		'doroshopping_ui_cart'          => array(
+			'title'       => __( 'Textos UI: Carrito', 'doroshopping' ),
+			'description' => __( 'Pagina carrito, modal y confianza.', 'doroshopping' ),
+			'priority'    => 40,
+		),
+		'doroshopping_ui_checkout'      => array(
+			'title'       => __( 'Textos UI: Checkout', 'doroshopping' ),
+			'description' => __( 'Checkout y pagina de gracias.', 'doroshopping' ),
+			'priority'    => 41,
+		),
+		'doroshopping_ui_shop'          => array(
+			'title'       => __( 'Textos UI: Tienda / Ofertas', 'doroshopping' ),
+			'description' => __( 'Filtros, ofertas y categorias.', 'doroshopping' ),
+			'priority'    => 42,
+		),
+		'doroshopping_ui_product'       => array(
+			'title'       => __( 'Textos UI: Ficha producto', 'doroshopping' ),
+			'description' => __( 'Buybox, wishlist y confianza.', 'doroshopping' ),
+			'priority'    => 43,
+		),
+		'doroshopping_ui_account_pages' => array(
+			'title'       => __( 'Textos UI: Mi cuenta (paginas)', 'doroshopping' ),
+			'description' => __( 'Dashboard, direcciones y detalles.', 'doroshopping' ),
+			'priority'    => 44,
+		),
+		'doroshopping_ui_auth'          => array(
+			'title'       => __( 'Textos UI: Login / Registro', 'doroshopping' ),
+			'description' => __( 'Modal y paginas de acceso.', 'doroshopping' ),
+			'priority'    => 45,
+		),
+	);
+
+	foreach ( $sections as $id => $meta ) {
+		$wp_customize->add_section(
+			$id,
+			array(
+				'title'       => $meta['title'],
+				'description' => $meta['description'],
+				'panel'       => 'doroshopping_panel',
+				'priority'    => $meta['priority'],
+			)
+		);
+	}
+
+	foreach ( doroshopping_i18n_ui_defaults() as $setting_id => $meta ) {
+		$is_textarea = ! empty( $meta['type'] ) && 'textarea' === $meta['type'];
+		$wp_customize->add_setting(
+			$setting_id,
+			array(
+				'default'           => isset( $meta['default'] ) ? $meta['default'] : '',
+				'sanitize_callback' => $is_textarea ? 'sanitize_textarea_field' : 'sanitize_text_field',
+			)
+		);
+		$wp_customize->add_control(
+			$setting_id,
+			array(
+				'label'   => isset( $meta['label'] ) ? $meta['label'] : $setting_id,
+				'section' => isset( $meta['section'] ) ? $meta['section'] : 'doroshopping_ui_header',
+				'type'    => $is_textarea ? 'textarea' : 'text',
+			)
+		);
+	}
+}
+
+/**
+ * Personalizar: selector de idioma + settings por lengua (home + UI).
  *
  * @param WP_Customize_Manager $wp_customize Manager.
  */
@@ -665,28 +931,46 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
 
 	$lang_control_args = array(
 		'label'       => __( 'Idioma a editar', 'doroshopping' ),
-		'description' => __( 'Elige el idioma y rellena imagen/títulos de ese idioma. Si dejas vacío, hereda el español.', 'doroshopping' ),
+		'description' => __( 'Elige el idioma y rellena los textos de ese idioma. Si dejas vacío, hereda el español.', 'doroshopping' ),
 		'type'        => 'select',
 		'choices'     => $choices,
 		'priority'    => 1,
 	);
 
-	$wp_customize->add_control(
-		'doroshopping_i18n_edit_lang',
-		array_merge( $lang_control_args, array( 'section' => 'doroshopping_home_images' ) )
+	$lang_sections = array(
+		'doroshopping_home_images',
+		'doroshopping_home_grids',
+		'doroshopping_ui_header',
+		'doroshopping_ui_account',
+		'doroshopping_ui_footer',
+		'doroshopping_ui_locale',
+		'doroshopping_ui_shipping',
+		'doroshopping_ui_cart',
+		'doroshopping_ui_checkout',
+		'doroshopping_ui_shop',
+		'doroshopping_ui_product',
+		'doroshopping_ui_account_pages',
+		'doroshopping_ui_auth',
 	);
-	$wp_customize->add_control(
-		'doroshopping_i18n_edit_lang_grids',
-		array_merge(
-			$lang_control_args,
-			array(
-				'settings' => 'doroshopping_i18n_edit_lang',
-				'section'  => 'doroshopping_home_grids',
+	foreach ( $lang_sections as $i => $section_id ) {
+		if ( ! $wp_customize->get_section( $section_id ) ) {
+			continue;
+		}
+		$wp_customize->add_control(
+			'doroshopping_i18n_edit_lang_' . $i,
+			array_merge(
+				$lang_control_args,
+				array(
+					'settings' => 'doroshopping_i18n_edit_lang',
+					'section'  => $section_id,
+				)
 			)
-		)
-	);
+		);
+	}
 
-	$defs = function_exists( 'doroshopping_i18n_home_setting_defs' ) ? doroshopping_i18n_home_setting_defs() : array();
+	$defs = function_exists( 'doroshopping_i18n_all_setting_defs' )
+		? doroshopping_i18n_all_setting_defs()
+		: ( function_exists( 'doroshopping_i18n_home_setting_defs' ) ? doroshopping_i18n_home_setting_defs() : array() );
 
 	foreach ( $langs as $lang ) {
 		$lang = sanitize_key( $lang );
@@ -695,10 +979,11 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
 		}
 
 		foreach ( $defs as $base_id => $type ) {
-			$setting_id = $base_id . '__' . $lang;
-			$section    = ( false !== strpos( $base_id, 'doroshopping_home_block_' ) || false !== strpos( $base_id, 'doroshopping_home_featured_' ) )
-				? 'doroshopping_home_grids'
-				: 'doroshopping_home_images';
+			$setting_id   = $base_id . '__' . $lang;
+			$base_control = $wp_customize->get_control( $base_id );
+			$section      = ( $base_control && ! empty( $base_control->section ) )
+				? $base_control->section
+				: ( ( 0 === strpos( $base_id, 'doroshopping_ui_' ) ) ? 'doroshopping_ui_header' : ( ( false !== strpos( $base_id, 'doroshopping_home_' ) ) ? 'doroshopping_home_grids' : 'doroshopping_home_images' ) );
 
 			$base_setting = $wp_customize->get_setting( $base_id );
 			$default_val  = $base_setting ? $base_setting->default : ( 'media' === $type ? 0 : '' );
@@ -714,7 +999,6 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
 				)
 			);
 
-			$base_control = $wp_customize->get_control( $base_id );
 			$label        = $base_control ? $base_control->label : $base_id;
 			$label        = sprintf(
 				/* translators: 1: field label 2: language code */
@@ -788,7 +1072,9 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
  */
 function doroshopping_customize_i18n_controls_js() {
 	$default = function_exists( 'doroshopping_i18n_default_lang' ) ? doroshopping_i18n_default_lang() : 'es';
-	$defs    = function_exists( 'doroshopping_i18n_home_setting_defs' ) ? array_keys( doroshopping_i18n_home_setting_defs() ) : array();
+	$defs    = function_exists( 'doroshopping_i18n_all_setting_defs' )
+		? array_keys( doroshopping_i18n_all_setting_defs() )
+		: ( function_exists( 'doroshopping_i18n_home_setting_defs' ) ? array_keys( doroshopping_i18n_home_setting_defs() ) : array() );
 	?>
 	<script>
 	(function (api) {

@@ -33,15 +33,22 @@ $defaults = array(
     ),
 );
 
+$get_mod = static function ( $key, $default = '' ) {
+    return function_exists( 'doroshopping_get_theme_mod' )
+        ? doroshopping_get_theme_mod( $key, $default )
+        : get_theme_mod( $key, $default );
+};
+
 $slides = array();
 foreach ( $defaults as $i => $default ) {
     $image = function_exists( 'doroshopping_get_theme_image_url' )
         ? doroshopping_get_theme_image_url( 'hero_' . $i . '_image', $default['image'] )
         : $default['image'];
-    $title = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_title', '' ) : get_theme_mod( 'doroshopping_hero_' . $i . '_title', '' );
-    $sub   = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_subtitle', '' ) : get_theme_mod( 'doroshopping_hero_' . $i . '_subtitle', '' );
-    $url   = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_url', '' ) : get_theme_mod( 'doroshopping_hero_' . $i . '_url', '' );
-    $align = function_exists( 'doroshopping_get_theme_mod' ) ? doroshopping_get_theme_mod( 'doroshopping_hero_' . $i . '_align', $default['align'] ) : get_theme_mod( 'doroshopping_hero_' . $i . '_align', $default['align'] );
+    $title = $get_mod( 'doroshopping_hero_' . $i . '_title', '' );
+    $sub   = $get_mod( 'doroshopping_hero_' . $i . '_subtitle', '' );
+    $cta   = $get_mod( 'doroshopping_hero_' . $i . '_cta', '' );
+    $url   = $get_mod( 'doroshopping_hero_' . $i . '_url', '' );
+    $align = $get_mod( 'doroshopping_hero_' . $i . '_align', $default['align'] );
     if ( ! in_array( $align, array( 'left', 'right' ), true ) ) {
         $align = $default['align'];
     }
@@ -50,7 +57,7 @@ foreach ( $defaults as $i => $default ) {
         'image'    => $image,
         'title'    => $title ? $title : $default['title'],
         'subtitle' => $sub ? $sub : $default['subtitle'],
-        'cta'      => $default['cta'],
+        'cta'      => $cta ? $cta : $default['cta'],
         'url'      => $url ? $url : $default['url'],
         'align'    => $align,
     );

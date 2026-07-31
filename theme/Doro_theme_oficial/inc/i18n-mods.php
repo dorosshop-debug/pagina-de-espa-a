@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Theme mods por idioma + herramientas Polylang (páginas).
  *
@@ -97,11 +97,6 @@ function doroshopping_get_theme_mod( $key, $default = false ) {
 }
 
 /**
- * Keys del home que se editan por idioma en Personalizar.
- *
- * @return string[]
- */
-/**
  * Settings del home que se editan por idioma en Personalizar.
  *
  * @return array<string, string> setting_id => type (text|url|select|media)
@@ -112,12 +107,21 @@ function doroshopping_i18n_home_setting_defs() {
 		$defs[ 'doroshopping_hero_' . $i . '_image' ]    = 'media';
 		$defs[ 'doroshopping_hero_' . $i . '_title' ]    = 'text';
 		$defs[ 'doroshopping_hero_' . $i . '_subtitle' ] = 'text';
+		$defs[ 'doroshopping_hero_' . $i . '_cta' ]      = 'text';
 		$defs[ 'doroshopping_hero_' . $i . '_url' ]      = 'url';
 		$defs[ 'doroshopping_hero_' . $i . '_align' ]    = 'select';
 	}
-	$defs['doroshopping_home_block_1_title']   = 'text';
-	$defs['doroshopping_home_block_2_title']   = 'text';
-	$defs['doroshopping_home_featured_title']  = 'text';
+	$defs['doroshopping_promo_image']           = 'media';
+	$defs['doroshopping_promo_title']           = 'text';
+	$defs['doroshopping_promo_cta']             = 'text';
+	$defs['doroshopping_promo_cta_url']         = 'url';
+	$defs['doroshopping_home_categories_title'] = 'text';
+	$defs['doroshopping_home_block_1_title']    = 'text';
+	$defs['doroshopping_home_block_2_title']    = 'text';
+	for ( $t = 1; $t <= 4; $t++ ) {
+		$defs[ 'doroshopping_home_tile_' . $t . '_label' ] = 'text';
+	}
+	$defs['doroshopping_home_featured_title'] = 'text';
 	return $defs;
 }
 
@@ -127,6 +131,94 @@ function doroshopping_i18n_home_setting_defs() {
  */
 function doroshopping_i18n_home_text_keys() {
 	return array_keys( doroshopping_i18n_home_setting_defs() );
+}
+
+/**
+ * Textos UI (header/footer + paginas). Merge de chrome + pages.
+ *
+ * @return array<string, array{default:string,label:string,section:string,type?:string}>
+ */
+function doroshopping_i18n_ui_defaults() {
+	static $cached = null;
+	if ( null !== $cached ) {
+		return $cached;
+	}
+
+	$base = array();
+	if ( function_exists( 'doroshopping_i18n_ui_chrome_defaults' ) ) {
+		$base = array_merge( $base, doroshopping_i18n_ui_chrome_defaults() );
+	}
+	if ( function_exists( 'doroshopping_i18n_ui_page_defaults' ) ) {
+		$base = array_merge( $base, doroshopping_i18n_ui_page_defaults() );
+	}
+
+	$cached = $base;
+	return $cached;
+}
+
+/**
+ * Settings UI para i18n.
+ *
+ * @return array<string, string>
+ */
+function doroshopping_i18n_ui_setting_defs() {
+	$defs = array();
+	foreach ( doroshopping_i18n_ui_defaults() as $key => $meta ) {
+		$defs[ $key ] = ( ! empty( $meta['type'] ) && 'textarea' === $meta['type'] ) ? 'text' : 'text';
+	}
+	return $defs;
+}
+
+/**
+ * Home + UI settings i18n.
+ *
+ * @return array<string, string>
+ */
+function doroshopping_i18n_all_setting_defs() {
+	return array_merge( doroshopping_i18n_home_setting_defs(), doroshopping_i18n_ui_setting_defs() );
+}
+
+/**
+ * Texto UI multi-idioma.
+ *
+ * @param string $key Setting key.
+ * @return string
+ */
+function doroshopping_ui_text( $key ) {
+	$key      = (string) $key;
+	$defaults = doroshopping_i18n_ui_defaults();
+	$default  = isset( $defaults[ $key ]['default'] ) ? $defaults[ $key ]['default'] : '';
+
+	if ( function_exists( 'doroshopping_get_theme_mod' ) ) {
+		$value = doroshopping_get_theme_mod( $key, $default );
+	} else {
+		$value = get_theme_mod( $key, $default );
+	}
+
+	$value = is_string( $value ) ? trim( $value ) : '';
+	return '' !== $value ? $value : $default;
+}
+
+/**
+ * Texto UI con sprintf.
+ *
+ * @param string $key Setting key.
+ * @param mixed  ...$args Args.
+ * @return string
+ */
+function doroshopping_ui_sprintf( $key, ...$args ) {
+	$template = doroshopping_ui_text( $key );
+	if ( empty( $args ) || '' === $template ) {
+		return $template;
+	}
+
+	try {
+		return sprintf( $template, ...$args );
+	} catch ( \ValueError $e ) {
+		return $template;
+	} catch ( \ArgumentCountError $e ) {
+		return $template;
+	}
 }
 
 /**
@@ -188,7 +280,8 @@ function doroshopping_i18n_admin_page() {
 				<li><?php esc_html_e( 'Pulsa el botón de arriba.', 'doroshopping' ); ?></li>
 				<li><?php esc_html_e( 'Ve a Páginas: cada Inicio/Contacto/etc. debe mostrar banderas enlazadas (lápiz, no solo +).', 'doroshopping' ); ?></li>
 				<li><?php esc_html_e( 'Edita el título/contenido de cada idioma (o Elementor en páginas de contenido).', 'doroshopping' ); ?></li>
-				<li><?php esc_html_e( 'Home (textos del hero): Apariencia → Personalizar → elige “Idioma a editar”.', 'doroshopping' ); ?></li>
+				<li><?php esc_html_e( 'Home + Textos UI: Apariencia → Personalizar → «Idioma a editar» (Home y todas las secciones Textos UI).', 'doroshopping' ); ?></li>
+				<li><?php esc_html_e( 'Mega menú (nombres): Menús / categorías con Polylang.', 'doroshopping' ); ?></li>
 				<li><?php esc_html_e( 'Productos/categorías: Productos → traducir con Polylang (o DeepL si lo tienes).', 'doroshopping' ); ?></li>
 			</ol>
 		<?php endif; ?>

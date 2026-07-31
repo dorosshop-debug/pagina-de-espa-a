@@ -43,13 +43,14 @@ function doroshopping_enqueue_assets() {
         'doroshopping-live-search'  => '/css/components/live-search.css',
         'doroshopping-product-card' => '/css/components/product-card.css',
         'doroshopping-auth-modal'   => '/css/components/auth-modal.css',
+        'doroshopping-geo-banner'   => '/css/components/geo-banner.css',
     );
 
     foreach ( $components as $handle => $path ) {
         wp_enqueue_style( $handle, $uri . $path, array( 'doroshopping-a11y' ), $ver );
     }
 
-    $style_deps = array( 'doroshopping-header', 'doroshopping-footer', 'doroshopping-cart-modal', 'doroshopping-live-search', 'doroshopping-product-card', 'doroshopping-auth-modal' );
+    $style_deps = array( 'doroshopping-header', 'doroshopping-footer', 'doroshopping-cart-modal', 'doroshopping-live-search', 'doroshopping-product-card', 'doroshopping-auth-modal', 'doroshopping-geo-banner' );
 
     if ( is_front_page() || is_home() ) {
         wp_enqueue_style( 'doroshopping-home', $uri . '/css/pages/home.css', $style_deps, $ver );
@@ -224,6 +225,17 @@ function doroshopping_enqueue_assets() {
                 'added'   => __( 'Añadido a la lista de deseos.', 'doroshopping' ),
                 'removed' => __( 'Eliminado de la lista de deseos.', 'doroshopping' ),
             ),
+        )
+    );
+
+    wp_localize_script(
+        'doroshopping-main',
+        'doroshoppingGeo',
+        array(
+            'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+            'nonce'   => wp_create_nonce( 'doroshopping_geo' ),
+            'enabled' => function_exists( 'doroshopping_geo_enabled' ) ? (bool) doroshopping_geo_enabled() : false,
+            'probe'   => function_exists( 'doroshopping_geo_should_probe' ) ? (bool) doroshopping_geo_should_probe() : false,
         )
     );
 

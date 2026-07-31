@@ -8,6 +8,10 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -45,7 +49,7 @@ if ( ! $elementor_header ) :
                     class="site-header__menu-btn site-nav__categories-btn"
                     aria-expanded="false"
                     aria-controls="mega-menu"
-                    aria-label="<?php esc_attr_e( 'Abrir menu de categorias', 'doroshopping' ); ?>"
+                    aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_all_categories' ) ); ?>"
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
                 </button>
@@ -58,7 +62,7 @@ if ( ! $elementor_header ) :
                     type="search"
                     name="s"
                     class="site-header__search-input"
-                    placeholder="<?php esc_attr_e( 'Buscar productos', 'doroshopping' ); ?>"
+                    placeholder="<?php echo esc_attr( $ui( 'doroshopping_ui_search_placeholder' ) ); ?>"
                     value="<?php echo esc_attr( get_search_query() ); ?>"
                     aria-autocomplete="list"
                     aria-controls="live-search-results"
@@ -95,9 +99,9 @@ if ( ! $elementor_header ) :
             </form>
             <div class="live-search" id="live-search-panel" hidden data-live-search-panel>
                 <ul class="live-search__list" id="live-search-results" data-live-search-results role="listbox"></ul>
-                <a href="#" class="live-search__all" data-live-search-all hidden><?php esc_html_e( 'Ver todos los resultados', 'doroshopping' ); ?></a>
-                <p class="live-search__empty" data-live-search-empty hidden><?php esc_html_e( 'No se encontraron productos.', 'doroshopping' ); ?></p>
-                <p class="live-search__loading" data-live-search-loading hidden><?php esc_html_e( 'Buscando...', 'doroshopping' ); ?></p>
+                <a href="#" class="live-search__all" data-live-search-all hidden><?php echo esc_html( $ui( 'doroshopping_ui_search_all' ) ); ?></a>
+                <p class="live-search__empty" data-live-search-empty hidden><?php echo esc_html( $ui( 'doroshopping_ui_search_empty' ) ); ?></p>
+                <p class="live-search__loading" data-live-search-loading hidden><?php echo esc_html( $ui( 'doroshopping_ui_search_loading' ) ); ?></p>
             </div>
         </div>
 
@@ -131,7 +135,7 @@ if ( ! $elementor_header ) :
                     <svg class="site-header__utility-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                     <span class="site-header__utility-text">
                         <span class="site-header__utility-label"><?php echo esc_html( function_exists( 'doroshopping_get_header_location' ) ? doroshopping_get_header_location()['label'] : __( 'Ubicación', 'doroshopping' ) ); ?></span>
-                        <span><?php esc_html_e( 'Envío', 'doroshopping' ); ?></span>
+                        <span><?php echo esc_html( $ui( 'doroshopping_ui_shipping_label' ) ); ?></span>
                     </span>
                     <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                 </button>
@@ -146,7 +150,7 @@ if ( ! $elementor_header ) :
                     <?php else : ?>
                         <span class="site-header__cart-count" data-cart-count>0</span>
                     <?php endif; ?>
-                    <span class="site-header__utility-label"><?php esc_html_e( 'Carrito', 'doroshopping' ); ?></span>
+                    <span class="site-header__utility-label"><?php echo esc_html( $ui( 'doroshopping_ui_cart_label' ) ); ?></span>
                 </span>
             </a>
         </div>
@@ -158,7 +162,7 @@ if ( ! $elementor_header ) :
                 <div class="site-nav__categories">
                     <button type="button" class="site-nav__categories-btn" aria-expanded="false" aria-controls="mega-menu">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-                        <?php esc_html_e( 'Todas las categorias', 'doroshopping' ); ?>
+                        <?php echo esc_html( $ui( 'doroshopping_ui_all_categories' ) ); ?>
                         <svg class="site-nav__categories-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
                     </button>
                 </div>
@@ -179,9 +183,9 @@ if ( ! $elementor_header ) :
                     $offers_url = function_exists( 'doroshopping_get_offers_url' ) ? doroshopping_get_offers_url() : $shop_url;
                     ?>
                     <div class="site-nav__menu">
-                        <a href="<?php echo esc_url( $shop_url ); ?>" class="is-active"><?php esc_html_e( 'Tienda', 'doroshopping' ); ?></a>
-                        <a href="<?php echo esc_url( $offers_url ); ?>"><?php esc_html_e( 'Ofertas', 'doroshopping' ); ?></a>
-                        <a href="<?php echo esc_url( doroshopping_get_page_url( 'contacto' ) ); ?>"><?php esc_html_e( 'Contacto', 'doroshopping' ); ?></a>
+                        <a href="<?php echo esc_url( $shop_url ); ?>" class="is-active"><?php echo esc_html( $ui( 'doroshopping_ui_nav_shop' ) ); ?></a>
+                        <a href="<?php echo esc_url( $offers_url ); ?>"><?php echo esc_html( $ui( 'doroshopping_ui_nav_offers' ) ); ?></a>
+                        <a href="<?php echo esc_url( doroshopping_get_page_url( 'contacto' ) ); ?>"><?php echo esc_html( $ui( 'doroshopping_ui_nav_contact' ) ); ?></a>
                     </div>
                     <?php
                 }

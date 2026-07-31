@@ -31,6 +31,7 @@ function doroshoppingBoot() {
     initProductShare();
     initSecurePaymentsModal();
     initCartPageEmptyReload();
+    initGeoSuggestBanner();
 }
 
 function doroshoppingStart() {
@@ -3193,4 +3194,123 @@ function initCartPageEmptyReload() {
             setTimeout(recoverEmpty, 100);
         });
     }
+}
+
+/**
+ * Aviso suave de país detectado por IP (sin GPS).
+ * La detección corre en AJAX para no retrasar el HTML.
+ */
+function initGeoSuggestBanner() {
+    var cfg = window.doroshoppingGeo || {};
+    if (!cfg.enabled || !cfg.probe) return;
+
+    try {
+        if (window.sessionStorage && sessionStorage.getItem('doro_geo_probed') === '1') {
+            return;
+        }
+    } catch (e) { /* private mode */ }
+
+    function markProbed() {
+        try {
+            if (window.sessionStorage) {
+                sessionStorage.setItem('doro_geo_probed', '1');
+            }
+        } catch (err) { /* ignore */ }
+    }
+
+    function post(action, extra) {
+        var body = new FormData();
+        body.append('action', action);
+        body.append('nonce', cfg.nonce || '');
+        if (extra) {
+            Object.keys(extra).forEach(function (key) {
+                body.append(key, extra[key]);
+            });
+        }
+        return fetch(cfg.ajaxUrl || '/wp-admin/admin-ajax.php', {
+            method: 'POST',
+            credentials: 'same-origin',
+            body: body
+        }).then(function (res) {
+            return res.json();
+        });
+    }
+
+    function openLocaleDropdown() {
+        var wrap = document.querySelector('.site-header__dropdown-wrap[data-dropdown="locale"]');
+        var btn = wrap ? wrap.querySelector('.site-header__utility-btn') : null;
+        if (btn) {
+            btn.click();
+            return;
+        }
+        var header = document.querySelector('.site-header');
+        if (header && typeof header.scrollIntoView === 'function') {
+            header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    function bindBanner(banner) {
+        if (!banner) return;
+
+        banner.hidden = false;
+
+        banner.addEventListener('click', function (e) {
+            var accept = e.target.closest('[data-geo-accept]');
+            var dismiss = e.target.closest('[data-geo-dismiss]');
+            var change = e.target.closest('[data-geo-change]');
+
+            if (accept) {
+                e.preventDefault();
+                accept.disabled = true;
+                post('doroshopping_geo_accept', {
+                    country: banner.getAttribute('data-geo-country') || ''
+                }).then(function (json) {
+                    markProbed();
+                    if (json && json.success && json.data && json.data.redirect) {
+                        window.location.href = json.data.redirect;
+                        return;
+                    }
+                    banner.hidden = true;
+                }).catch(function () {
+                    accept.disabled = false;
+                });
+                return;
+            }
+
+            if (change) {
+                e.preventDefault();
+                post('doroshopping_geo_dismiss').finally(function () {
+                    markProbed();
+                    banner.hidden = true;
+                    openLocaleDropdown();
+                });
+                return;
+            }
+
+            if (dismiss) {
+                e.preventDefault();
+                post('doroshopping_geo_dismiss').finally(function () {
+                    markProbed();
+                    banner.hidden = true;
+                });
+            }
+        });
+    }
+
+    window.setTimeout(function () {
+        post('doroshopping_geo_probe').then(function (json) {
+            markProbed();
+            if (!json || !json.success || !json.data || !json.data.suggest || !json.data.html) {
+                return;
+            }
+            var wrap = document.createElement('div');
+            wrap.innerHTML = String(json.data.html).trim();
+            var banner = wrap.querySelector('[data-geo-banner]') || wrap.firstElementChild;
+            if (!banner) return;
+            document.body.appendChild(banner);
+            bindBanner(banner);
+        }).catch(function () {
+            markProbed();
+        });
+    }, 900);
 }

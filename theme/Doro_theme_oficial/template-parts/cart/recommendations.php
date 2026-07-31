@@ -9,6 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 if ( ! function_exists( 'wc_get_products' ) ) {
     return;
 }
@@ -27,8 +31,8 @@ if ( empty( $products ) ) {
 }
 ?>
 
-<section class="doro-cesta-recs" aria-label="<?php esc_attr_e( 'Recomendados', 'doroshopping' ); ?>">
-    <h2 class="doro-cesta-recs__title"><?php esc_html_e( 'Seguro que te gusta', 'doroshopping' ); ?></h2>
+<section class="doro-cesta-recs" aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_cart_recs_aria' ) ); ?>">
+    <h2 class="doro-cesta-recs__title"><?php echo esc_html( $ui( 'doroshopping_ui_cart_recs' ) ); ?></h2>
     <ul class="products columns-6 doro-cesta-recs__grid">
         <?php
         foreach ( $products as $product ) {

@@ -9,7 +9,21 @@ $uri         = get_template_directory_uri() . '/assets/images';
 $promo_image = function_exists( 'doroshopping_get_theme_image_url' )
     ? doroshopping_get_theme_image_url( 'promo_image', $uri . '/banners/banner_seccion_3.png' )
     : $uri . '/banners/banner_seccion_3.png';
-$shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+
+$get_mod = static function ( $key, $default = '' ) {
+    return function_exists( 'doroshopping_get_theme_mod' )
+        ? doroshopping_get_theme_mod( $key, $default )
+        : get_theme_mod( $key, $default );
+};
+
+$shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
+$promo_title = $get_mod(
+    'doroshopping_promo_title',
+    __( 'Gadgets de Ultima Generacion que no sabias que necesitabas.', 'doroshopping' )
+);
+$promo_cta = $get_mod( 'doroshopping_promo_cta', __( 'Comprar', 'doroshopping' ) );
+$promo_url = $get_mod( 'doroshopping_promo_cta_url', '' );
+$promo_url = $promo_url ? esc_url_raw( $promo_url ) : $shop_url;
 
 $float_defaults = array(
     1 => array(
@@ -31,7 +45,7 @@ foreach ( $float_defaults as $index => $fallback ) {
     $image = function_exists( 'doroshopping_get_theme_image_url' )
         ? doroshopping_get_theme_image_url( 'promo_float_' . $index . '_image', $fallback['image'] )
         : $fallback['image'];
-    $url   = get_theme_mod( 'doroshopping_promo_float_' . $index . '_url', '' );
+    $url   = $get_mod( 'doroshopping_promo_float_' . $index . '_url', '' );
     $url   = $url ? esc_url_raw( $url ) : $shop_url;
 
     $products[] = array(
@@ -43,11 +57,11 @@ foreach ( $float_defaults as $index => $fallback ) {
 ?>
 
 <section class="home-promo" data-promo-parallax>
-    <img class="home-promo__image" src="<?php echo esc_url( $promo_image ); ?>" alt="<?php esc_attr_e( 'Gadgets de Ultima Generacion', 'doroshopping' ); ?>" loading="lazy" decoding="async">
+    <img class="home-promo__image" src="<?php echo esc_url( $promo_image ); ?>" alt="<?php echo esc_attr( $promo_title ); ?>" loading="lazy" decoding="async">
 
     <div class="home-promo__content">
-        <h2 class="home-promo__title"><?php esc_html_e( 'Gadgets de Ultima Generacion que no sabias que necesitabas.', 'doroshopping' ); ?></h2>
-        <a href="<?php echo esc_url( $shop_url ); ?>" class="home-promo__cta"><?php esc_html_e( 'Comprar', 'doroshopping' ); ?></a>
+        <h2 class="home-promo__title"><?php echo esc_html( $promo_title ); ?></h2>
+        <a href="<?php echo esc_url( $promo_url ); ?>" class="home-promo__cta"><?php echo esc_html( $promo_cta ); ?></a>
     </div>
 
     <div class="home-promo__floats" aria-hidden="false">

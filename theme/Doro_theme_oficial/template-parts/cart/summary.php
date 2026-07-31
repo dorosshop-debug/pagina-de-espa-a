@@ -9,6 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 $count    = isset( $args['count'] ) ? (int) $args['count'] : 0;
 $is_empty = ! empty( $args['is_empty'] );
 $total    = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_total() : wc_price( 0 );
@@ -20,10 +24,14 @@ if ( ! $shop ) {
 if ( ! $checkout ) {
     $checkout = $shop;
 }
+
+$continue_label = function_exists( 'doroshopping_ui_sprintf' )
+    ? doroshopping_ui_sprintf( 'doroshopping_ui_cart_continue', $count )
+    : '';
 ?>
 
 <div class="doro-cesta-summary">
-    <h2 class="doro-cesta-summary__title"><?php esc_html_e( 'Resumen', 'doroshopping' ); ?></h2>
+    <h2 class="doro-cesta-summary__title"><?php echo esc_html( $ui( 'doroshopping_ui_cart_summary' ) ); ?></h2>
 
     <div
         class="doro-cesta-summary__shipping"
@@ -32,43 +40,31 @@ if ( ! $checkout ) {
         data-shipping-ready="0"
         hidden
     >
-        <p class="doro-cesta-summary__shipping-title"><?php esc_html_e( 'Envío estimado', 'doroshopping' ); ?></p>
+        <p class="doro-cesta-summary__shipping-title"><?php echo esc_html( $ui( 'doroshopping_ui_cart_shipping_est' ) ); ?></p>
         <p class="doro-cesta-summary__shipping-dest">
-            <?php esc_html_e( 'Destino:', 'doroshopping' ); ?>
+            <?php echo esc_html( $ui( 'doroshopping_ui_cart_dest' ) ); ?>
             <strong data-shipping-destination>&mdash;</strong>
         </p>
         <ul class="doro-cesta-summary__shipping-list">
-            <li><span><?php esc_html_e( 'Transportista', 'doroshopping' ); ?></span> <strong data-shipping-carrier>&mdash;</strong></li>
-            <li><span><?php esc_html_e( 'Tiempo', 'doroshopping' ); ?></span> <strong data-shipping-eta>&mdash;</strong></li>
-            <li><span><?php esc_html_e( 'Coste', 'doroshopping' ); ?></span> <strong data-shipping-cost>&mdash;</strong></li>
+            <li><span><?php echo esc_html( $ui( 'doroshopping_ui_cart_carrier' ) ); ?></span> <strong data-shipping-carrier>&mdash;</strong></li>
+            <li><span><?php echo esc_html( $ui( 'doroshopping_ui_cart_time' ) ); ?></span> <strong data-shipping-eta>&mdash;</strong></li>
+            <li><span><?php echo esc_html( $ui( 'doroshopping_ui_cart_cost' ) ); ?></span> <strong data-shipping-cost>&mdash;</strong></li>
         </ul>
         <p class="doro-cesta-summary__shipping-note" data-shipping-note></p>
     </div>
 
     <div class="doro-cesta-summary__row">
-        <span><?php esc_html_e( 'Estimación total', 'doroshopping' ); ?></span>
+        <span><?php echo esc_html( $ui( 'doroshopping_ui_cart_total_est' ) ); ?></span>
         <strong class="doro-cesta-summary__total"><?php echo $is_empty ? wp_kses_post( wc_price( 0 ) ) : wp_kses_post( $total ); ?></strong>
     </div>
 
     <?php if ( $is_empty ) : ?>
         <a class="doro-cesta-summary__cta is-disabled" href="<?php echo esc_url( $shop ); ?>" aria-disabled="true">
-            <?php
-            printf(
-                /* translators: %d: cart item count */
-                esc_html__( 'Continuar (%d)', 'doroshopping' ),
-                $count
-            );
-            ?>
+            <?php echo esc_html( $continue_label ); ?>
         </a>
-            <?php else : ?>
-                <a class="doro-cesta-summary__cta" href="<?php echo esc_url( $checkout ); ?>">
-                    <?php
-                    printf(
-                        /* translators: %d: cart item count */
-                        esc_html__( 'Continuar (%d)', 'doroshopping' ),
-                        $count
-                    );
-                    ?>
-                </a>
-            <?php endif; ?>
+    <?php else : ?>
+        <a class="doro-cesta-summary__cta" href="<?php echo esc_url( $checkout ); ?>">
+            <?php echo esc_html( $continue_label ); ?>
+        </a>
+    <?php endif; ?>
 </div>

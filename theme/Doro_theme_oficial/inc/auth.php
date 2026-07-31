@@ -177,7 +177,9 @@ function doroshopping_is_password_flow_view() {
  */
 function doroshopping_get_header_user_name() {
     if ( ! is_user_logged_in() ) {
-        return __( 'Ingresar', 'doroshopping' );
+        return function_exists( 'doroshopping_ui_text' )
+            ? doroshopping_ui_text( 'doroshopping_ui_login_label' )
+            : __( 'Ingresar', 'doroshopping' );
     }
 
     $user = wp_get_current_user();
@@ -204,6 +206,11 @@ function doroshopping_get_header_user_name() {
  * @return string
  */
 function doroshopping_get_header_user_greeting() {
+    if ( function_exists( 'doroshopping_ui_text' ) ) {
+        return is_user_logged_in()
+            ? doroshopping_ui_text( 'doroshopping_ui_greeting_user' )
+            : doroshopping_ui_text( 'doroshopping_ui_greeting_guest' );
+    }
     return is_user_logged_in()
         ? __( 'Hola', 'doroshopping' )
         : __( 'Bienvenido', 'doroshopping' );

@@ -322,7 +322,7 @@ function doroshopping_mega_menu_from_nav() {
                 'image'   => doroshopping_mega_menu_item_image( $top, $thumbs[0] ),
                 'links'   => array(
                     array(
-                        'label' => __( 'Ver categoría', 'doroshopping' ),
+                        'label' => function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( 'doroshopping_ui_mega_view_category' ) : __( 'Ver categoría', 'doroshopping' ),
                         'url'   => $top->url,
                     ),
                 ),
@@ -346,7 +346,7 @@ function doroshopping_mega_menu_from_nav() {
                 }
                 if ( empty( $links ) ) {
                     $links[] = array(
-                        'label' => __( 'Ver todo', 'doroshopping' ),
+                        'label' => function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( 'doroshopping_ui_mega_view_all' ) : __( 'Ver todo', 'doroshopping' ),
                         'url'   => $child->url,
                     );
                 }
@@ -441,7 +441,7 @@ function doroshopping_mega_menu_from_product_cats() {
                     }
                 } else {
                     $links[] = array(
-                        'label' => __( 'Ver todo', 'doroshopping' ),
+                        'label' => function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( 'doroshopping_ui_mega_view_all' ) : __( 'Ver todo', 'doroshopping' ),
                         'url'   => get_term_link( $child ),
                     );
                 }
@@ -459,7 +459,7 @@ function doroshopping_mega_menu_from_product_cats() {
                 'image'   => doroshopping_mega_menu_term_image( $parent->term_id, $thumbs[ $pi % 2 ] ),
                 'links'   => array(
                     array(
-                        'label' => __( 'Ver categoría', 'doroshopping' ),
+                        'label' => function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( 'doroshopping_ui_mega_view_category' ) : __( 'Ver categoría', 'doroshopping' ),
                         'url'   => get_term_link( $parent ),
                     ),
                 ),

@@ -8,6 +8,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 get_header();
 
 if ( function_exists( 'elementor_theme_do_location' ) && elementor_theme_do_location( 'archive' ) ) {
@@ -64,7 +68,7 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
 
     <div class="doro-category__container">
         <?php if ( ! empty( $children ) ) : ?>
-            <section class="doro-category__subs" aria-label="<?php esc_attr_e( 'Subcategorías', 'doroshopping' ); ?>">
+            <section class="doro-category__subs" aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_cat_subs' ) ); ?>">
                 <div class="doro-category__subs-grid">
                     <?php foreach ( $children as $child ) : ?>
                         <?php
@@ -95,9 +99,9 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
         <?php endif; ?>
 
         <div class="doro-category__layout">
-            <aside class="doro-category__filters" data-doro-filters aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">
+            <aside class="doro-category__filters" data-doro-filters aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_filters' ) ); ?>">
                 <div class="doro-category__filters-card">
-                    <h2 class="doro-category__filters-title"><?php esc_html_e( 'Filtros', 'doroshopping' ); ?></h2>
+                    <h2 class="doro-category__filters-title"><?php echo esc_html( $ui( 'doroshopping_ui_shop_filters' ) ); ?></h2>
                     <?php
                     if ( ! is_active_sidebar( 'shop-filters' ) ) {
                         get_template_part( 'template-parts/shop/filters', 'fallback' );
@@ -110,8 +114,8 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
 
             <section class="doro-category__shop">
                 <div class="doro-category__shop-header">
-                    <h2 class="doro-category__shop-title"><?php esc_html_e( 'Más formas de comprar', 'doroshopping' ); ?></h2>
-                    <span class="doro-category__chip"><?php esc_html_e( 'Para ti', 'doroshopping' ); ?></span>
+                    <h2 class="doro-category__shop-title"><?php echo esc_html( $ui( 'doroshopping_ui_shop_cat_more' ) ); ?></h2>
+                    <span class="doro-category__chip"><?php echo esc_html( $ui( 'doroshopping_ui_shop_cat_for_you' ) ); ?></span>
                 </div>
 
                 <?php do_action( 'woocommerce_before_shop_loop' ); ?>
@@ -127,7 +131,7 @@ $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_
                     <?php woocommerce_product_loop_end(); ?>
                     <?php do_action( 'woocommerce_after_shop_loop' ); ?>
                 <?php else : ?>
-                    <p class="doro-category__empty"><?php esc_html_e( 'No hay productos en esta categoría todavía.', 'doroshopping' ); ?></p>
+                    <p class="doro-category__empty"><?php echo esc_html( $ui( 'doroshopping_ui_shop_cat_empty' ) ); ?></p>
                 <?php endif; ?>
             </section>
         </div>

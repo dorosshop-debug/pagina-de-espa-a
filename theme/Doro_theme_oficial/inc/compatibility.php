@@ -437,15 +437,7 @@ function doroshopping_get_header_location() {
         $code = strtoupper( sanitize_text_field( wp_unslash( $_COOKIE['doroshopping_country'] ) ) );
     }
 
-    // Geo Controller / CF Geo Plugin.
-    if ( '' === $code && function_exists( 'do_shortcode' ) && shortcode_exists( 'cfgeo' ) ) {
-        $detected = trim( wp_strip_all_tags( do_shortcode( '[cfgeo return="country_code" default=""]' ) ) );
-        if ( $detected ) {
-            $code = strtoupper( sanitize_text_field( $detected ) );
-        }
-    }
-
-    // WooCommerce customer country.
+    // WooCommerce customer country (sin forzar IP: el aviso suave pide confirmación).
     if ( '' === $code && function_exists( 'WC' ) && WC()->customer ) {
         $ship = WC()->customer->get_shipping_country();
         $bill = WC()->customer->get_billing_country();
@@ -856,3 +848,72 @@ function doroshopping_woocommerce_setup() {
     add_theme_support( 'elementor' );
 }
 add_action( 'after_setup_theme', 'doroshopping_woocommerce_setup' );
+
+/**
+ * ¿Autocomplete Google Address activo?
+ *
+ * @return bool
+ */
+function doroshopping_is_aga_active() {
+    if ( defined( 'AGA_VERSION' ) ) {
+        return true;
+    }
+    $plugin = 'autocomplete-google-address/autocomplete-google-address.php';
+    if ( ! function_exists( 'is_plugin_active' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+    return function_exists( 'is_plugin_active' ) && is_plugin_active( $plugin );
+}
+
+/**
+ * Parche defensivo: AGA llama querySelectorAll('') si main_selector está vacío
+ * en alguna config (rompe la consola). Saltamos selectores vacíos.
+ *
+ * Arreglo real: Google Address → configs → Trigger Field = #billing_address_1 etc.
+ *
+ * @return void
+ */
+function doroshopping_aga_empty_selector_guard() {
+    if ( is_admin() || ! doroshopping_is_aga_active() ) {
+        return;
+    }
+    ?>
+<script>
+(function () {
+    function patchAga() {
+        if (!window.aga || typeof window.aga.setupAutocomplete !== 'function' || window.aga.__doroGuard) {
+            return !!window.aga;
+        }
+        var orig = window.aga.setupAutocomplete;
+        window.aga.setupAutocomplete = function (config) {
+            if (!config || !config.main_selector || !String(config.main_selector).trim()) {
+                return;
+            }
+            return orig.call(this, config);
+        };
+        window.aga.__doroGuard = true;
+        if (Array.isArray(window.aga_form_configs)) {
+            window.aga_form_configs = window.aga_form_configs.filter(function (c) {
+                return c && c.main_selector && String(c.main_selector).trim();
+            });
+        }
+        return true;
+    }
+
+    if (patchAga()) {
+        return;
+    }
+
+    var tries = 0;
+    var timer = setInterval(function () {
+        tries += 1;
+        if (patchAga() || tries > 80) {
+            clearInterval(timer);
+        }
+    }, 50);
+})();
+</script>
+    <?php
+}
+add_action( 'wp_head', 'doroshopping_aga_empty_selector_guard', 1 );
+add_action( 'wp_footer', 'doroshopping_aga_empty_selector_guard', 1 );

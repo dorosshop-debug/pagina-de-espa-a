@@ -7,6 +7,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 global $product;
 
 if ( empty( $product ) || ! $product->is_visible() ) {
@@ -38,7 +42,7 @@ $image_html  = $product->get_image(
                 data-product_id="<?php echo esc_attr( (string) $product_id ); ?>"
                 data-product_sku="<?php echo esc_attr( $product->get_sku() ); ?>"
                 data-quantity="1"
-                aria-label="<?php echo esc_attr( sprintf( __( 'Añadir %s al carrito', 'doroshopping' ), $product->get_name() ) ); ?>"
+                aria-label="<?php echo esc_attr( function_exists( 'doroshopping_ui_sprintf' ) ? doroshopping_ui_sprintf( 'doroshopping_ui_product_add_aria', $product->get_name() ) : $product->get_name() ); ?>"
             >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             </button>
@@ -46,7 +50,7 @@ $image_html  = $product->get_image(
             <a
                 href="<?php echo esc_url( $product->get_permalink() ); ?>"
                 class="home-product-card__cart-btn"
-                aria-label="<?php echo esc_attr( sprintf( __( 'Ver %s', 'doroshopping' ), $product->get_name() ) ); ?>"
+                aria-label="<?php echo esc_attr( function_exists( 'doroshopping_ui_sprintf' ) ? doroshopping_ui_sprintf( 'doroshopping_ui_product_view_aria', $product->get_name() ) : $product->get_name() ); ?>"
             >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             </a>
@@ -57,7 +61,7 @@ $image_html  = $product->get_image(
             data-wishlist-toggle
             data-product-id="<?php echo esc_attr( (string) $product_id ); ?>"
             aria-pressed="false"
-            aria-label="<?php esc_attr_e( 'Anadir a lista de deseos', 'doroshopping' ); ?>"
+            aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_product_card_wishlist' ) ); ?>"
         >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
         </button>

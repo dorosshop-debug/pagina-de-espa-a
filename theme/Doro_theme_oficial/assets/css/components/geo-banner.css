@@ -1,0 +1,132 @@
+/* Aviso suave de ubicación (geo) */
+.doro-geo-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 10050;
+    pointer-events: none;
+}
+
+.doro-geo-banner[hidden] {
+    display: none !important;
+}
+
+.doro-geo-banner__inner {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    background: var(--color-white, #fff);
+    border: 1px solid var(--color-grey-border, #e0e0e0);
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
+    border-radius: var(--radius-md, 8px);
+    font-family: var(--font-family, inherit);
+    color: var(--color-dark, #1a1a1a);
+}
+
+.doro-geo-banner__flag {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+.doro-geo-banner__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.doro-geo-banner__message {
+    margin: 0;
+    font-size: var(--font-size-base, 14px);
+    line-height: 1.4;
+}
+
+.doro-geo-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 0 1 auto;
+}
+
+.doro-geo-banner__btn {
+    appearance: none;
+    border: 1px solid var(--color-grey-border, #e0e0e0);
+    background: var(--color-white, #fff);
+    color: var(--color-dark, #1a1a1a);
+    border-radius: var(--radius-sm, 4px);
+    padding: 8px 12px;
+    font: inherit;
+    font-size: var(--font-size-sm, 12px);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition, 0.2s ease), border-color var(--transition, 0.2s ease);
+}
+
+.doro-geo-banner__btn:hover {
+    background: var(--color-grey-bg, #f5f5f5);
+}
+
+.doro-geo-banner__btn--primary {
+    background: var(--color-orange, #f8942d);
+    border-color: var(--color-orange, #f8942d);
+    color: #fff;
+}
+
+.doro-geo-banner__btn--primary:hover {
+    filter: brightness(0.96);
+    background: var(--color-orange, #f8942d);
+}
+
+.doro-geo-banner__btn--ghost {
+    border-color: transparent;
+    background: transparent;
+    font-weight: 500;
+    color: var(--color-grey-text, #666);
+}
+
+.doro-geo-banner__close {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--color-grey-text, #666);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 4px;
+}
+
+@media (max-width: 640px) {
+    .doro-geo-banner {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .doro-geo-banner__inner {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        padding: 12px;
+    }
+
+    .doro-geo-banner__actions {
+        width: 100%;
+    }
+
+    .doro-geo-banner__close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+    }
+
+    .doro-geo-banner__inner {
+        position: relative;
+        padding-right: 36px;
+    }
+}

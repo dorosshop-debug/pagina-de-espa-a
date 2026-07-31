@@ -5,6 +5,10 @@
  * @package Doroshopping
  */
 
+$ui = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 $shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
 $base_url = is_product_taxonomy() ? get_term_link( get_queried_object() ) : $shop_url;
 if ( is_wp_error( $base_url ) ) {
@@ -137,10 +141,10 @@ $doroshopping_cat_is_open = static function ( $term, $current_id, $ancestors ) {
 };
 
 $price_ranges = array(
-	array( 'label' => __( 'Hasta 20 EUR', 'doroshopping' ), 'min' => 0, 'max' => 20 ),
-	array( 'label' => __( '20 - 50 EUR', 'doroshopping' ), 'min' => 20, 'max' => 50 ),
-	array( 'label' => __( '50 - 100 EUR', 'doroshopping' ), 'min' => 50, 'max' => 100 ),
-	array( 'label' => __( 'Mas de 100 EUR', 'doroshopping' ), 'min' => 100, 'max' => '' ),
+	array( 'label' => $ui( 'doroshopping_ui_shop_price_1' ), 'min' => 0, 'max' => 20 ),
+	array( 'label' => $ui( 'doroshopping_ui_shop_price_2' ), 'min' => 20, 'max' => 50 ),
+	array( 'label' => $ui( 'doroshopping_ui_shop_price_3' ), 'min' => 50, 'max' => 100 ),
+	array( 'label' => $ui( 'doroshopping_ui_shop_price_4' ), 'min' => 100, 'max' => '' ),
 );
 
 $current_min    = isset( $_GET['min_price'] ) ? wc_clean( wp_unslash( $_GET['min_price'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -148,12 +152,12 @@ $current_max    = isset( $_GET['max_price'] ) ? wc_clean( wp_unslash( $_GET['max
 $current_rating = isset( $_GET['min_rating'] ) ? absint( $_GET['min_rating'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 ?>
 
-<div class="doro-shop__widget" data-doro-filter-widget data-filter-label="<?php esc_attr_e( 'Categorías', 'doroshopping' ); ?>">
-	<h3 class="doro-shop__widget-title"><?php esc_html_e( 'Categorías', 'doroshopping' ); ?></h3>
+<div class="doro-shop__widget" data-doro-filter-widget data-filter-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_categories' ) ); ?>">
+	<h3 class="doro-shop__widget-title"><?php echo esc_html( $ui( 'doroshopping_ui_shop_categories' ) ); ?></h3>
 	<ul class="doro-shop__filter-list doro-shop__filter-list--cats">
 		<li class="doro-shop__cat-item">
 			<a href="<?php echo esc_url( $shop_url ); ?>" class="<?php echo ! $current_term_id ? 'is-active' : ''; ?>"<?php echo ! $current_term_id ? ' aria-current="page"' : ''; ?>>
-				<?php esc_html_e( 'Todas las categorías', 'doroshopping' ); ?>
+				<?php echo esc_html( $ui( 'doroshopping_ui_shop_all_categories' ) ); ?>
 			</a>
 		</li>
 
@@ -307,7 +311,7 @@ $current_rating = isset( $_GET['min_rating'] ) ? absint( $_GET['min_rating'] ) :
 				</li>
 			<?php endforeach; ?>
 		<?php else : ?>
-			<li><a href="<?php echo esc_url( $shop_url ); ?>"><?php esc_html_e( 'Ver todos los productos', 'doroshopping' ); ?></a></li>
+			<li><a href="<?php echo esc_url( $shop_url ); ?>"><?php echo esc_html( $ui( 'doroshopping_ui_shop_view_all' ) ); ?></a></li>
 		<?php endif; ?>
 	</ul>
 </div>
@@ -427,8 +431,8 @@ if ( ! empty( $attribute_taxonomies ) && ( null === $context_product_ids || ! em
 }
 ?>
 
-<div class="doro-shop__widget" data-doro-filter-widget data-filter-label="<?php esc_attr_e( 'Precio', 'doroshopping' ); ?>">
-	<h3 class="doro-shop__widget-title"><?php esc_html_e( 'Precio', 'doroshopping' ); ?></h3>
+<div class="doro-shop__widget" data-doro-filter-widget data-filter-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_price' ) ); ?>">
+	<h3 class="doro-shop__widget-title"><?php echo esc_html( $ui( 'doroshopping_ui_shop_price' ) ); ?></h3>
 	<ul class="doro-shop__filter-list">
 		<?php foreach ( $price_ranges as $range ) : ?>
 			<?php
@@ -451,13 +455,13 @@ if ( ! empty( $attribute_taxonomies ) && ( null === $context_product_ids || ! em
 			</li>
 		<?php endforeach; ?>
 		<?php if ( $current_min !== '' || $current_max !== '' ) : ?>
-			<li><a href="<?php echo esc_url( remove_query_arg( array( 'min_price', 'max_price' ), $base_url ) ); ?>"><?php esc_html_e( 'Quitar filtro de precio', 'doroshopping' ); ?></a></li>
+			<li><a href="<?php echo esc_url( remove_query_arg( array( 'min_price', 'max_price' ), $base_url ) ); ?>"><?php echo esc_html( $ui( 'doroshopping_ui_shop_remove_price' ) ); ?></a></li>
 		<?php endif; ?>
 	</ul>
 </div>
 
-<div class="doro-shop__widget" data-doro-filter-widget data-filter-label="<?php esc_attr_e( 'Valoración', 'doroshopping' ); ?>">
-	<h3 class="doro-shop__widget-title"><?php esc_html_e( 'Valoración', 'doroshopping' ); ?></h3>
+<div class="doro-shop__widget" data-doro-filter-widget data-filter-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_rating' ) ); ?>">
+	<h3 class="doro-shop__widget-title"><?php echo esc_html( $ui( 'doroshopping_ui_shop_rating' ) ); ?></h3>
 	<ul class="doro-shop__filter-list">
 		<?php foreach ( array( 4, 3 ) as $stars ) : ?>
 			<?php
@@ -467,13 +471,17 @@ if ( ! empty( $attribute_taxonomies ) && ( null === $context_product_ids || ! em
 			<li>
 				<a href="<?php echo esc_url( $url ); ?>"<?php echo $is_active ? ' aria-current="true" class="is-active"' : ''; ?>>
 					<?php
-					echo esc_html( sprintf( __( '%d estrellas o más', 'doroshopping' ), $stars ) );
+					echo esc_html(
+						function_exists( 'doroshopping_ui_sprintf' )
+							? doroshopping_ui_sprintf( 'doroshopping_ui_shop_rating_stars', $stars )
+							: sprintf( __( '%d estrellas o más', 'doroshopping' ), $stars )
+					);
 					?>
 				</a>
 			</li>
 		<?php endforeach; ?>
 		<?php if ( $current_rating ) : ?>
-			<li><a href="<?php echo esc_url( remove_query_arg( 'min_rating', $base_url ) ); ?>"><?php esc_html_e( 'Quitar filtro de valoración', 'doroshopping' ); ?></a></li>
+			<li><a href="<?php echo esc_url( remove_query_arg( 'min_rating', $base_url ) ); ?>"><?php echo esc_html( $ui( 'doroshopping_ui_shop_remove_rating' ) ); ?></a></li>
 		<?php endif; ?>
 	</ul>
 </div>

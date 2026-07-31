@@ -1,10 +1,13 @@
 <?php
 /**
- * Dropdown idioma / moneda / ubicación (Polylang + CURCY / YayCurrency + Geo).
+ * Dropdown idioma / moneda / ubicación (Polylang + CURCY / YayCurrency + geo del tema).
  *
  * @package Doroshopping
  */
 
+$ui        = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
 $flags_uri = get_template_directory_uri() . '/assets/images/flags';
 $languages = function_exists( 'doroshopping_get_header_languages' ) ? doroshopping_get_header_languages() : array();
 $lang_code = function_exists( 'doroshopping_get_current_language_code' ) ? doroshopping_get_current_language_code() : 'es';
@@ -29,13 +32,13 @@ if ( ! empty( $location['map'] ) && is_array( $location['map'] ) ) {
 }
 if ( empty( $locations ) ) {
 	$locations = array(
-		'es' => array( 'label' => __( 'España', 'doroshopping' ), 'flag' => $flags_uri . '/spain.png', 'lang' => 'es', 'currency' => 'EUR' ),
-		'pt' => array( 'label' => __( 'Portugal', 'doroshopping' ), 'flag' => $flags_uri . '/ptg.png', 'lang' => 'pt', 'currency' => 'EUR' ),
-		'fr' => array( 'label' => __( 'Francia', 'doroshopping' ), 'flag' => $flags_uri . '/francia.png', 'lang' => 'fr', 'currency' => 'EUR' ),
-		'de' => array( 'label' => __( 'Alemania', 'doroshopping' ), 'flag' => $flags_uri . '/alemania.png', 'lang' => 'de', 'currency' => 'EUR' ),
-		'it' => array( 'label' => __( 'Italia', 'doroshopping' ), 'flag' => $flags_uri . '/italia.png', 'lang' => 'it', 'currency' => 'EUR' ),
-		'gb' => array( 'label' => __( 'Reino Unido', 'doroshopping' ), 'flag' => $flags_uri . '/reino-unido.png', 'lang' => 'en', 'currency' => 'GBP' ),
-		'ch' => array( 'label' => __( 'Suiza', 'doroshopping' ), 'flag' => $flags_uri . '/suiza.svg', 'lang' => 'fr', 'currency' => 'CHF' ),
+		'es' => array( 'label' => $ui( 'doroshopping_ui_country_es' ), 'flag' => $flags_uri . '/spain.png', 'lang' => 'es', 'currency' => 'EUR' ),
+		'pt' => array( 'label' => $ui( 'doroshopping_ui_country_pt' ), 'flag' => $flags_uri . '/ptg.png', 'lang' => 'pt', 'currency' => 'EUR' ),
+		'fr' => array( 'label' => $ui( 'doroshopping_ui_country_fr' ), 'flag' => $flags_uri . '/francia.png', 'lang' => 'fr', 'currency' => 'EUR' ),
+		'de' => array( 'label' => $ui( 'doroshopping_ui_country_de' ), 'flag' => $flags_uri . '/alemania.png', 'lang' => 'de', 'currency' => 'EUR' ),
+		'it' => array( 'label' => $ui( 'doroshopping_ui_country_it' ), 'flag' => $flags_uri . '/italia.png', 'lang' => 'it', 'currency' => 'EUR' ),
+		'gb' => array( 'label' => $ui( 'doroshopping_ui_country_gb' ), 'flag' => $flags_uri . '/reino-unido.png', 'lang' => 'en', 'currency' => 'GBP' ),
+		'ch' => array( 'label' => $ui( 'doroshopping_ui_country_ch' ), 'flag' => $flags_uri . '/suiza.svg', 'lang' => 'fr', 'currency' => 'CHF' ),
 	);
 }
 
@@ -114,7 +117,7 @@ $doroshopping_render_flag_select = static function ( $field_id, $name, $label_id
 ?>
 
 <div class="header-dropdown header-dropdown--locale" id="dropdown-locale" hidden>
-	<p class="header-dropdown__title"><?php esc_html_e( 'Elige país de envío, idioma y moneda.', 'doroshopping' ); ?></p>
+	<p class="header-dropdown__title"><?php echo esc_html( $ui( 'doroshopping_ui_locale_title' ) ); ?></p>
 
 	<?php
 	// Slot oculto de plugin (sincronización JS opcional); el selector visible es el del tema.
@@ -175,11 +178,11 @@ $doroshopping_render_flag_select = static function ( $field_id, $name, $label_id
 			'locale-ubicacion-label',
 			$locations,
 			$selected_loc,
-			__( 'Elegir ubicación', 'doroshopping' ),
-			__( 'Ubicación (envío)', 'doroshopping' )
+			$ui( 'doroshopping_ui_locale_choose_location' ),
+			$ui( 'doroshopping_ui_locale_location_label' )
 		);
 		?>
-		<p class="header-dropdown__hint"><?php esc_html_e( 'La ubicación tambien sugiere el envio', 'doroshopping' ); ?></p>
+		<p class="header-dropdown__hint"><?php echo esc_html( $ui( 'doroshopping_ui_locale_location_hint' ) ); ?></p>
 
 		<?php
 		if ( ! empty( $languages ) ) {
@@ -190,11 +193,11 @@ $doroshopping_render_flag_select = static function ( $field_id, $name, $label_id
 				$languages,
 				$lang_code,
 				'',
-				__( 'Lengua', 'doroshopping' )
+				$ui( 'doroshopping_ui_locale_language_label' )
 			);
-			echo '<p class="header-dropdown__hint">' . esc_html__( 'Elegir idioma.', 'doroshopping' ) . '</p>';
+			echo '<p class="header-dropdown__hint">' . esc_html( $ui( 'doroshopping_ui_locale_language_hint' ) ) . '</p>';
 		} else {
-			echo '<p class="header-dropdown__hint">' . esc_html__( 'Activa Polylang para cambiar de idioma.', 'doroshopping' ) . '</p>';
+			echo '<p class="header-dropdown__hint">' . esc_html( $ui( 'doroshopping_ui_locale_polylang_hint' ) ) . '</p>';
 		}
 		?>
 
@@ -205,12 +208,11 @@ $doroshopping_render_flag_select = static function ( $field_id, $name, $label_id
 			'locale-divisa-label',
 			$currencies,
 			$currency_code,
-			__( 'Elegir moneda', 'doroshopping' ),
-			__( 'Moneda', 'doroshopping' )
+			$ui( 'doroshopping_ui_locale_choose_currency' ),
+			$ui( 'doroshopping_ui_locale_currency_label' )
 		);
 		?>
-		<p class="header-dropdown__hint"><?php esc_html_e( '', 'doroshopping' ); ?></p>
 
-		<button type="submit" class="header-dropdown__submit" name="doroshopping_locale_submit" value="1"><?php esc_html_e( 'Guardar', 'doroshopping' ); ?></button>
+		<button type="submit" class="header-dropdown__submit" name="doroshopping_locale_submit" value="1"><?php echo esc_html( $ui( 'doroshopping_ui_locale_save' ) ); ?></button>
 	</form>
 </div>

@@ -9,6 +9,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 get_header();
 
 if ( function_exists( 'elementor_theme_do_location' ) && elementor_theme_do_location( 'archive' ) ) {
@@ -29,16 +33,16 @@ $is_offers = function_exists( 'doroshopping_is_offers_view' ) && doroshopping_is
         ?>
 
         <?php if ( $is_offers ) : ?>
-            <section class="doro-offers-hero" aria-label="<?php esc_attr_e( 'Ofertas', 'doroshopping' ); ?>">
-                <div class="doro-offers-hero__badge"><?php esc_html_e( 'Super Ofertas', 'doroshopping' ); ?></div>
-                <h1 class="doro-offers-hero__title"><?php esc_html_e( 'Ofertas', 'doroshopping' ); ?></h1>
+            <section class="doro-offers-hero" aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_offers_title' ) ); ?>">
+                <div class="doro-offers-hero__badge"><?php echo esc_html( $ui( 'doroshopping_ui_shop_offers_badge' ) ); ?></div>
+                <h1 class="doro-offers-hero__title"><?php echo esc_html( $ui( 'doroshopping_ui_shop_offers_title' ) ); ?></h1>
                 <p class="doro-offers-hero__text">
-                    <?php esc_html_e( 'Descuentos flash, precios bajos y novedades. Filtra a la izquierda y encuentra tu próxima compra.', 'doroshopping' ); ?>
+                    <?php echo esc_html( $ui( 'doroshopping_ui_shop_offers_lead' ) ); ?>
                 </p>
                 <ul class="doro-offers-hero__tags" aria-hidden="true">
-                    <li><?php esc_html_e( 'Envío rápido', 'doroshopping' ); ?></li>
-                    <li><?php esc_html_e( 'Pago seguro', 'doroshopping' ); ?></li>
-                    <li><?php esc_html_e( 'Devoluciones fáciles', 'doroshopping' ); ?></li>
+                    <li><?php echo esc_html( $ui( 'doroshopping_ui_shop_ship_fast' ) ); ?></li>
+                    <li><?php echo esc_html( $ui( 'doroshopping_ui_shop_pay_secure' ) ); ?></li>
+                    <li><?php echo esc_html( $ui( 'doroshopping_ui_shop_returns_easy' ) ); ?></li>
                 </ul>
             </section>
         <?php else : ?>
@@ -51,7 +55,7 @@ $is_offers = function_exists( 'doroshopping_is_offers_view' ) && doroshopping_is
         <?php endif; ?>
 
         <div class="doro-shop__layout">
-            <aside class="doro-shop__sidebar" data-doro-filters aria-label="<?php esc_attr_e( 'Filtros', 'doroshopping' ); ?>">
+            <aside class="doro-shop__sidebar" data-doro-filters aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_filters' ) ); ?>">
                 <?php doroshopping_shop_sidebar(); ?>
             </aside>
 

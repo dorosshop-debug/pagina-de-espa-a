@@ -13,6 +13,10 @@ if ( ! $product ) {
 	return;
 }
 
+$ui = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 $product_id = (int) $product->get_id();
 $attrs      = $product->get_attributes();
 ?>
@@ -25,10 +29,10 @@ $attrs      = $product->get_attributes();
 			data-wishlist-toggle
 			data-product-id="<?php echo esc_attr( (string) $product_id ); ?>"
 			aria-pressed="false"
-			aria-label="<?php esc_attr_e( 'Añadir a lista de deseos', 'doroshopping' ); ?>"
+			aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_product_wishlist_aria' ) ); ?>"
 		>
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-			<?php esc_html_e( 'Lista de deseos', 'doroshopping' ); ?>
+			<?php echo esc_html( $ui( 'doroshopping_ui_product_wishlist' ) ); ?>
 		</button>
 		<button
 			type="button"
@@ -36,10 +40,10 @@ $attrs      = $product->get_attributes();
 			data-share-product
 			data-share-url="<?php echo esc_url( get_permalink( $product_id ) ); ?>"
 			data-share-title="<?php echo esc_attr( $product->get_name() ); ?>"
-			aria-label="<?php esc_attr_e( 'Compartir', 'doroshopping' ); ?>"
+			aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_product_share' ) ); ?>"
 		>
 			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-			<?php esc_html_e( 'Compartir', 'doroshopping' ); ?>
+			<?php echo esc_html( $ui( 'doroshopping_ui_product_share' ) ); ?>
 		</button>
 	</div>
 
@@ -49,7 +53,7 @@ $attrs      = $product->get_attributes();
 
 	<?php if ( ! empty( $attrs ) ) : ?>
 		<div class="doro-product__specs" id="doro-additional-info">
-			<h3 class="doro-product__specs-title"><?php esc_html_e( 'Información adicional', 'doroshopping' ); ?></h3>
+			<h3 class="doro-product__specs-title"><?php echo esc_html( $ui( 'doroshopping_ui_product_specs' ) ); ?></h3>
 			<table class="doro-product__specs-table shop_attributes">
 				<tbody>
 					<?php foreach ( $attrs as $attribute ) : ?>

@@ -7,6 +7,10 @@
 
 defined( 'ABSPATH' ) || exit;
 
+$ui = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 $current_user = wp_get_current_user();
 $icons        = array(
 	'dashboard'       => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>',
@@ -31,7 +35,7 @@ do_action( 'woocommerce_before_account_navigation' );
 			?>
 		</span>
 		<div class="doro-account__nav-user-text">
-			<p class="doro-account__nav-user-label"><?php esc_html_e( 'Hola', 'doroshopping' ); ?></p>
+			<p class="doro-account__nav-user-label"><?php echo esc_html( $ui( 'doroshopping_ui_acc_nav_hello' ) ); ?></p>
 			<p class="doro-account__nav-user-name"><?php echo esc_html( $current_user->display_name ? $current_user->display_name : $current_user->user_login ); ?></p>
 		</div>
 	</div>

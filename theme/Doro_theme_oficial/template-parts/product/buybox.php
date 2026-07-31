@@ -16,9 +16,13 @@ if ( ! $product ) {
     return;
 }
 
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 $destination = apply_filters(
     'doroshopping_shipping_destination_label',
-    __( 'España', 'doroshopping' ),
+    $ui( 'doroshopping_ui_country_es' ),
     $product
 );
 
@@ -42,7 +46,7 @@ $shipping = apply_filters(
         'carrier'     => '',
         'eta'         => '',
         'cost_html'   => '',
-        'note'        => __( 'Coste estimado según destino. El importe final puede variar ligeramente en checkout.', 'doroshopping' ),
+        'note'        => $ui( 'doroshopping_ui_product_ship_note' ),
         'ready'       => false,
     ),
     $product
@@ -61,7 +65,7 @@ if ( null !== $stock_qty && $stock_qty > 0 ) {
     /* translators: %d: stock quantity */
     $stock_text = sprintf( _n( 'Solo quedan %d disponible', 'Solo quedan %d disponibles', $stock_qty, 'doroshopping' ), $stock_qty );
 } elseif ( ! $product->is_in_stock() ) {
-    $stock_text = __( 'Agotado', 'doroshopping' );
+    $stock_text = $ui( 'doroshopping_ui_product_out_of_stock' );
 }
 ?>
 
@@ -80,16 +84,16 @@ if ( null !== $stock_qty && $stock_qty > 0 ) {
         class="doro-buybox__ship-card"
         data-doro-shipping
         data-shipping-ready="<?php echo $ready ? '1' : '0'; ?>"
-        aria-label="<?php esc_attr_e( 'Información de envío', 'doroshopping' ); ?>"
+        aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_product_ship_info' ) ); ?>"
     >
         <header class="doro-buybox__ship-head">
             <span class="doro-buybox__ship-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="1.5"/><circle cx="18.5" cy="18.5" r="1.5"/></svg>
             </span>
             <div>
-                <h3 class="doro-buybox__ship-title"><?php esc_html_e( 'Información de envío', 'doroshopping' ); ?></h3>
+                <h3 class="doro-buybox__ship-title"><?php echo esc_html( $ui( 'doroshopping_ui_product_ship_info' ) ); ?></h3>
                 <p class="doro-buybox__ship-dest">
-                    <?php esc_html_e( 'Destino:', 'doroshopping' ); ?>
+                    <?php echo esc_html( $ui( 'doroshopping_ui_product_dest' ) ); ?>
                     <strong data-shipping-destination><?php echo esc_html( $dest ); ?></strong>
                 </p>
             </div>
@@ -97,15 +101,15 @@ if ( null !== $stock_qty && $stock_qty > 0 ) {
 
         <dl class="doro-buybox__ship-rows">
             <div class="doro-buybox__ship-row">
-                <dt><?php esc_html_e( 'Transportista', 'doroshopping' ); ?></dt>
+                <dt><?php echo esc_html( $ui( 'doroshopping_ui_product_carrier' ) ); ?></dt>
                 <dd data-shipping-carrier><?php echo $carrier ? esc_html( $carrier ) : '&mdash;'; ?></dd>
             </div>
             <div class="doro-buybox__ship-row">
-                <dt><?php esc_html_e( 'Tiempo estimado', 'doroshopping' ); ?></dt>
+                <dt><?php echo esc_html( $ui( 'doroshopping_ui_product_eta' ) ); ?></dt>
                 <dd data-shipping-eta><?php echo $eta ? esc_html( $eta ) : '&mdash;'; ?></dd>
             </div>
             <div class="doro-buybox__ship-row">
-                <dt><?php esc_html_e( 'Coste estimado', 'doroshopping' ); ?></dt>
+                <dt><?php echo esc_html( $ui( 'doroshopping_ui_product_cost_est' ) ); ?></dt>
                 <dd data-shipping-cost><?php echo $cost_html ? wp_kses_post( $cost_html ) : '&mdash;'; ?></dd>
             </div>
         </dl>
@@ -131,9 +135,9 @@ if ( null !== $stock_qty && $stock_qty > 0 ) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </span>
             <div>
-                <strong><?php esc_html_e( 'Seguridad y Privacidad', 'doroshopping' ); ?></strong>
-                <span><?php esc_html_e( 'Pago 100% Seguro', 'doroshopping' ); ?></span>
-                <span><?php esc_html_e( 'Privacidad segura', 'doroshopping' ); ?></span>
+                <strong><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_security' ) ); ?></strong>
+                <span><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_pay' ) ); ?></span>
+                <span><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_privacy' ) ); ?></span>
             </div>
         </li>
         <li>
@@ -141,9 +145,9 @@ if ( null !== $stock_qty && $stock_qty > 0 ) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
             </span>
             <div>
-                <strong><?php esc_html_e( 'Devoluciones GRATIS', 'doroshopping' ); ?></strong>
-                <span><?php esc_html_e( 'Devoluciones gratis en 30 días', 'doroshopping' ); ?></span>
-                <span><?php esc_html_e( 'Reembolso por artículos dañados', 'doroshopping' ); ?></span>
+                <strong><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_returns' ) ); ?></strong>
+                <span><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_returns_30' ) ); ?></span>
+                <span><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_refund' ) ); ?></span>
             </div>
         </li>
         <li>
@@ -151,9 +155,9 @@ if ( null !== $stock_qty && $stock_qty > 0 ) {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg>
             </span>
             <div>
-                <strong><?php esc_html_e( 'Servicio Profesional', 'doroshopping' ); ?></strong>
-                <span><?php esc_html_e( 'Garantía Oficial', 'doroshopping' ); ?></span>
-                <span><?php esc_html_e( 'Soporte al Cliente', 'doroshopping' ); ?></span>
+                <strong><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_service' ) ); ?></strong>
+                <span><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_warranty' ) ); ?></span>
+                <span><?php echo esc_html( $ui( 'doroshopping_ui_product_trust_support' ) ); ?></span>
             </div>
         </li>
     </ul>

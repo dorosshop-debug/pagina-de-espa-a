@@ -70,26 +70,39 @@ $doroshopping_tile_url = static function ( $term_id ) {
     return is_wp_error( $link ) ? '#' : $link;
 };
 
+$get_mod = static function ( $key, $default = '' ) {
+    return function_exists( 'doroshopping_get_theme_mod' )
+        ? doroshopping_get_theme_mod( $key, $default )
+        : get_theme_mod( $key, $default );
+};
+
 $tile_1 = absint( get_theme_mod( 'doroshopping_home_tile_1_cat', 0 ) );
 $tile_2 = absint( get_theme_mod( 'doroshopping_home_tile_2_cat', 0 ) );
 $tile_3 = absint( get_theme_mod( 'doroshopping_home_tile_3_cat', 0 ) );
 $tile_4 = absint( get_theme_mod( 'doroshopping_home_tile_4_cat', 0 ) );
 
+$tile_labels = array(
+    1 => $get_mod( 'doroshopping_home_tile_1_label', __( 'Microfonos y auriculares', 'doroshopping' ) ),
+    2 => $get_mod( 'doroshopping_home_tile_2_label', __( 'Gaming', 'doroshopping' ) ),
+    3 => $get_mod( 'doroshopping_home_tile_3_label', __( 'Deportes', 'doroshopping' ) ),
+    4 => $get_mod( 'doroshopping_home_tile_4_label', __( 'Hogar y Gadgets', 'doroshopping' ) ),
+);
+
+$section_title = $get_mod( 'doroshopping_home_categories_title', __( 'Categorias & Ofertas', 'doroshopping' ) );
+
 $block_left = array(
-    'title'      => function_exists( 'doroshopping_get_theme_mod' )
-        ? doroshopping_get_theme_mod( 'doroshopping_home_block_1_title', __( 'Tecnologia para tu hogar', 'doroshopping' ) )
-        : get_theme_mod( 'doroshopping_home_block_1_title', __( 'Tecnologia para tu hogar', 'doroshopping' ) ),
+    'title'      => $get_mod( 'doroshopping_home_block_1_title', __( 'Tecnologia para tu hogar', 'doroshopping' ) ),
     'products'   => ! empty( $products_left ) ? doroshopping_map_wc_products_for_carousel( $products_left ) : $fallback_left,
     'categories' => array(
         array(
             'image' => $cat_uri . '/auriculares.png',
-            'label' => __( 'Microfonos y auriculares', 'doroshopping' ),
+            'label' => $tile_labels[1],
             'url'   => $doroshopping_tile_url( $tile_1 ),
             'file'  => 'auriculares.png',
         ),
         array(
             'image' => $cat_uri . '/videjuegos.png',
-            'label' => __( 'Gaming', 'doroshopping' ),
+            'label' => $tile_labels[2],
             'url'   => $doroshopping_tile_url( $tile_2 ),
             'file'  => 'videjuegos.png',
         ),
@@ -97,20 +110,18 @@ $block_left = array(
 );
 
 $block_right = array(
-    'title'      => function_exists( 'doroshopping_get_theme_mod' )
-        ? doroshopping_get_theme_mod( 'doroshopping_home_block_2_title', __( 'Promociones de Lanzamiento', 'doroshopping' ) )
-        : get_theme_mod( 'doroshopping_home_block_2_title', __( 'Promociones de Lanzamiento', 'doroshopping' ) ),
+    'title'      => $get_mod( 'doroshopping_home_block_2_title', __( 'Promociones de Lanzamiento', 'doroshopping' ) ),
     'products'   => ! empty( $products_right ) ? doroshopping_map_wc_products_for_carousel( $products_right ) : $fallback_right,
     'categories' => array(
         array(
             'image' => $cat_uri . '/deportes.png',
-            'label' => __( 'Deportes', 'doroshopping' ),
+            'label' => $tile_labels[3],
             'url'   => $doroshopping_tile_url( $tile_3 ),
             'file'  => 'deportes.png',
         ),
         array(
             'image' => $cat_uri . '/hogar.png',
-            'label' => __( 'Hogar y Gadgets', 'doroshopping' ),
+            'label' => $tile_labels[4],
             'url'   => $doroshopping_tile_url( $tile_4 ),
             'file'  => 'hogar.png',
         ),
@@ -176,7 +187,7 @@ function doroshopping_render_category_block( $block, $index ) {
 ?>
 
 <section class="home-categories">
-    <h2 class="home-categories__title"><?php esc_html_e( 'Categorias & Ofertas', 'doroshopping' ); ?></h2>
+    <h2 class="home-categories__title"><?php echo esc_html( $section_title ); ?></h2>
     <div class="home-categories__grid">
         <?php
         foreach ( $blocks as $index => $block ) {

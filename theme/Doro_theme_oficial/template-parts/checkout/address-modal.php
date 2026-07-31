@@ -10,6 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 if ( ! function_exists( 'WC' ) || ! WC()->checkout() ) {
     return;
 }
@@ -19,8 +23,8 @@ if ( ! function_exists( 'WC' ) || ! WC()->checkout() ) {
     <div class="doro-modal__backdrop" data-address-modal-close></div>
     <div class="doro-modal__dialog">
         <header class="doro-modal__header">
-            <h2 id="doro-address-modal-title" class="doro-modal__title"><?php esc_html_e( 'Añadir nueva dirección', 'doroshopping' ); ?></h2>
-            <button type="button" class="doro-modal__close" data-address-modal-close aria-label="<?php esc_attr_e( 'Cerrar', 'doroshopping' ); ?>">
+            <h2 id="doro-address-modal-title" class="doro-modal__title"><?php echo esc_html( $ui( 'doroshopping_ui_checkout_address_modal_title' ) ); ?></h2>
+            <button type="button" class="doro-modal__close" data-address-modal-close aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_ship_close' ) ); ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
         </header>
@@ -33,10 +37,10 @@ if ( ! function_exists( 'WC' ) || ! WC()->checkout() ) {
 
         <footer class="doro-modal__footer">
             <button type="button" class="doro-modal__btn doro-modal__btn--primary" data-address-modal-confirm>
-                <?php esc_html_e( 'Confirmar', 'doroshopping' ); ?>
+                <?php echo esc_html( $ui( 'doroshopping_ui_checkout_confirm' ) ); ?>
             </button>
             <button type="button" class="doro-modal__btn doro-modal__btn--ghost" data-address-modal-close>
-                <?php esc_html_e( 'Cancelar', 'doroshopping' ); ?>
+                <?php echo esc_html( $ui( 'doroshopping_ui_checkout_cancel' ) ); ?>
             </button>
         </footer>
     </div>

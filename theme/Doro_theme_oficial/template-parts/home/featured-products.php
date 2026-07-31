@@ -8,6 +8,10 @@
  * @package Doroshopping
  */
 
+$ui = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 $cat_id    = absint( get_theme_mod( 'doroshopping_home_featured_cat', 0 ) );
 $max_limit = absint( get_theme_mod( 'doroshopping_home_featured_limit', 90 ) );
 if ( $max_limit < 30 ) {
@@ -70,11 +74,11 @@ $go_to_shop    = $shown > 0 && ! $can_load_more;
 					class="doro-load-more__btn"
 					data-home-load-more-btn
 				>
-					<?php esc_html_e( 'Ver más', 'doroshopping' ); ?>
+					<?php echo esc_html( $ui( 'doroshopping_ui_home_ver_mas' ) ); ?>
 				</button>
 			<?php else : ?>
 				<a class="doro-load-more__btn" href="<?php echo esc_url( $more_url ); ?>">
-					<?php esc_html_e( 'Ver más en la tienda', 'doroshopping' ); ?>
+					<?php echo esc_html( $ui( 'doroshopping_ui_home_ver_mas_shop' ) ); ?>
 				</a>
 			<?php endif; ?>
 		</div>

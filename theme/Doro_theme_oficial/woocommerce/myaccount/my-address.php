@@ -7,12 +7,16 @@
 
 defined( 'ABSPATH' ) || exit;
 
+$ui = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
 $customer_id = get_current_user_id();
 $get_addresses = apply_filters(
 	'woocommerce_my_account_get_addresses',
 	array(
-		'billing'  => __( 'Dirección de facturación', 'doroshopping' ),
-		'shipping' => __( 'Dirección de envío', 'doroshopping' ),
+		'billing'  => $ui( 'doroshopping_ui_acc_addr_billing' ),
+		'shipping' => $ui( 'doroshopping_ui_acc_addr_shipping' ),
 	),
 	$customer_id
 );
@@ -20,10 +24,10 @@ $get_addresses = apply_filters(
 
 <section class="doro-account-addresses">
 	<header class="doro-account-section__header">
-		<p class="doro-account-section__eyebrow"><?php esc_html_e( 'Mi cuenta', 'doroshopping' ); ?></p>
-		<h2 class="doro-account-section__title"><?php esc_html_e( 'Direcciones', 'doroshopping' ); ?></h2>
+		<p class="doro-account-section__eyebrow"><?php echo esc_html( $ui( 'doroshopping_ui_acc_eyebrow' ) ); ?></p>
+		<h2 class="doro-account-section__title"><?php echo esc_html( $ui( 'doroshopping_ui_acc_addr_title' ) ); ?></h2>
 		<p class="doro-account-section__text">
-			<?php esc_html_e( 'Las siguientes direcciones se usarán por defecto en el pago y en el envío.', 'doroshopping' ); ?>
+			<?php echo esc_html( $ui( 'doroshopping_ui_acc_addr_lead' ) ); ?>
 		</p>
 	</header>
 
@@ -37,7 +41,7 @@ $get_addresses = apply_filters(
 				<header class="doro-account-addresses__card-head">
 					<h3 class="doro-account-addresses__card-title"><?php echo esc_html( $title ); ?></h3>
 					<a class="doro-account-addresses__edit" href="<?php echo esc_url( $edit_url ); ?>">
-						<?php echo $address ? esc_html__( 'Editar', 'doroshopping' ) : esc_html__( 'Añadir', 'doroshopping' ); ?>
+						<?php echo $address ? esc_html( $ui( 'doroshopping_ui_acc_edit' ) ) : esc_html( $ui( 'doroshopping_ui_acc_add' ) ); ?>
 					</a>
 				</header>
 				<div class="doro-account-addresses__card-body">
@@ -45,7 +49,7 @@ $get_addresses = apply_filters(
 						<address><?php echo wp_kses_post( $address ); ?></address>
 					<?php else : ?>
 						<p class="doro-account-addresses__empty">
-							<?php esc_html_e( 'Aún no has configurado este tipo de dirección.', 'doroshopping' ); ?>
+							<?php echo esc_html( $ui( 'doroshopping_ui_acc_addr_empty' ) ); ?>
 						</p>
 					<?php endif; ?>
 				</div>
