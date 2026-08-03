@@ -17,6 +17,7 @@ if ( is_wp_error( $base_url ) ) {
 
 /**
  * Conserva filtros actuales al cambiar uno (precio, atributo, etc.).
+ * Limita el apilado para no generar un árbol infinito de URLs a crawlers.
  *
  * @param string $url Base.
  * @return string
@@ -26,6 +27,7 @@ $doroshopping_filter_base = static function ( $url ) {
 	if ( empty( $_GET ) || ! is_array( $_GET ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return $url;
 	}
+	$attr_kept = 0;
 	foreach ( $_GET as $key => $value ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$key = sanitize_key( (string) $key );
 		if ( '' === $key ) {
@@ -34,8 +36,18 @@ $doroshopping_filter_base = static function ( $url ) {
 		if ( ! preg_match( '/^(filter_|min_price|max_price|min_rating|orderby|on_sale)/', $key ) ) {
 			continue;
 		}
+		// Ignorar filtros legacy BigBuy / attributegroup (no del tema).
+		if ( 0 === strpos( $key, 'filter_attributegroup_' ) || 'filter_brand' === $key ) {
+			continue;
+		}
 		if ( is_array( $value ) ) {
 			continue;
+		}
+		if ( 0 === strpos( $key, 'filter_' ) ) {
+			if ( $attr_kept >= 2 ) {
+				continue;
+			}
+			++$attr_kept;
 		}
 		$keep[ $key ] = wc_clean( wp_unslash( $value ) );
 	}
@@ -73,28 +85,38 @@ $context_product_ids = null;
 if ( is_product_taxonomy() ) {
 	$qo = get_queried_object();
 	if ( $qo && ! empty( $qo->term_id ) && ! empty( $qo->taxonomy ) ) {
-		$context_product_ids = get_posts(
-			array(
-				'post_type'              => 'product',
-				'post_status'            => 'publish',
-				'posts_per_page'         => -1,
-				'fields'                 => 'ids',
-				'no_found_rows'          => true,
-				'update_post_meta_cache' => false,
-				'update_post_term_cache' => false,
-				'tax_query'              => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		$term_count = isset( $qo->count ) ? (int) $qo->count : 0;
+		// Categorías grandes: no cargar todos los IDs (mata la CPU bajo crawl).
+		if ( $term_count > 0 && $term_count <= 400 ) {
+			$cache_key           = 'doro_ctx_pids_' . (int) $qo->term_id;
+			$context_product_ids = get_transient( $cache_key );
+			if ( false === $context_product_ids ) {
+				$context_product_ids = get_posts(
 					array(
-						'taxonomy'         => $qo->taxonomy,
-						'field'            => 'term_id',
-						'terms'            => array( (int) $qo->term_id ),
-						'include_children' => true,
-					),
-				),
-			)
-		);
-		if ( ! is_array( $context_product_ids ) ) {
-			$context_product_ids = array();
+						'post_type'              => 'product',
+						'post_status'            => 'publish',
+						'posts_per_page'         => 400,
+						'fields'                 => 'ids',
+						'no_found_rows'          => true,
+						'update_post_meta_cache' => false,
+						'update_post_term_cache' => false,
+						'tax_query'              => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+							array(
+								'taxonomy'         => $qo->taxonomy,
+								'field'            => 'term_id',
+								'terms'            => array( (int) $qo->term_id ),
+								'include_children' => true,
+							),
+						),
+					)
+				);
+				if ( ! is_array( $context_product_ids ) ) {
+					$context_product_ids = array();
+				}
+				set_transient( $cache_key, $context_product_ids, 6 * HOUR_IN_SECONDS );
+			}
 		}
+		// Si es muy grande o vacía: null = términos globales hide_empty (barato).
 	}
 }
 

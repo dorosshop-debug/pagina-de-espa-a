@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'DOROSHOPPING_VERSION', '1.9.1' );
+define( 'DOROSHOPPING_VERSION', '1.9.2' );
 define( 'DOROSHOPPING_DIR', get_template_directory() );
 define( 'DOROSHOPPING_URI', get_template_directory_uri() );
 
@@ -28,6 +28,7 @@ require_once DOROSHOPPING_DIR . '/inc/enqueue.php';
 require_once DOROSHOPPING_DIR . '/inc/ajax-cart.php';
 require_once DOROSHOPPING_DIR . '/inc/ajax-search.php';
 require_once DOROSHOPPING_DIR . '/inc/seo.php';
+require_once DOROSHOPPING_DIR . '/inc/performance-guard.php';
 require_once DOROSHOPPING_DIR . '/inc/geolocation.php';
 require_once DOROSHOPPING_DIR . '/inc/compatibility.php';
 require_once DOROSHOPPING_DIR . '/inc/bigbuy-shipping.php';
