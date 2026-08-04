@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Plantilla de páginas estáticas (CMS).
  *

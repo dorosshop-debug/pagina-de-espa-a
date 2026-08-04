@@ -16,6 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string
  */
 function doroshopping_order_button_text( $text ) {
+    if ( function_exists( 'doroshopping_ui_text' ) ) {
+        $custom = doroshopping_ui_text( 'doroshopping_ui_checkout_place_order' );
+        if ( '' !== $custom ) {
+            return $custom;
+        }
+    }
     return __( 'Realizar pedido', 'doroshopping' );
 }
 add_filter( 'woocommerce_order_button_text', 'doroshopping_order_button_text' );

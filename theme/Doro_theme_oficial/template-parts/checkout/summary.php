@@ -13,15 +13,40 @@ if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
     return;
 }
 
-$cart = WC()->cart;
+$ui = static function ( $key ) {
+    return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
+
+$cart        = WC()->cart;
+$place_order = $ui( 'doroshopping_ui_checkout_place_order' );
+if ( '' === $place_order ) {
+    $place_order = __( 'Realizar pedido', 'doroshopping' );
+}
+
+$legal_html = '';
+if ( function_exists( 'doroshopping_ui_sprintf' ) ) {
+    $legal_html = doroshopping_ui_sprintf(
+        'doroshopping_ui_checkout_legal',
+        esc_url( doroshopping_get_page_url( 'terminos-y-condiciones' ) ),
+        esc_url( doroshopping_get_page_url( 'politica-de-privacidad' ) )
+    );
+}
+if ( '' === $legal_html ) {
+    $legal_html = sprintf(
+        /* translators: 1: terms URL, 2: privacy URL */
+        __( 'Al realizar el pedido aceptas nuestros <a href="%1$s">términos y condiciones</a> y la <a href="%2$s">política de privacidad</a>.', 'doroshopping' ),
+        esc_url( doroshopping_get_page_url( 'terminos-y-condiciones' ) ),
+        esc_url( doroshopping_get_page_url( 'politica-de-privacidad' ) )
+    );
+}
 ?>
 
 <div class="doro-checkout-summary">
-    <h2 class="doro-checkout-summary__title"><?php esc_html_e( 'Resumen', 'doroshopping' ); ?></h2>
+    <h2 class="doro-checkout-summary__title"><?php echo esc_html( $ui( 'doroshopping_ui_checkout_summary' ) ); ?></h2>
 
     <div class="doro-checkout-summary__rows">
         <div class="doro-checkout-summary__row">
-            <span><?php esc_html_e( 'Subtotal', 'doroshopping' ); ?></span>
+            <span><?php echo esc_html( $ui( 'doroshopping_ui_checkout_subtotal' ) ); ?></span>
             <span><?php wc_cart_totals_subtotal_html(); ?></span>
         </div>
 
@@ -63,11 +88,11 @@ $cart = WC()->cart;
     </div>
 
     <div class="doro-checkout-summary__tax-note">
-        <?php esc_html_e( 'No se cobrarán impuestos adicionales al entregar', 'doroshopping' ); ?>
+        <?php echo esc_html( $ui( 'doroshopping_ui_checkout_tax_note' ) ); ?>
     </div>
 
     <div class="doro-checkout-summary__total">
-        <span><?php esc_html_e( 'Total', 'doroshopping' ); ?></span>
+        <span><?php echo esc_html( $ui( 'doroshopping_ui_checkout_total' ) ); ?></span>
         <strong><?php wc_cart_totals_order_total_html(); ?></strong>
     </div>
 
@@ -86,7 +111,12 @@ $cart = WC()->cart;
 
         <?php do_action( 'woocommerce_review_order_before_submit' ); ?>
 
-        <?php echo apply_filters( 'woocommerce_order_button_html', '<button type="submit" class="button alt doro-checkout-summary__cta" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( __( 'Realizar pedido', 'doroshopping' ) ) . '" data-value="' . esc_attr( __( 'Realizar pedido', 'doroshopping' ) ) . '">' . esc_html( __( 'Realizar pedido', 'doroshopping' ) ) . '</button>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+        <?php
+        echo apply_filters( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            'woocommerce_order_button_html',
+            '<button type="submit" class="button alt doro-checkout-summary__cta" name="woocommerce_checkout_place_order" id="place_order" value="' . esc_attr( $place_order ) . '" data-value="' . esc_attr( $place_order ) . '">' . esc_html( $place_order ) . '</button>'
+        );
+        ?>
 
         <?php do_action( 'woocommerce_review_order_after_submit' ); ?>
 
@@ -94,15 +124,6 @@ $cart = WC()->cart;
     </div>
 
     <p class="doro-checkout-summary__legal">
-        <?php
-        echo wp_kses_post(
-            sprintf(
-                /* translators: 1: terms URL, 2: privacy URL */
-                __( 'Al realizar el pedido aceptas nuestros <a href="%1$s">términos y condiciones</a> y la <a href="%2$s">política de privacidad</a>.', 'doroshopping' ),
-                esc_url( doroshopping_get_page_url( 'terminos-y-condiciones' ) ),
-                esc_url( doroshopping_get_page_url( 'politica-de-privacidad' ) )
-            )
-        );
-        ?>
+        <?php echo wp_kses_post( $legal_html ); ?>
     </p>
 </div>

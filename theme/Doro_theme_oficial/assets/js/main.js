@@ -153,7 +153,10 @@ function initAddressModal() {
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('doro-modal-open');
         if (titleEl) {
-            titleEl.textContent = mode === 'edit' ? 'Editar direcci?n de entrega' : 'A?adir nueva direcci?n';
+            var shipI18n = (window.doroshoppingShipping && window.doroshoppingShipping.i18n) ? window.doroshoppingShipping.i18n : {};
+            titleEl.textContent = mode === 'edit'
+                ? (shipI18n.addressEdit || 'Editar dirección')
+                : (shipI18n.addressAdd || 'Añadir nueva dirección');
         }
         clearFieldErrors();
         if (bodyEl) {
@@ -292,7 +295,7 @@ function initAddressModal() {
         if (!name && !address) {
             var emptyMsg = (window.doroshoppingShipping && window.doroshoppingShipping.i18n && window.doroshoppingShipping.i18n.emptyAddress)
                 ? window.doroshoppingShipping.i18n.emptyAddress
-                : 'A?n no has a?adido una direcci?n de entrega.';
+                : 'Aún no has añadido una dirección de entrega.';
             preview.innerHTML = '<p class="doro-checkout-address__empty">' + esc(emptyMsg) + '</p>';
             syncEditButton();
             return;
@@ -490,7 +493,7 @@ function initShopLoadMore() {
         loading = true;
         btn.classList.add('is-loading');
         btn.disabled = true;
-        btn.textContent = (window.doroshoppingI18n && window.doroshoppingI18n.loading) ? window.doroshoppingI18n.loading : 'Cargando?';
+        btn.textContent = (window.doroshoppingI18n && window.doroshoppingI18n.loading) ? window.doroshoppingI18n.loading : 'Cargando…';
 
         fetch(nextUrl, { credentials: 'same-origin' })
             .then(function (res) { return res.text(); })
@@ -698,7 +701,7 @@ function initHomeLoadMore() {
         var link = document.createElement('a');
         link.className = 'doro-load-more__btn';
         link.href = shopUrl;
-        link.textContent = i18n.viewShop || 'Ver m?s en la tienda';
+        link.textContent = i18n.viewShop || 'Ver más en la tienda';
         wrap.appendChild(link);
     }
 
@@ -721,7 +724,7 @@ function initHomeLoadMore() {
         loading = true;
         btn.disabled = true;
         btn.classList.add('is-loading');
-        btn.textContent = i18n.loading || 'Cargando?';
+        btn.textContent = i18n.loading || 'Cargando…';
 
         var body = new FormData();
         body.append('action', 'doroshopping_home_load_more');
@@ -757,7 +760,7 @@ function initHomeLoadMore() {
 
                 btn.disabled = false;
                 btn.classList.remove('is-loading');
-                btn.textContent = i18n.viewMore || 'Ver m?s';
+                btn.textContent = i18n.viewMore || 'Ver más';
             })
             .catch(function () {
                 switchToShop();
@@ -2373,7 +2376,7 @@ function initProductDescriptionClamp() {
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'doro-desc-clamp__toggle';
-        btn.textContent = 'Leer m?s';
+        btn.textContent = 'Leer más';
         btn.setAttribute('aria-expanded', 'false');
 
         wrap.appendChild(inner);
@@ -2391,7 +2394,7 @@ function initProductDescriptionClamp() {
             btn.addEventListener('click', function () {
                 var collapsed = wrap.classList.toggle('is-collapsed');
                 // toggle returns true if class was added (= collapsed)
-                btn.textContent = collapsed ? 'Leer m?s' : 'Leer menos';
+                btn.textContent = collapsed ? 'Leer más' : 'Leer menos';
                 btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
             });
         });
@@ -2728,16 +2731,25 @@ function initBigBuyShipping() {
     var roots = Array.prototype.slice.call(document.querySelectorAll('[data-doro-shipping]'));
     if (!roots.length) return;
 
-    var FALLBACKS = {
-        DE: { carrier: 'DHL / DPD', time: '3 - 5 dias habiles', cost: '8.90 EUR' },
-        GB: { carrier: 'Royal Mail / DHL', time: '5 - 8 dias habiles', cost: '12.90 GBP' },
-        UK: { carrier: 'Royal Mail / DHL', time: '5 - 8 dias habiles', cost: '12.90 GBP' },
-        ES: { carrier: 'Correos Express / SEUR', time: '2 - 4 dias habiles', cost: '6.90 EUR' },
-        FR: { carrier: 'Colissimo / DHL', time: '3 - 5 dias habiles', cost: '7.90 EUR' },
-        IT: { carrier: 'BRT / DHL', time: '4 - 6 dias habiles', cost: '8.90 EUR' },
-        PT: { carrier: 'CTT / DHL', time: '3 - 5 dias habiles', cost: '6.90 EUR' },
-        CH: { carrier: 'Swiss Post / DHL', time: '5 - 8 dias habiles', cost: '14.90 CHF' }
+    var FALLBACKS = (cfg && cfg.fallbacks) ? cfg.fallbacks : {
+        DE: { carrier: 'DHL / DPD', range: '3 - 5', cost: '8.90 EUR' },
+        GB: { carrier: 'Royal Mail / DHL', range: '5 - 8', cost: '12.90 GBP' },
+        UK: { carrier: 'Royal Mail / DHL', range: '5 - 8', cost: '12.90 GBP' },
+        ES: { carrier: 'Correos Express / SEUR', range: '2 - 4', cost: '6.90 EUR' },
+        FR: { carrier: 'Colissimo / DHL', range: '3 - 5', cost: '7.90 EUR' },
+        IT: { carrier: 'BRT / DHL', range: '4 - 6', cost: '8.90 EUR' },
+        PT: { carrier: 'CTT / DHL', range: '3 - 5', cost: '6.90 EUR' },
+        CH: { carrier: 'Swiss Post / DHL', range: '5 - 8', cost: '14.90 CHF' }
     };
+
+    function formatEta(range) {
+        var tpl = (cfg && cfg.i18n && cfg.i18n.etaDays) || '%s dias habiles';
+        return String(tpl).replace('%s', range || '');
+    }
+
+    function fallbackNote() {
+        return (cfg && cfg.i18n && cfg.i18n.note) || 'Coste estimado segun destino. El importe final puede variar ligeramente en checkout.';
+    }
 
     function readCookie(name) {
         var parts = (document.cookie || '').split(';');
@@ -2770,13 +2782,14 @@ function initBigBuyShipping() {
 
     function fallback(code) {
         var data = FALLBACKS[code] || FALLBACKS.ES;
+        var range = data.range || data.time || '';
         return {
             success: true,
             source: 'fallback',
             carrier: data.carrier,
-            time: data.time,
+            time: data.range ? formatEta(data.range) : range,
             cost: data.cost,
-            note: 'Coste estimado segun destino. El importe final puede variar ligeramente en checkout.',
+            note: fallbackNote(),
             country: code
         };
     }
@@ -2939,7 +2952,7 @@ function initLegalPageToc() {
         var li = document.createElement('li');
         var a = document.createElement('a');
         a.href = '#' + id;
-        a.textContent = h.textContent || ('Secci?n ' + (i + 1));
+        a.textContent = h.textContent || ('Sección ' + (i + 1));
         li.appendChild(a);
         list.appendChild(li);
     });

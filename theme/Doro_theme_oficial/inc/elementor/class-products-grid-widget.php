@@ -164,7 +164,13 @@ class Products_Grid_Widget extends \Elementor\Widget_Base {
             ?>
             <div class="doro-load-more">
                 <a class="doro-load-more__btn" href="<?php echo esc_url( $more_url ); ?>">
-                    <?php esc_html_e( 'Ver más', 'doroshopping' ); ?>
+                    <?php
+                    echo esc_html(
+                        function_exists( 'doroshopping_ui_text' )
+                            ? doroshopping_ui_text( 'doroshopping_ui_home_ver_mas' )
+                            : __( 'Ver más', 'doroshopping' )
+                    );
+                    ?>
                 </a>
             </div>
         </section>

@@ -98,6 +98,9 @@ function doroshopping_shop_load_more_button() {
 
     $next_page = $current + 1;
     $next_url  = get_pagenum_link( $next_page, false );
+    $view_more = function_exists( 'doroshopping_ui_text' )
+        ? doroshopping_ui_text( 'doroshopping_ui_home_ver_mas' )
+        : __( 'Ver más', 'doroshopping' );
     ?>
     <div class="doro-load-more" data-doro-load-more>
         <button
@@ -108,7 +111,7 @@ function doroshopping_shop_load_more_button() {
             data-next-page="<?php echo esc_attr( (string) $next_page ); ?>"
             data-total-pages="<?php echo esc_attr( (string) $total ); ?>"
         >
-            <?php esc_html_e( 'Ver más', 'doroshopping' ); ?>
+            <?php echo esc_html( $view_more ); ?>
         </button>
     </div>
     <?php
@@ -133,11 +136,17 @@ function doroshopping_single_rating() {
     echo '<div class="doro-product__rating-row">';
     echo doroshopping_get_star_rating_html( $rating, $count ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     if ( $count > 0 ) {
-        echo '<a class="doro-product__rating-count" href="#tab-reviews">' . esc_html( sprintf( _n( '%d valoracion', '%d valoraciones', $count, 'doroshopping' ), $count ) ) . '</a>';
+        $reviews_key = ( 1 === $count ) ? 'doroshopping_ui_product_reviews_one' : 'doroshopping_ui_product_reviews_many';
+        $reviews_txt = function_exists( 'doroshopping_ui_sprintf' )
+            ? doroshopping_ui_sprintf( $reviews_key, $count )
+            : sprintf( _n( '%d valoracion', '%d valoraciones', $count, 'doroshopping' ), $count );
+        echo '<a class="doro-product__rating-count" href="#tab-reviews">' . esc_html( $reviews_txt ) . '</a>';
     }
     if ( $sold > 0 ) {
-        /* translators: %s: number of sales */
-        echo '<span class="doro-product__sold">' . esc_html( sprintf( __( '%s+ vendidos', 'doroshopping' ), number_format_i18n( $sold ) ) ) . '</span>';
+        $sold_txt = function_exists( 'doroshopping_ui_sprintf' )
+            ? doroshopping_ui_sprintf( 'doroshopping_ui_product_sold', number_format_i18n( $sold ) )
+            : sprintf( __( '%s+ vendidos', 'doroshopping' ), number_format_i18n( $sold ) );
+        echo '<span class="doro-product__sold">' . esc_html( $sold_txt ) . '</span>';
     }
     echo '</div>';
 }
@@ -243,6 +252,15 @@ function doroshopping_more_products_section() {
 
     $shown         = count( $ids );
     $can_load_more = $shown >= $batch && $shown < $max_limit;
+    $more_title    = function_exists( 'doroshopping_ui_text' )
+        ? doroshopping_ui_text( 'doroshopping_ui_product_more_title' )
+        : __( 'Más productos para ti', 'doroshopping' );
+    $view_more     = function_exists( 'doroshopping_ui_text' )
+        ? doroshopping_ui_text( 'doroshopping_ui_home_ver_mas' )
+        : __( 'Ver más', 'doroshopping' );
+    $view_shop     = function_exists( 'doroshopping_ui_text' )
+        ? doroshopping_ui_text( 'doroshopping_ui_home_ver_mas_shop' )
+        : __( 'Ver más en la tienda', 'doroshopping' );
     ?>
     <section
         id="doro-more-products"
@@ -255,7 +273,7 @@ function doroshopping_more_products_section() {
         data-max="<?php echo esc_attr( (string) $max_limit ); ?>"
         data-shop-url="<?php echo esc_url( $shop_url ); ?>"
     >
-        <h2 class="doro-product__more-title"><?php esc_html_e( 'Más productos para ti', 'doroshopping' ); ?></h2>
+        <h2 class="doro-product__more-title"><?php echo esc_html( $more_title ); ?></h2>
         <ul class="products columns-5" data-product-more-grid>
             <?php
             foreach ( $ids as $product_id ) {
@@ -276,11 +294,11 @@ function doroshopping_more_products_section() {
                     class="doro-load-more__btn"
                     data-product-more-btn
                 >
-                    <?php esc_html_e( 'Ver más', 'doroshopping' ); ?>
+                    <?php echo esc_html( $view_more ); ?>
                 </button>
             <?php else : ?>
                 <a class="doro-load-more__btn" href="<?php echo esc_url( $shop_url ); ?>">
-                    <?php esc_html_e( 'Ver más en la tienda', 'doroshopping' ); ?>
+                    <?php echo esc_html( $view_shop ); ?>
                 </a>
             <?php endif; ?>
         </div>

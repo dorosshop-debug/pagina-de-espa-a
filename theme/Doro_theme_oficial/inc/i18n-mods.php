@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Theme mods por idioma + herramientas Polylang (páginas).
  *
@@ -219,6 +219,49 @@ function doroshopping_ui_sprintf( $key, ...$args ) {
 	} catch ( \ArgumentCountError $e ) {
 		return $template;
 	}
+}
+
+/**
+ * Etiqueta de país desde Textos UI (Personalizar).
+ *
+ * @param string $code ISO2.
+ * @return string
+ */
+function doroshopping_ui_country_label( $code ) {
+	$code = strtoupper( sanitize_text_field( (string) $code ) );
+	if ( 'UK' === $code ) {
+		$code = 'GB';
+	}
+
+	$map = array(
+		'ES' => 'doroshopping_ui_country_es',
+		'PT' => 'doroshopping_ui_country_pt',
+		'FR' => 'doroshopping_ui_country_fr',
+		'DE' => 'doroshopping_ui_country_de',
+		'IT' => 'doroshopping_ui_country_it',
+		'CH' => 'doroshopping_ui_country_ch',
+		'GB' => 'doroshopping_ui_country_gb',
+	);
+
+	if ( isset( $map[ $code ] ) ) {
+		return doroshopping_ui_text( $map[ $code ] );
+	}
+
+	return $code;
+}
+
+/**
+ * Tiempo estimado “X - Y días hábiles” multiidioma.
+ *
+ * @param string $range Rango numérico, p. ej. "2 - 4".
+ * @return string
+ */
+function doroshopping_ui_eta_days( $range ) {
+	$range = trim( (string) $range );
+	if ( '' === $range ) {
+		return '';
+	}
+	return doroshopping_ui_sprintf( 'doroshopping_ui_product_eta_days', $range );
 }
 
 /**

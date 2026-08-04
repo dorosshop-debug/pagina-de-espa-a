@@ -147,6 +147,9 @@ function doroshopping_enqueue_assets() {
     wp_enqueue_script( 'doroshopping-main', $uri . '/js/main.js', $script_deps, $ver, true );
 
     $cart_count = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+    $ui         = static function ( $key, $fallback = '' ) {
+        return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : $fallback;
+    };
 
     wp_localize_script(
         'doroshopping-main',
@@ -155,9 +158,9 @@ function doroshopping_enqueue_assets() {
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( 'doroshopping_home' ),
             'i18n'    => array(
-                'loading'  => __( 'Cargando…', 'doroshopping' ),
-                'viewMore' => __( 'Ver más', 'doroshopping' ),
-                'viewShop' => __( 'Ver más en la tienda', 'doroshopping' ),
+                'loading'  => $ui( 'doroshopping_ui_loading', __( 'Cargando…', 'doroshopping' ) ),
+                'viewMore' => $ui( 'doroshopping_ui_home_ver_mas', __( 'Ver más', 'doroshopping' ) ),
+                'viewShop' => $ui( 'doroshopping_ui_home_ver_mas_shop', __( 'Ver más en la tienda', 'doroshopping' ) ),
             ),
         )
     );
@@ -169,9 +172,9 @@ function doroshopping_enqueue_assets() {
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( 'doroshopping_product_more' ),
             'i18n'    => array(
-                'loading'  => __( 'Cargando…', 'doroshopping' ),
-                'viewMore' => __( 'Ver más', 'doroshopping' ),
-                'viewShop' => __( 'Ver más en la tienda', 'doroshopping' ),
+                'loading'  => $ui( 'doroshopping_ui_loading', __( 'Cargando…', 'doroshopping' ) ),
+                'viewMore' => $ui( 'doroshopping_ui_home_ver_mas', __( 'Ver más', 'doroshopping' ) ),
+                'viewShop' => $ui( 'doroshopping_ui_home_ver_mas_shop', __( 'Ver más en la tienda', 'doroshopping' ) ),
             ),
         )
     );
@@ -259,6 +262,12 @@ function doroshopping_enqueue_assets() {
         }
     }
 
+    $country_ui = static function ( $code, $fallback ) {
+        return function_exists( 'doroshopping_ui_country_label' )
+            ? doroshopping_ui_country_label( $code )
+            : $fallback;
+    };
+
     wp_localize_script(
         'doroshopping-main',
         'doroshoppingShipping',
@@ -266,23 +275,39 @@ function doroshopping_enqueue_assets() {
             'restUrl'   => esc_url_raw( rest_url( 'doro/v1/bigbuy-shipping' ) ),
             'nonce'     => wp_create_nonce( 'wp_rest' ),
             'country'   => isset( $loc['code'] ) ? $loc['code'] : 'ES',
-            'label'     => isset( $loc['label'] ) ? $loc['label'] : 'España',
+            'label'     => isset( $loc['code'] ) && function_exists( 'doroshopping_ui_country_label' )
+                ? doroshopping_ui_country_label( $loc['code'] )
+                : ( isset( $loc['label'] ) ? $loc['label'] : 'España' ),
             'postcode'  => function_exists( 'doroshopping_get_shipping_postcode' ) ? doroshopping_get_shipping_postcode() : '',
             'cartLines' => $cart_lines,
             'labels'    => array(
-                'ES' => __( 'España', 'doroshopping' ),
-                'PT' => __( 'Portugal', 'doroshopping' ),
-                'FR' => __( 'Francia', 'doroshopping' ),
-                'DE' => __( 'Alemania', 'doroshopping' ),
-                'IT' => __( 'Italia', 'doroshopping' ),
-                'GB' => __( 'Reino Unido', 'doroshopping' ),
-                'UK' => __( 'Reino Unido', 'doroshopping' ),
-                'CH' => __( 'Suiza', 'doroshopping' ),
+                'ES' => $country_ui( 'ES', __( 'España', 'doroshopping' ) ),
+                'PT' => $country_ui( 'PT', __( 'Portugal', 'doroshopping' ) ),
+                'FR' => $country_ui( 'FR', __( 'Francia', 'doroshopping' ) ),
+                'DE' => $country_ui( 'DE', __( 'Alemania', 'doroshopping' ) ),
+                'IT' => $country_ui( 'IT', __( 'Italia', 'doroshopping' ) ),
+                'GB' => $country_ui( 'GB', __( 'Reino Unido', 'doroshopping' ) ),
+                'UK' => $country_ui( 'GB', __( 'Reino Unido', 'doroshopping' ) ),
+                'CH' => $country_ui( 'CH', __( 'Suiza', 'doroshopping' ) ),
+            ),
+            'fallbacks' => array(
+                'DE' => array( 'carrier' => 'DHL / DPD', 'range' => '3 - 5', 'cost' => '8.90 EUR' ),
+                'GB' => array( 'carrier' => 'Royal Mail / DHL', 'range' => '5 - 8', 'cost' => '12.90 GBP' ),
+                'UK' => array( 'carrier' => 'Royal Mail / DHL', 'range' => '5 - 8', 'cost' => '12.90 GBP' ),
+                'ES' => array( 'carrier' => 'Correos Express / SEUR', 'range' => '2 - 4', 'cost' => '6.90 EUR' ),
+                'FR' => array( 'carrier' => 'Colissimo / DHL', 'range' => '3 - 5', 'cost' => '7.90 EUR' ),
+                'IT' => array( 'carrier' => 'BRT / DHL', 'range' => '4 - 6', 'cost' => '8.90 EUR' ),
+                'PT' => array( 'carrier' => 'CTT / DHL', 'range' => '3 - 5', 'cost' => '6.90 EUR' ),
+                'CH' => array( 'carrier' => 'Swiss Post / DHL', 'range' => '5 - 8', 'cost' => '14.90 CHF' ),
             ),
             'i18n'      => array(
-                'loading'      => __( 'Calculando envío…', 'doroshopping' ),
-                'error'        => __( 'No se pudo calcular el envío.', 'doroshopping' ),
-                'emptyAddress' => __( 'Aún no has añadido una dirección de entrega.', 'doroshopping' ),
+                'loading'      => $ui( 'doroshopping_ui_ship_calc_loading', __( 'Calculando envío…', 'doroshopping' ) ),
+                'error'        => $ui( 'doroshopping_ui_ship_calc_error', __( 'No se pudo calcular el envío.', 'doroshopping' ) ),
+                'emptyAddress' => $ui( 'doroshopping_ui_checkout_empty_address', $ui( 'doroshopping_ui_ship_empty', __( 'Aún no has añadido una dirección de entrega.', 'doroshopping' ) ) ),
+                'addressAdd'   => $ui( 'doroshopping_ui_checkout_address_modal_title', __( 'Añadir nueva dirección', 'doroshopping' ) ),
+                'addressEdit'  => $ui( 'doroshopping_ui_checkout_edit_address', __( 'Editar dirección', 'doroshopping' ) ),
+                'etaDays'      => $ui( 'doroshopping_ui_product_eta_days', __( '%s días hábiles', 'doroshopping' ) ),
+                'note'         => $ui( 'doroshopping_ui_product_ship_note', __( 'Coste estimado según destino. El importe final puede variar ligeramente en checkout.', 'doroshopping' ) ),
             ),
             'localeMap' => function_exists( 'doroshopping_get_location_locale_map' ) ? doroshopping_get_location_locale_map() : array(),
             'preview'   => false,

@@ -62,8 +62,10 @@ $ready     = ! empty( $shipping['ready'] ) || ( $carrier || $eta || $cost_html )
 $stock_qty  = $product->managing_stock() ? $product->get_stock_quantity() : null;
 $stock_text = '';
 if ( null !== $stock_qty && $stock_qty > 0 ) {
-    /* translators: %d: stock quantity */
-    $stock_text = sprintf( _n( 'Solo quedan %d disponible', 'Solo quedan %d disponibles', $stock_qty, 'doroshopping' ), $stock_qty );
+    $stock_key  = ( 1 === (int) $stock_qty ) ? 'doroshopping_ui_product_stock_one' : 'doroshopping_ui_product_stock_many';
+    $stock_text = function_exists( 'doroshopping_ui_sprintf' )
+        ? doroshopping_ui_sprintf( $stock_key, $stock_qty )
+        : sprintf( _n( 'Solo quedan %d disponible', 'Solo quedan %d disponibles', $stock_qty, 'doroshopping' ), $stock_qty );
 } elseif ( ! $product->is_in_stock() ) {
     $stock_text = $ui( 'doroshopping_ui_product_out_of_stock' );
 }

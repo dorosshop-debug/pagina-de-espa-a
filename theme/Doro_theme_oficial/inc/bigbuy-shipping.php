@@ -99,58 +99,65 @@ function doroshopping_bigbuy_shipping_fallback( $country, $reason = '' ) {
     $fallbacks = array(
         'DE' => array(
             'carrier' => 'DHL / DPD',
-            'time'    => '3 - 5 días hábiles',
+            'range'   => '3 - 5',
             'cost'    => '8.90 EUR',
         ),
         'GB' => array(
             'carrier' => 'Royal Mail / DHL',
-            'time'    => '5 - 8 días hábiles',
+            'range'   => '5 - 8',
             'cost'    => '12.90 GBP',
         ),
         'UK' => array(
             'carrier' => 'Royal Mail / DHL',
-            'time'    => '5 - 8 días hábiles',
+            'range'   => '5 - 8',
             'cost'    => '12.90 GBP',
         ),
         'ES' => array(
             'carrier' => 'Correos Express / SEUR',
-            'time'    => '2 - 4 días hábiles',
+            'range'   => '2 - 4',
             'cost'    => '6.90 EUR',
         ),
         'FR' => array(
             'carrier' => 'Colissimo / DHL',
-            'time'    => '3 - 5 días hábiles',
+            'range'   => '3 - 5',
             'cost'    => '7.90 EUR',
         ),
         'IT' => array(
             'carrier' => 'BRT / DHL',
-            'time'    => '4 - 6 días hábiles',
+            'range'   => '4 - 6',
             'cost'    => '8.90 EUR',
         ),
         'PT' => array(
             'carrier' => 'CTT / DHL',
-            'time'    => '3 - 5 días hábiles',
+            'range'   => '3 - 5',
             'cost'    => '6.90 EUR',
         ),
         'CH' => array(
             'carrier' => 'Swiss Post / DHL',
-            'time'    => '5 - 8 días hábiles',
+            'range'   => '5 - 8',
             'cost'    => '14.90 CHF',
         ),
     );
 
     $data = isset( $fallbacks[ $country ] ) ? $fallbacks[ $country ] : $fallbacks['ES'];
+    $time = function_exists( 'doroshopping_ui_eta_days' )
+        ? doroshopping_ui_eta_days( $data['range'] )
+        : ( $data['range'] . ' días hábiles' );
 
-    $note = __( 'Coste estimado según destino. El importe final puede variar ligeramente en checkout.', 'doroshopping' );
+    $note = function_exists( 'doroshopping_ui_text' )
+        ? doroshopping_ui_text( 'doroshopping_ui_product_ship_note' )
+        : __( 'Coste estimado según destino. El importe final puede variar ligeramente en checkout.', 'doroshopping' );
     if ( $reason && ! doroshopping_bigbuy_api_key() ) {
-        $note = __( 'Estimación local. Configura la API key de BigBuy en Personalizar o wp-config.', 'doroshopping' );
+        $note = function_exists( 'doroshopping_ui_text' )
+            ? doroshopping_ui_text( 'doroshopping_ui_product_ship_note_local' )
+            : __( 'Estimación local. Configura la API key de BigBuy en Personalizar o wp-config.', 'doroshopping' );
     }
 
     return array(
         'success'  => true,
         'source'   => 'fallback',
         'carrier'  => $data['carrier'],
-        'time'     => $data['time'],
+        'time'     => $time,
         'cost'     => $data['cost'],
         'note'     => $note,
         'country'  => $country,
@@ -274,7 +281,9 @@ function doroshopping_parse_bigbuy_shipping_response( $body, $country ) {
         'carrier' => $best['carrier'],
         'time'    => $best['time'],
         'cost'    => $best['cost_label'],
-        'note'    => __( 'Tarifa BigBuy (opción más económica). El coste final puede variar en checkout.', 'doroshopping' ),
+        'note'    => function_exists( 'doroshopping_ui_text' )
+            ? doroshopping_ui_text( 'doroshopping_ui_product_ship_note_api' )
+            : __( 'Tarifa BigBuy (opción más económica). El coste final puede variar en checkout.', 'doroshopping' ),
         'country' => strtoupper( $country ),
         'options' => array_slice( $options, 0, 5 ),
         'mode'    => doroshopping_bigbuy_mode(),
@@ -578,7 +587,9 @@ function doroshopping_filter_product_shipping_estimate( $estimate, $product ) {
     $country = isset( $loc['code'] ) ? $loc['code'] : 'ES';
     $quote   = doroshopping_bigbuy_shipping_fallback( $country, 'ssr' );
 
-    $estimate['destination'] = isset( $loc['label'] ) ? $loc['label'] : $country;
+    $estimate['destination'] = function_exists( 'doroshopping_ui_country_label' )
+        ? doroshopping_ui_country_label( $country )
+        : ( isset( $loc['label'] ) ? $loc['label'] : $country );
     $estimate['carrier']     = isset( $quote['carrier'] ) ? $quote['carrier'] : '';
     $estimate['eta']         = isset( $quote['time'] ) ? $quote['time'] : '';
     $estimate['cost_html']   = isset( $quote['cost'] ) ? esc_html( $quote['cost'] ) : '';
@@ -599,6 +610,9 @@ add_filter( 'doroshopping_product_shipping_estimate', 'doroshopping_filter_produ
 function doroshopping_filter_shipping_destination_label( $label ) {
     if ( function_exists( 'doroshopping_get_header_location' ) ) {
         $loc = doroshopping_get_header_location();
+        if ( ! empty( $loc['code'] ) && function_exists( 'doroshopping_ui_country_label' ) ) {
+            return doroshopping_ui_country_label( $loc['code'] );
+        }
         if ( ! empty( $loc['label'] ) ) {
             return $loc['label'];
         }

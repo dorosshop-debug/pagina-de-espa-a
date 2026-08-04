@@ -154,6 +154,11 @@ function doroshopping_i18n_ui_page_defaults() {
 			'label'   => __( 'Envio: codigo postal', 'doroshopping' ),
 			'section' => 'doroshopping_ui_shipping',
 		),
+		'doroshopping_ui_ship_empty'             => array(
+			'default' => __( 'Aún no has añadido una dirección de entrega.', 'doroshopping' ),
+			'label'   => __( 'Envio: sin direccion', 'doroshopping' ),
+			'section' => 'doroshopping_ui_shipping',
+		),
 		'doroshopping_ui_ship_save'              => array(
 			'default' => __( 'Guardar dirección', 'doroshopping' ),
 			'label'   => __( 'Envio: guardar', 'doroshopping' ),
@@ -495,6 +500,44 @@ function doroshopping_i18n_ui_page_defaults() {
 			'label'   => __( 'Checkout: cancelar', 'doroshopping' ),
 			'section' => 'doroshopping_ui_checkout',
 		),
+		'doroshopping_ui_checkout_summary'       => array(
+			'default' => __( 'Resumen', 'doroshopping' ),
+			'label'   => __( 'Checkout: resumen', 'doroshopping' ),
+			'section' => 'doroshopping_ui_checkout',
+		),
+		'doroshopping_ui_checkout_subtotal'      => array(
+			'default' => __( 'Subtotal', 'doroshopping' ),
+			'label'   => __( 'Checkout: subtotal', 'doroshopping' ),
+			'section' => 'doroshopping_ui_checkout',
+		),
+		'doroshopping_ui_checkout_total'         => array(
+			'default' => __( 'Total', 'doroshopping' ),
+			'label'   => __( 'Checkout: total', 'doroshopping' ),
+			'section' => 'doroshopping_ui_checkout',
+		),
+		'doroshopping_ui_checkout_tax_note'      => array(
+			'default' => __( 'No se cobrarán impuestos adicionales al entregar', 'doroshopping' ),
+			'label'   => __( 'Checkout: nota impuestos', 'doroshopping' ),
+			'section' => 'doroshopping_ui_checkout',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_checkout_place_order'   => array(
+			'default' => __( 'Realizar pedido', 'doroshopping' ),
+			'label'   => __( 'Checkout: realizar pedido', 'doroshopping' ),
+			'section' => 'doroshopping_ui_checkout',
+		),
+		'doroshopping_ui_checkout_empty_address' => array(
+			'default' => __( 'Aún no has añadido una dirección de entrega.', 'doroshopping' ),
+			'label'   => __( 'Checkout: sin direccion', 'doroshopping' ),
+			'section' => 'doroshopping_ui_checkout',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_checkout_legal'         => array(
+			'default' => __( 'Al realizar el pedido aceptas nuestros <a href="%1$s">términos y condiciones</a> y la <a href="%2$s">política de privacidad</a>.', 'doroshopping' ),
+			'label'   => __( 'Checkout: aviso legal (usa %1$s y %2$s)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_checkout',
+			'type'    => 'textarea',
+		),
 		'doroshopping_ui_thankyou_fail_title'    => array(
 			'default' => __( 'El pago no se completó', 'doroshopping' ),
 			'label'   => __( 'Gracias: fallo titulo', 'doroshopping' ),
@@ -795,6 +838,73 @@ function doroshopping_i18n_ui_page_defaults() {
 		'doroshopping_ui_product_out_of_stock'   => array(
 			'default' => __( 'Agotado', 'doroshopping' ),
 			'label'   => __( 'Producto: agotado', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_more_title'     => array(
+			'default' => __( 'Más productos para ti', 'doroshopping' ),
+			'label'   => __( 'Producto: mas productos titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_buy_now'        => array(
+			'default' => __( 'Ir a la compra', 'doroshopping' ),
+			'label'   => __( 'Producto: ir a la compra', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_stock_one'      => array(
+			'default' => __( 'Solo quedan %d disponible', 'doroshopping' ),
+			'label'   => __( 'Producto: stock singular (usa %d)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_stock_many'     => array(
+			'default' => __( 'Solo quedan %d disponibles', 'doroshopping' ),
+			'label'   => __( 'Producto: stock plural (usa %d)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_eta_days'       => array(
+			'default' => __( '%s días hábiles', 'doroshopping' ),
+			'label'   => __( 'Producto: dias habiles (usa %s, ej. 2 - 4)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_ship_note_api'  => array(
+			'default' => __( 'Tarifa BigBuy (opción más económica). El coste final puede variar en checkout.', 'doroshopping' ),
+			'label'   => __( 'Producto: nota envio API', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_product_ship_note_local'=> array(
+			'default' => __( 'Estimación local. Configura la API key de BigBuy en Personalizar o wp-config.', 'doroshopping' ),
+			'label'   => __( 'Producto: nota envio local', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_product_reviews_one'    => array(
+			'default' => __( '%d valoracion', 'doroshopping' ),
+			'label'   => __( 'Producto: valoracion singular (usa %d)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_reviews_many'   => array(
+			'default' => __( '%d valoraciones', 'doroshopping' ),
+			'label'   => __( 'Producto: valoraciones plural (usa %d)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_product_sold'           => array(
+			'default' => __( '%s+ vendidos', 'doroshopping' ),
+			'label'   => __( 'Producto: vendidos (usa %s)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_loading'                => array(
+			'default' => __( 'Cargando…', 'doroshopping' ),
+			'label'   => __( 'General: cargando', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_ship_calc_loading'      => array(
+			'default' => __( 'Calculando envío…', 'doroshopping' ),
+			'label'   => __( 'Envio: calculando', 'doroshopping' ),
+			'section' => 'doroshopping_ui_product',
+		),
+		'doroshopping_ui_ship_calc_error'        => array(
+			'default' => __( 'No se pudo calcular el envío.', 'doroshopping' ),
+			'label'   => __( 'Envio: error calculo', 'doroshopping' ),
 			'section' => 'doroshopping_ui_product',
 		),
 		'doroshopping_ui_product_trust_security' => array(

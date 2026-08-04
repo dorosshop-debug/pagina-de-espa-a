@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Template Name: Lista de deseos
  * Template post type: page

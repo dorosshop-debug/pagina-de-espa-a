@@ -420,14 +420,19 @@ function doroshopping_apply_currency( $currency ) {
  */
 function doroshopping_get_header_location() {
     $flags_uri = get_template_directory_uri() . '/assets/images/flags';
+    $ui_label  = static function ( $code, $fallback ) {
+        return function_exists( 'doroshopping_ui_country_label' )
+            ? doroshopping_ui_country_label( $code )
+            : $fallback;
+    };
     $map       = array(
-        'ES' => array( 'label' => __( 'España', 'doroshopping' ), 'flag' => $flags_uri . '/spain.png', 'lang' => 'es', 'currency' => 'EUR' ),
-        'PT' => array( 'label' => __( 'Portugal', 'doroshopping' ), 'flag' => $flags_uri . '/ptg.png', 'lang' => 'pt', 'currency' => 'EUR' ),
-        'FR' => array( 'label' => __( 'Francia', 'doroshopping' ), 'flag' => $flags_uri . '/francia.png', 'lang' => 'fr', 'currency' => 'EUR' ),
-        'DE' => array( 'label' => __( 'Alemania', 'doroshopping' ), 'flag' => $flags_uri . '/alemania.png', 'lang' => 'de', 'currency' => 'EUR' ),
-        'IT' => array( 'label' => __( 'Italia', 'doroshopping' ), 'flag' => $flags_uri . '/italia.png', 'lang' => 'it', 'currency' => 'EUR' ),
-        'GB' => array( 'label' => __( 'Reino Unido', 'doroshopping' ), 'flag' => $flags_uri . '/reino-unido.png', 'lang' => 'en', 'currency' => 'GBP' ),
-        'CH' => array( 'label' => __( 'Suiza', 'doroshopping' ), 'flag' => $flags_uri . '/suiza.svg', 'lang' => 'fr', 'currency' => 'CHF' ),
+        'ES' => array( 'label' => $ui_label( 'ES', __( 'España', 'doroshopping' ) ), 'flag' => $flags_uri . '/spain.png', 'lang' => 'es', 'currency' => 'EUR' ),
+        'PT' => array( 'label' => $ui_label( 'PT', __( 'Portugal', 'doroshopping' ) ), 'flag' => $flags_uri . '/ptg.png', 'lang' => 'pt', 'currency' => 'EUR' ),
+        'FR' => array( 'label' => $ui_label( 'FR', __( 'Francia', 'doroshopping' ) ), 'flag' => $flags_uri . '/francia.png', 'lang' => 'fr', 'currency' => 'EUR' ),
+        'DE' => array( 'label' => $ui_label( 'DE', __( 'Alemania', 'doroshopping' ) ), 'flag' => $flags_uri . '/alemania.png', 'lang' => 'de', 'currency' => 'EUR' ),
+        'IT' => array( 'label' => $ui_label( 'IT', __( 'Italia', 'doroshopping' ) ), 'flag' => $flags_uri . '/italia.png', 'lang' => 'it', 'currency' => 'EUR' ),
+        'GB' => array( 'label' => $ui_label( 'GB', __( 'Reino Unido', 'doroshopping' ) ), 'flag' => $flags_uri . '/reino-unido.png', 'lang' => 'en', 'currency' => 'GBP' ),
+        'CH' => array( 'label' => $ui_label( 'CH', __( 'Suiza', 'doroshopping' ) ), 'flag' => $flags_uri . '/suiza.svg', 'lang' => 'fr', 'currency' => 'CHF' ),
     );
 
     $code = '';
