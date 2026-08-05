@@ -137,6 +137,10 @@ add_action( 'wp_login', 'doroshopping_merge_wishlist_on_login', 10, 2 );
 function doroshopping_ajax_toggle_wishlist() {
     check_ajax_referer( 'doroshopping_wishlist', 'nonce' );
 
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'wishlist', 40, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
     $product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
     if ( ! $product_id ) {
         wp_send_json_error( array( 'message' => __( 'Producto no valido.', 'doroshopping' ) ), 400 );

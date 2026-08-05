@@ -76,15 +76,15 @@ function doroshopping_geo_normalize_country( $code ) {
  * @return string
  */
 function doroshopping_geo_client_ip() {
-	$candidates = array();
-	if ( ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) ) {
-		$candidates[] = wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	// Reutilizar helper de seguridad (no confiar en X-Forwarded-For genérico).
+	if ( function_exists( 'doroshopping_security_client_ip' ) ) {
+		$ip = doroshopping_security_client_ip();
+		return (string) apply_filters( 'doroshopping_geo_client_ip', $ip );
 	}
-	if ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-		$xff = explode( ',', (string) wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		if ( ! empty( $xff[0] ) ) {
-			$candidates[] = trim( $xff[0] );
-		}
+
+	$candidates = array();
+	if ( ! empty( $_SERVER['HTTP_CF_CONNECTING_IP'] ) && ! empty( $_SERVER['HTTP_CF_RAY'] ) ) {
+		$candidates[] = wp_unslash( $_SERVER['HTTP_CF_CONNECTING_IP'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	}
 	if ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
 		$candidates[] = wp_unslash( $_SERVER['REMOTE_ADDR'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -150,6 +150,10 @@ function doroshopping_geo_set_country_cookie( $country ) {
 	if ( ! $country ) {
 		return;
 	}
+	if ( function_exists( 'doroshopping_set_cookie' ) ) {
+		doroshopping_set_cookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, false );
+		return;
+	}
 	$args = doroshopping_geo_cookie_args();
 	setcookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, $args['path'], $args['domain'], is_ssl(), false );
 	$_COOKIE['doroshopping_country'] = $country;
@@ -161,6 +165,10 @@ function doroshopping_geo_set_country_cookie( $country ) {
  * @return void
  */
 function doroshopping_geo_set_dismiss_cookie() {
+	if ( function_exists( 'doroshopping_set_cookie' ) ) {
+		doroshopping_set_cookie( 'doroshopping_geo_dismiss', '1', time() + ( DAY_IN_SECONDS * 30 ), false );
+		return;
+	}
 	$args = doroshopping_geo_cookie_args();
 	setcookie( 'doroshopping_geo_dismiss', '1', time() + ( DAY_IN_SECONDS * 30 ), $args['path'], $args['domain'], is_ssl(), false );
 	$_COOKIE['doroshopping_geo_dismiss'] = '1';
@@ -477,6 +485,10 @@ function doroshopping_geo_should_probe() {
  */
 function doroshopping_ajax_geo_probe() {
 	check_ajax_referer( 'doroshopping_geo', 'nonce' );
+
+	if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'geo_probe', 20, 60 ) ) {
+		doroshopping_rate_limit_ajax_block();
+	}
 
 	$payload = doroshopping_geo_suggest_payload();
 	if ( ! $payload ) {

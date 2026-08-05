@@ -687,7 +687,7 @@ function doroshopping_customize_register( $wp_customize ) {
             'label'       => __( 'API Key BigBuy', 'doroshopping' ),
             'section'     => 'doroshopping_bigbuy',
             'type'        => 'password',
-            'description' => __( 'Header: Authorization Bearer. Sin clave se usa estimación local por país.', 'doroshopping' ),
+            'description' => __( 'Preferible en wp-config: define(\'DORO_BIGBUY_API_KEY\', \'...\'); Así no se guarda en la BD. Sin clave = estimación local.', 'doroshopping' ),
         )
     );
 
@@ -719,7 +719,16 @@ function doroshopping_customize_register( $wp_customize ) {
         'doroshopping_bigbuy_endpoint',
         array(
             'default'           => '',
-            'sanitize_callback' => 'esc_url_raw',
+            'sanitize_callback' => static function ( $url ) {
+                $url = esc_url_raw( (string) $url );
+                if ( ! $url ) {
+                    return '';
+                }
+                if ( function_exists( 'doroshopping_bigbuy_sanitize_endpoint' ) && ! doroshopping_bigbuy_sanitize_endpoint( $url ) ) {
+                    return '';
+                }
+                return $url;
+            },
         )
     );
     $wp_customize->add_control(
@@ -728,7 +737,7 @@ function doroshopping_customize_register( $wp_customize ) {
             'label'       => __( 'Endpoint shipping (opcional)', 'doroshopping' ),
             'section'     => 'doroshopping_bigbuy',
             'type'        => 'url',
-            'description' => __( 'Vacío = /rest/shipping/orders.json según el entorno. Solo rellénalo si BigBuy te da otra URL.', 'doroshopping' ),
+            'description' => __( 'Solo hosts *.bigbuy.eu por HTTPS. Vacío = endpoint oficial.', 'doroshopping' ),
         )
     );
 
@@ -931,7 +940,7 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
 
 	$lang_control_args = array(
 		'label'       => __( 'Idioma a editar', 'doroshopping' ),
-		'description' => __( 'Elige el idioma y rellena los textos de ese idioma. Si dejas vacío, hereda el español.', 'doroshopping' ),
+		'description' => __( 'Cambia el idioma y edita solo esa traducción. Español se guarda en la clave base; EN/DE/FR/IT/PT en claves independientes (no se pisan entre sí). Vacío = hereda español.', 'doroshopping' ),
 		'type'        => 'select',
 		'choices'     => $choices,
 		'priority'    => 1,
@@ -986,10 +995,17 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
 				: ( ( 0 === strpos( $base_id, 'doroshopping_ui_' ) ) ? 'doroshopping_ui_header' : ( ( false !== strpos( $base_id, 'doroshopping_home_' ) ) ? 'doroshopping_home_grids' : 'doroshopping_home_images' ) );
 
 			$base_setting = $wp_customize->get_setting( $base_id );
-			$default_val  = $base_setting ? $base_setting->default : ( 'media' === $type ? 0 : '' );
-			$sanitize     = ( $base_setting && is_callable( $base_setting->sanitize_callback ) )
+			// Pack embebido como default del Customizer; si no hay, vacío (hereda ES en front).
+			$default_val = ( 'media' === $type ) ? 0 : '';
+			if ( 'media' !== $type && function_exists( 'doroshopping_i18n_builtin_text' ) ) {
+				$builtin = doroshopping_i18n_builtin_text( $base_id, $lang );
+				if ( '' !== $builtin ) {
+					$default_val = $builtin;
+				}
+			}
+			$sanitize = ( $base_setting && is_callable( $base_setting->sanitize_callback ) )
 				? $base_setting->sanitize_callback
-				: ( 'media' === $type ? 'absint' : ( 'url' === $type ? 'esc_url_raw' : 'sanitize_text_field' ) );
+				: ( 'media' === $type ? 'absint' : ( 'url' === $type ? 'esc_url_raw' : ( 'textarea' === $type ? 'sanitize_textarea_field' : 'sanitize_text_field' ) ) );
 
 			$wp_customize->add_setting(
 				$setting_id,
@@ -1068,34 +1084,98 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
 }
 
 /**
- * JS: mostrar/ocultar controles al cambiar “Idioma a editar”.
+ * JS: visibilidad por idioma + redirigir escrituras al setting __{lang}.
+ *
+ * Evita que scripts/consola o controles base sobrescriban el idioma por defecto
+ * cuando “Idioma a editar” no es el default.
  */
 function doroshopping_customize_i18n_controls_js() {
 	$default = function_exists( 'doroshopping_i18n_default_lang' ) ? doroshopping_i18n_default_lang() : 'es';
 	$defs    = function_exists( 'doroshopping_i18n_all_setting_defs' )
 		? array_keys( doroshopping_i18n_all_setting_defs() )
 		: ( function_exists( 'doroshopping_i18n_home_setting_defs' ) ? array_keys( doroshopping_i18n_home_setting_defs() ) : array() );
+	$langs   = function_exists( 'doroshopping_i18n_language_slugs' ) ? doroshopping_i18n_language_slugs() : array( 'es', 'en', 'de', 'fr', 'it', 'pt' );
 	?>
 	<script>
 	(function (api) {
 		if (!api) return;
 		var defaultLang = <?php echo wp_json_encode( $default ); ?>;
 		var baseIds = <?php echo wp_json_encode( array_values( $defs ) ); ?>;
+		var langSlugs = <?php echo wp_json_encode( array_values( $langs ) ); ?>;
+		var baseIdSet = {};
+		baseIds.forEach( function ( id ) { baseIdSet[ id ] = true; } );
+		var redirecting = false;
+		var lastDefaultVals = {};
+
+		function currentEditLang() {
+			var setting = api( 'doroshopping_i18n_edit_lang' );
+			return ( setting && setting.get() ) ? setting.get() : defaultLang;
+		}
+
+		function langSuffixFromControlId( id ) {
+			var i, lang, needle;
+			for ( i = 0; i < langSlugs.length; i++ ) {
+				lang = langSlugs[ i ];
+				if ( lang === defaultLang ) continue;
+				needle = '__' + lang;
+				if ( id.length > needle.length && id.slice( -needle.length ) === needle ) {
+					return { base: id.slice( 0, -needle.length ), lang: lang };
+				}
+			}
+			return null;
+		}
 
 		function syncLangVisibility() {
-			var setting = api( 'doroshopping_i18n_edit_lang' );
-			if ( ! setting ) return;
-			var lang = setting.get() || defaultLang;
-			baseIds.forEach( function ( baseId ) {
-				var defCtrl = api.control( baseId );
-				if ( defCtrl ) {
-					defCtrl.active.set( lang === defaultLang );
+			var lang = currentEditLang();
+			api.control.each( function ( control ) {
+				var id = control.id;
+				var parsed;
+				if ( baseIdSet[ id ] ) {
+					control.active.set( lang === defaultLang );
+					return;
 				}
-				api.control.each( function ( control ) {
-					if ( control.id.indexOf( baseId + '__' ) === 0 ) {
-						var suffix = control.id.slice( ( baseId + '__' ).length );
-						control.active.set( suffix === lang );
+				parsed = langSuffixFromControlId( id );
+				if ( parsed && baseIdSet[ parsed.base ] ) {
+					control.active.set( parsed.lang === lang );
+				}
+			} );
+		}
+
+		function rememberDefaultValues() {
+			if ( currentEditLang() !== defaultLang ) return;
+			baseIds.forEach( function ( baseId ) {
+				var setting = api( baseId );
+				if ( setting ) {
+					lastDefaultVals[ baseId ] = setting.get();
+				}
+			} );
+		}
+
+		function patchBaseWriteRedirect() {
+			baseIds.forEach( function ( baseId ) {
+				var setting = api( baseId );
+				if ( ! setting || setting._doroI18nPatched ) return;
+				setting._doroI18nPatched = true;
+				lastDefaultVals[ baseId ] = setting.get();
+				setting.bind( function ( newVal ) {
+					var lang, target, prev;
+					if ( redirecting ) return;
+					lang = currentEditLang();
+					if ( lang === defaultLang ) {
+						lastDefaultVals[ baseId ] = newVal;
+						return;
 					}
+					target = api( baseId + '__' + lang );
+					if ( ! target ) return;
+					redirecting = true;
+					target.set( newVal );
+					prev = Object.prototype.hasOwnProperty.call( lastDefaultVals, baseId )
+						? lastDefaultVals[ baseId ]
+						: setting.default;
+					if ( setting.get() !== prev ) {
+						setting.set( prev );
+					}
+					redirecting = false;
 				} );
 			} );
 		}
@@ -1103,8 +1183,11 @@ function doroshopping_customize_i18n_controls_js() {
 		api.bind( 'ready', function () {
 			var setting = api( 'doroshopping_i18n_edit_lang' );
 			if ( ! setting ) return;
+			patchBaseWriteRedirect();
+			rememberDefaultValues();
 			setting.bind( function () {
 				syncLangVisibility();
+				rememberDefaultValues();
 				if ( api.previewer ) {
 					api.previewer.refresh();
 				}

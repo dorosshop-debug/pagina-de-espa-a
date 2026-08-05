@@ -80,7 +80,7 @@ function doroshopping_get_cart_payload() {
         $items[] = array(
             'key'        => $cart_item_key,
             'product_id' => $product_id,
-            'name'       => $product->get_name(),
+            'name'       => wp_strip_all_tags( $product->get_name() ),
             'quantity'   => $quantity,
             'price_html' => WC()->cart->get_product_price( $product ),
             'image'      => $image_url,
@@ -104,7 +104,7 @@ function doroshopping_get_cart_payload() {
         $thumb_id = $rec->get_image_id();
         $recommendations[] = array(
             'id'         => $rec->get_id(),
-            'name'       => $rec->get_name(),
+            'name'       => wp_strip_all_tags( $rec->get_name() ),
             'price_html' => $rec->get_price_html(),
             'image'      => $thumb_id
                 ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' )
@@ -140,6 +140,10 @@ add_action( 'wp_ajax_nopriv_doroshopping_get_cart', 'doroshopping_ajax_get_cart'
 function doroshopping_ajax_update_cart_item() {
     check_ajax_referer( 'doroshopping_cart', 'nonce' );
 
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'cart_write', 60, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
     if ( ! doroshopping_ensure_wc_cart( true ) ) {
         wp_send_json_error( array( 'message' => __( 'Carrito no disponible.', 'doroshopping' ) ), 400 );
     }
@@ -147,13 +151,22 @@ function doroshopping_ajax_update_cart_item() {
     $key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
     $qty = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 0;
 
-    if ( '' === $key ) {
+    if ( '' === $key || ! WC()->cart->get_cart_item( $key ) ) {
         wp_send_json_error( array( 'message' => __( 'Item invalido.', 'doroshopping' ) ), 400 );
     }
 
     if ( $qty < 1 ) {
         WC()->cart->remove_cart_item( $key );
     } else {
+        $max = 99;
+        $item = WC()->cart->get_cart_item( $key );
+        if ( ! empty( $item['data'] ) && is_object( $item['data'] ) && method_exists( $item['data'], 'get_max_purchase_quantity' ) ) {
+            $m = (int) $item['data']->get_max_purchase_quantity();
+            if ( $m > 0 ) {
+                $max = $m;
+            }
+        }
+        $qty = min( $qty, $max );
         WC()->cart->set_quantity( $key, $qty, true );
     }
 
@@ -169,13 +182,17 @@ add_action( 'wp_ajax_nopriv_doroshopping_update_cart_item', 'doroshopping_ajax_u
 function doroshopping_ajax_remove_cart_item() {
     check_ajax_referer( 'doroshopping_cart', 'nonce' );
 
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'cart_write', 60, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
     if ( ! doroshopping_ensure_wc_cart( true ) ) {
         wp_send_json_error( array( 'message' => __( 'Carrito no disponible.', 'doroshopping' ) ), 400 );
     }
 
     $key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
 
-    if ( '' === $key ) {
+    if ( '' === $key || ! WC()->cart->get_cart_item( $key ) ) {
         wp_send_json_error( array( 'message' => __( 'Item invalido.', 'doroshopping' ) ), 400 );
     }
 
@@ -192,12 +209,17 @@ add_action( 'wp_ajax_nopriv_doroshopping_remove_cart_item', 'doroshopping_ajax_r
 function doroshopping_ajax_add_to_cart() {
     check_ajax_referer( 'doroshopping_cart', 'nonce' );
 
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'cart_write', 60, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
     if ( ! doroshopping_ensure_wc_cart( true ) ) {
         wp_send_json_error( array( 'message' => __( 'Carrito no disponible.', 'doroshopping' ) ), 400 );
     }
 
     $product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
     $quantity   = isset( $_POST['quantity'] ) ? max( 1, absint( $_POST['quantity'] ) ) : 1;
+    $quantity   = min( $quantity, 99 );
 
     if ( $product_id <= 0 ) {
         wp_send_json_error( array( 'message' => __( 'Producto invalido.', 'doroshopping' ) ), 400 );
@@ -261,9 +283,11 @@ function doroshopping_ajax_home_load_more() {
     if ( $batch < 1 ) {
         $batch = 30;
     }
+    $batch = min( $batch, 48 );
     if ( $max < $batch ) {
         $max = $batch;
     }
+    $max = min( $max, 300 );
     if ( $page < 2 ) {
         $page = 2;
     }
@@ -332,6 +356,7 @@ function doroshopping_ajax_product_more_load() {
     if ( $batch < 1 ) {
         $batch = 30;
     }
+    $batch = min( $batch, 48 );
     if ( $max > 240 ) {
         $max = 240;
     }

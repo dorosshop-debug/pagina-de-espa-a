@@ -87,9 +87,15 @@ function doroshopping_get_theme_mod( $key, $default = false ) {
 
 	if ( $lang && $lang !== $def ) {
 		$localized = get_theme_mod( doroshopping_i18n_mod_key( $key, $lang ), null );
-		// 0 / '' = sin valor propio → hereda idioma por defecto.
+		// 0 / '' = sin valor propio → pack embebido → idioma por defecto.
 		if ( null !== $localized && false !== $localized && '' !== $localized && ! ( is_numeric( $localized ) && (int) $localized === 0 ) ) {
 			return $localized;
+		}
+		if ( function_exists( 'doroshopping_i18n_builtin_text' ) ) {
+			$builtin = doroshopping_i18n_builtin_text( $key, $lang );
+			if ( '' !== $builtin ) {
+				return $builtin;
+			}
 		}
 	}
 
@@ -164,7 +170,7 @@ function doroshopping_i18n_ui_defaults() {
 function doroshopping_i18n_ui_setting_defs() {
 	$defs = array();
 	foreach ( doroshopping_i18n_ui_defaults() as $key => $meta ) {
-		$defs[ $key ] = ( ! empty( $meta['type'] ) && 'textarea' === $meta['type'] ) ? 'text' : 'text';
+		$defs[ $key ] = ( ! empty( $meta['type'] ) && 'textarea' === $meta['type'] ) ? 'textarea' : 'text';
 	}
 	return $defs;
 }

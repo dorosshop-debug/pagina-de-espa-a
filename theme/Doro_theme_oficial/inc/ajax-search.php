@@ -15,8 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 function doroshopping_ajax_live_search() {
     check_ajax_referer( 'doroshopping_search', 'nonce' );
 
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'live_search', 40, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
     $term = isset( $_GET['term'] ) ? sanitize_text_field( wp_unslash( $_GET['term'] ) ) : '';
     $term = trim( $term );
+    if ( strlen( $term ) > 80 ) {
+        $term = substr( $term, 0, 80 );
+    }
 
     if ( strlen( $term ) < 2 ) {
         wp_send_json_success(
@@ -54,13 +61,13 @@ function doroshopping_ajax_live_search() {
             $image_id = $product->get_image_id();
             $items[]  = array(
                 'id'         => $product->get_id(),
-                'title'      => $product->get_name(),
+                'title'      => wp_strip_all_tags( $product->get_name() ),
                 'url'        => $product->get_permalink(),
                 'price_html' => $product->get_price_html(),
                 'image'      => $image_id
                     ? wp_get_attachment_image_url( $image_id, 'thumbnail' )
                     : wc_placeholder_img_src( 'thumbnail' ),
-                'sku'        => $product->get_sku(),
+                'sku'        => wp_strip_all_tags( (string) $product->get_sku() ),
             );
         }
         wp_reset_postdata();

@@ -22,6 +22,8 @@ require_once DOROSHOPPING_DIR . '/inc/support.php';
 require_once DOROSHOPPING_DIR . '/inc/mega-menu.php';
 require_once DOROSHOPPING_DIR . '/inc/i18n-ui-chrome.php';
 require_once DOROSHOPPING_DIR . '/inc/i18n-ui-pages.php';
+require_once DOROSHOPPING_DIR . '/inc/i18n-ui-translations-pages.php';
+require_once DOROSHOPPING_DIR . '/inc/i18n-ui-translations.php';
 require_once DOROSHOPPING_DIR . '/inc/i18n-mods.php';
 require_once DOROSHOPPING_DIR . '/inc/customizer.php';
 require_once DOROSHOPPING_DIR . '/inc/enqueue.php';

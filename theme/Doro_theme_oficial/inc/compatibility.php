@@ -664,6 +664,11 @@ function doroshopping_handle_locale_preferences() {
         exit;
     }
 
+    if ( function_exists( 'doroshopping_prefs_rate_limit_ok' ) && ! doroshopping_prefs_rate_limit_ok( 'locale_prefs' ) ) {
+        wp_safe_redirect( $redirect );
+        exit;
+    }
+
     // País → solo envío / cookie. NO cambia el idioma.
     if ( isset( $_POST['ubicacion'] ) ) {
         $country = strtoupper( sanitize_text_field( wp_unslash( $_POST['ubicacion'] ) ) );
@@ -672,10 +677,14 @@ function doroshopping_handle_locale_preferences() {
             if ( 'UK' === $country ) {
                 $country = 'GB';
             }
-            $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
-            $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
-            setcookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
-            $_COOKIE['doroshopping_country'] = $country;
+            if ( function_exists( 'doroshopping_set_cookie' ) ) {
+                doroshopping_set_cookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, false );
+            } else {
+                $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+                $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+                setcookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+                $_COOKIE['doroshopping_country'] = $country;
+            }
 
             if ( function_exists( 'WC' ) && WC()->customer ) {
                 WC()->customer->set_billing_country( $country );
@@ -742,6 +751,11 @@ function doroshopping_handle_shipping_preferences() {
         exit;
     }
 
+    if ( function_exists( 'doroshopping_prefs_rate_limit_ok' ) && ! doroshopping_prefs_rate_limit_ok( 'shipping_prefs' ) ) {
+        wp_safe_redirect( $redirect );
+        exit;
+    }
+
     $country  = isset( $_POST['pais'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_POST['pais'] ) ) ) : '';
     $state    = isset( $_POST['provincia'] ) ? sanitize_text_field( wp_unslash( $_POST['provincia'] ) ) : '';
     $city     = isset( $_POST['ciudad'] ) ? sanitize_text_field( wp_unslash( $_POST['ciudad'] ) ) : '';
@@ -749,10 +763,14 @@ function doroshopping_handle_shipping_preferences() {
 
     if ( $country ) {
         $country = substr( $country, 0, 2 );
-        $path    = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
-        $domain  = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
-        setcookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
-        $_COOKIE['doroshopping_country'] = $country;
+        if ( function_exists( 'doroshopping_set_cookie' ) ) {
+            doroshopping_set_cookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, false );
+        } else {
+            $path    = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+            $domain  = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+            setcookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+            $_COOKIE['doroshopping_country'] = $country;
+        }
     }
 
     if ( function_exists( 'WC' ) && WC()->customer ) {
@@ -773,10 +791,14 @@ function doroshopping_handle_shipping_preferences() {
     }
 
     if ( $postcode ) {
-        $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
-        $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
-        setcookie( 'doroshopping_postcode', $postcode, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
-        $_COOKIE['doroshopping_postcode'] = $postcode;
+        if ( function_exists( 'doroshopping_set_cookie' ) ) {
+            doroshopping_set_cookie( 'doroshopping_postcode', $postcode, time() + YEAR_IN_SECONDS, false );
+        } else {
+            $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+            $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+            setcookie( 'doroshopping_postcode', $postcode, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+            $_COOKIE['doroshopping_postcode'] = $postcode;
+        }
     }
 
     wp_safe_redirect( $redirect );

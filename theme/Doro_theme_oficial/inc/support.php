@@ -74,6 +74,11 @@ function doroshopping_handle_support_form() {
 		exit;
 	}
 
+	if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'support_form', 5, HOUR_IN_SECONDS ) ) {
+		wp_safe_redirect( add_query_arg( 'support', 'error', $redirect ) );
+		exit;
+	}
+
 	// Honeypot anti-spam.
 	if ( ! empty( $_POST['doro_support_website'] ) ) {
 		wp_safe_redirect( add_query_arg( 'support', 'sent', $redirect ) );
@@ -120,7 +125,7 @@ function doroshopping_handle_support_form() {
 
 	$headers = array(
 		'Content-Type: text/plain; charset=UTF-8',
-		'Reply-To: ' . $name . ' <' . $email . '>',
+		'Reply-To: ' . sprintf( '%s <%s>', str_replace( array( "\r", "\n", '<', '>' ), '', $name ), $email ),
 	);
 
 	$sent = wp_mail( $to, $subject, $body, $headers );

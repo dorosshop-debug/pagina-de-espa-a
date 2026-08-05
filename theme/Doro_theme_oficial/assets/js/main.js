@@ -1703,7 +1703,7 @@ function initCartModal() {
         if (!itemsEl) return;
 
         if (!items.length) {
-            itemsEl.innerHTML = '<p class="cart-modal__empty">' + (data.empty_message || i18n('empty', 'Tu carrito esta vacio.')) + '</p>';
+            itemsEl.innerHTML = '<p class="cart-modal__empty">' + escapeHtml(data.empty_message || i18n('empty', 'Tu carrito esta vacio.')) + '</p>';
         } else {
             itemsEl.innerHTML = items.map(function (item) {
                 return (

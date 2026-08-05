@@ -63,13 +63,35 @@ function doroshopping_bigbuy_base_url() {
  */
 function doroshopping_bigbuy_endpoint() {
     if ( defined( 'DORO_BIGBUY_ENDPOINT' ) && DORO_BIGBUY_ENDPOINT ) {
-        return (string) DORO_BIGBUY_ENDPOINT;
+        $forced = (string) DORO_BIGBUY_ENDPOINT;
+        return doroshopping_bigbuy_sanitize_endpoint( $forced )
+            ? $forced
+            : doroshopping_bigbuy_base_url() . '/rest/shipping/orders.json';
     }
     $custom = (string) get_theme_mod( 'doroshopping_bigbuy_endpoint', '' );
-    if ( $custom ) {
-        return $custom;
+    if ( $custom && doroshopping_bigbuy_sanitize_endpoint( $custom ) ) {
+        return esc_url_raw( $custom );
     }
     return doroshopping_bigbuy_base_url() . '/rest/shipping/orders.json';
+}
+
+/**
+ * Solo permitir hosts BigBuy (evita SSRF vía Customizer).
+ *
+ * @param string $url URL.
+ * @return bool
+ */
+function doroshopping_bigbuy_sanitize_endpoint( $url ) {
+    $url = esc_url_raw( (string) $url );
+    if ( ! $url || 0 !== strpos( $url, 'https://' ) ) {
+        return false;
+    }
+    $host = wp_parse_url( $url, PHP_URL_HOST );
+    if ( ! is_string( $host ) || '' === $host ) {
+        return false;
+    }
+    $host = strtolower( $host );
+    return (bool) preg_match( '/(^|\.)bigbuy\.eu$/', $host );
 }
 
 /**
@@ -484,6 +506,16 @@ function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
     }
     // En preview/local sin nonce: solo fallback (no llama a BigBuy API).
     $nonce_ok = $nonce && wp_verify_nonce( $nonce, 'wp_rest' );
+
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'bigbuy_ship', 20, 60 ) ) {
+        return new WP_REST_Response(
+            array(
+                'success' => false,
+                'message' => __( 'Demasiadas peticiones. Espera un momento e inténtalo de nuevo.', 'doroshopping' ),
+            ),
+            429
+        );
+    }
 
     $country  = strtoupper( sanitize_text_field( (string) $request->get_param( 'country' ) ) );
     $postcode = sanitize_text_field( (string) $request->get_param( 'postcode' ) );
