@@ -90,6 +90,10 @@ function doroshopping_enqueue_assets() {
             'page-payments.php',
             'page-shipping.php',
             'page-buyer-protection.php',
+            'page-about.php',
+            'page-contact.php',
+            'page-returns.php',
+            'page-legal.php',
         ) )
         || is_page( array(
             'cupones',
@@ -99,10 +103,31 @@ function doroshopping_enqueue_assets() {
             'metodos-de-pago',
             'envios',
             'proteccion-del-comprador',
+            'nosotros',
+            'contacto',
+            'politica-de-devoluciones',
+            'politica-de-privacidad',
+            'aviso-legal',
+            'terminos-y-condiciones',
+            'politica-de-cookies',
+            'cookies',
         ) );
 
     if ( $is_support_page ) {
         wp_enqueue_style( 'doroshopping-support', $uri . '/css/pages/support.css', $style_deps, $ver );
+    }
+
+    $is_legal_page = is_page_template( 'page-legal.php' )
+        || is_page( array(
+            'politica-de-privacidad',
+            'aviso-legal',
+            'terminos-y-condiciones',
+            'politica-de-cookies',
+            'cookies',
+        ) );
+
+    if ( $is_legal_page ) {
+        wp_enqueue_style( 'doroshopping-page', $uri . '/css/pages/page.css', $style_deps, $ver );
     }
 
     if ( is_search() ) {

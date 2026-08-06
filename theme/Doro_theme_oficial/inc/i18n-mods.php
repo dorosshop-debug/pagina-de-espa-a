@@ -157,6 +157,15 @@ function doroshopping_i18n_ui_defaults() {
 	if ( function_exists( 'doroshopping_i18n_ui_page_defaults' ) ) {
 		$base = array_merge( $base, doroshopping_i18n_ui_page_defaults() );
 	}
+	if ( function_exists( 'doroshopping_i18n_ui_legal_page_defaults' ) ) {
+		$base = array_merge( $base, doroshopping_i18n_ui_legal_page_defaults() );
+	}
+	if ( function_exists( 'doroshopping_i18n_ui_support_page_defaults' ) ) {
+		$base = array_merge( $base, doroshopping_i18n_ui_support_page_defaults() );
+	}
+	if ( function_exists( 'doroshopping_i18n_ui_content_page_defaults' ) ) {
+		$base = array_merge( $base, doroshopping_i18n_ui_content_page_defaults() );
+	}
 
 	$cached = $base;
 	return $cached;

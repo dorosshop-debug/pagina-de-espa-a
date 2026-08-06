@@ -383,6 +383,33 @@ function doroshopping_i18n_builtin_ui_packs() {
 		}
 	}
 
+	if ( function_exists( 'doroshopping_i18n_builtin_ui_legal_packs' ) ) {
+		$legal = doroshopping_i18n_builtin_ui_legal_packs();
+		foreach ( $packs as $lang => $rows ) {
+			if ( ! empty( $legal[ $lang ] ) && is_array( $legal[ $lang ] ) ) {
+				$packs[ $lang ] = array_merge( $rows, $legal[ $lang ] );
+			}
+		}
+	}
+
+	if ( function_exists( 'doroshopping_i18n_builtin_ui_support_packs' ) ) {
+		$support = doroshopping_i18n_builtin_ui_support_packs();
+		foreach ( $packs as $lang => $rows ) {
+			if ( ! empty( $support[ $lang ] ) && is_array( $support[ $lang ] ) ) {
+				$packs[ $lang ] = array_merge( $rows, $support[ $lang ] );
+			}
+		}
+	}
+
+	if ( function_exists( 'doroshopping_i18n_builtin_ui_content_packs' ) ) {
+		$content = doroshopping_i18n_builtin_ui_content_packs();
+		foreach ( $packs as $lang => $rows ) {
+			if ( ! empty( $content[ $lang ] ) && is_array( $content[ $lang ] ) ) {
+				$packs[ $lang ] = array_merge( $rows, $content[ $lang ] );
+			}
+		}
+	}
+
 	unset( $header_account_footer );
 
 	return $packs;

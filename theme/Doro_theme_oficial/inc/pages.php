@@ -138,33 +138,39 @@ function doroshopping_essential_pages() {
 
     return array(
         'nosotros'                  => array(
-            'title'   => __( 'Sobre nosotros', 'doroshopping' ),
-            'content' => $nosotros,
+            'title'    => __( 'Sobre nosotros', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-about.php',
         ),
         'aviso-legal'               => array(
             'title'         => __( 'Aviso legal', 'doroshopping' ),
             'content'       => $aviso,
             'force_refresh' => true,
+            'template'      => 'page-legal.php',
         ),
         'politica-de-privacidad'    => array(
             'title'     => __( 'Política de privacidad', 'doroshopping' ),
             'content'   => $privacidad,
             'wc_option' => 'woocommerce_privacy_policy_page_id',
+            'template'  => 'page-legal.php',
         ),
         'terminos-y-condiciones'    => array(
             'title'         => __( 'Términos y condiciones', 'doroshopping' ),
             'content'       => $terminos,
             'wc_option'     => 'woocommerce_terms_page_id',
             'force_refresh' => true,
+            'template'      => 'page-legal.php',
         ),
         'politica-de-cookies'       => array(
             'title'         => __( 'Política de cookies', 'doroshopping' ),
             'content'       => $cookies,
             'force_refresh' => true,
+            'template'      => 'page-legal.php',
         ),
         'politica-de-devoluciones'  => array(
-            'title'   => __( 'Política de devoluciones y reembolsos', 'doroshopping' ),
-            'content' => '<p>' . __( 'Plazos, condiciones y proceso para devoluciones, cambios y reembolsos. Derecho de desistimiento (14 días en la UE) y excepciones.', 'doroshopping' ) . '</p>' . $placeholder,
+            'title'    => __( 'Política de devoluciones y reembolsos', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-returns.php',
         ),
         'envios'                    => array(
             'title'    => __( 'Envíos', 'doroshopping' ),
@@ -172,8 +178,9 @@ function doroshopping_essential_pages() {
             'template' => 'page-shipping.php',
         ),
         'contacto'                  => array(
-            'title'   => __( 'Contacto', 'doroshopping' ),
-            'content' => '<p>' . __( '¿Necesitas ayuda? Escríbenos y te responderemos lo antes posible. Añade aquí el formulario de contacto, email y horarios de atención.', 'doroshopping' ) . '</p>' . $placeholder,
+            'title'    => __( 'Contacto', 'doroshopping' ),
+            'content'  => '',
+            'template' => 'page-contact.php',
         ),
         'centro-de-ayuda'           => array(
             'title'    => __( 'Centro de ayuda', 'doroshopping' ),
@@ -539,7 +546,7 @@ function doroshopping_maybe_create_essential_pages_admin() {
         // Reasignar plantillas / refrescar legales aunque las páginas ya existan.
         if ( ! $need ) {
             $defs = doroshopping_essential_pages();
-            foreach ( array( 'metodos-de-pago', 'envios', 'proteccion-del-comprador', 'aviso-legal', 'terminos-y-condiciones', 'politica-de-cookies' ) as $slug_check ) {
+            foreach ( array( 'metodos-de-pago', 'envios', 'proteccion-del-comprador', 'politica-de-privacidad', 'aviso-legal', 'terminos-y-condiciones', 'politica-de-cookies' ) as $slug_check ) {
                 $p = doroshopping_get_page_by_slug( $slug_check );
                 if ( ! $p instanceof WP_Post ) {
                     $need = true;

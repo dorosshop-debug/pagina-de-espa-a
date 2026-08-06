@@ -855,6 +855,76 @@ function doroshopping_customize_register_ui_texts( $wp_customize ) {
 			'description' => __( 'Modal y paginas de acceso.', 'doroshopping' ),
 			'priority'    => 45,
 		),
+		'doroshopping_ui_coupons'       => array(
+			'title'       => __( 'Textos UI: Cupones', 'doroshopping' ),
+			'description' => __( 'Pagina Cupones (plantilla). Polylang solo enlaza titulo/URL; textos aqui o packs del tema.', 'doroshopping' ),
+			'priority'    => 46,
+		),
+		'doroshopping_ui_shipping_page' => array(
+			'title'       => __( 'Textos UI: Envios (pagina)', 'doroshopping' ),
+			'description' => __( 'Plantilla Envios. Polylang solo enlaza titulo/URL.', 'doroshopping' ),
+			'priority'    => 47,
+		),
+		'doroshopping_ui_help_page'     => array(
+			'title'       => __( 'Textos UI: Centro de ayuda', 'doroshopping' ),
+			'description' => __( 'Formulario y enlaces de soporte.', 'doroshopping' ),
+			'priority'    => 48,
+		),
+		'doroshopping_ui_faq_page'      => array(
+			'title'       => __( 'Textos UI: FAQ', 'doroshopping' ),
+			'description' => __( 'Preguntas frecuentes (categorias y respuestas).', 'doroshopping' ),
+			'priority'    => 49,
+		),
+		'doroshopping_ui_payments_page' => array(
+			'title'       => __( 'Textos UI: Metodos de pago', 'doroshopping' ),
+			'description' => __( 'Pagina de metodos de pago (plantilla).', 'doroshopping' ),
+			'priority'    => 50,
+		),
+		'doroshopping_ui_protect_page'  => array(
+			'title'       => __( 'Textos UI: Proteccion comprador', 'doroshopping' ),
+			'description' => __( 'Pagina de seguridad y proteccion.', 'doroshopping' ),
+			'priority'    => 51,
+		),
+		'doroshopping_ui_wishlist_page' => array(
+			'title'       => __( 'Textos UI: Lista de deseos', 'doroshopping' ),
+			'description' => __( 'Pagina wishlist (vacía / login).', 'doroshopping' ),
+			'priority'    => 52,
+		),
+		'doroshopping_ui_cms_page'      => array(
+			'title'       => __( 'Textos UI: Páginas CMS', 'doroshopping' ),
+			'description' => __( 'Cromado, índice y enlaces de páginas informativas y legales.', 'doroshopping' ),
+			'priority'    => 53,
+		),
+		'doroshopping_ui_404_page'      => array(
+			'title'       => __( 'Textos UI: Página 404', 'doroshopping' ),
+			'description' => __( 'Página no encontrada.', 'doroshopping' ),
+			'priority'    => 54,
+		),
+		'doroshopping_ui_search_page'   => array(
+			'title'       => __( 'Textos UI: Búsqueda', 'doroshopping' ),
+			'description' => __( 'Resultados de búsqueda.', 'doroshopping' ),
+			'priority'    => 55,
+		),
+		'doroshopping_ui_about_page'    => array(
+			'title'       => __( 'Textos UI: Sobre nosotros', 'doroshopping' ),
+			'description' => __( 'Plantilla de presentación de la marca.', 'doroshopping' ),
+			'priority'    => 56,
+		),
+		'doroshopping_ui_contact_page'  => array(
+			'title'       => __( 'Textos UI: Contacto', 'doroshopping' ),
+			'description' => __( 'Plantilla de contacto y enlaces rápidos.', 'doroshopping' ),
+			'priority'    => 57,
+		),
+		'doroshopping_ui_returns_page'  => array(
+			'title'       => __( 'Textos UI: Devoluciones', 'doroshopping' ),
+			'description' => __( 'Plantilla de política de devoluciones.', 'doroshopping' ),
+			'priority'    => 58,
+		),
+		'doroshopping_ui_legal_page'    => array(
+			'title'       => __( 'Textos UI: Legales', 'doroshopping' ),
+			'description' => __( 'Privacidad, aviso, terminos y cookies (plantilla).', 'doroshopping' ),
+			'priority'    => 59,
+		),
 	);
 
 	foreach ( $sections as $id => $meta ) {
@@ -960,6 +1030,20 @@ function doroshopping_customize_register_i18n( $wp_customize ) {
 		'doroshopping_ui_product',
 		'doroshopping_ui_account_pages',
 		'doroshopping_ui_auth',
+		'doroshopping_ui_coupons',
+		'doroshopping_ui_shipping_page',
+		'doroshopping_ui_help_page',
+		'doroshopping_ui_faq_page',
+		'doroshopping_ui_payments_page',
+		'doroshopping_ui_protect_page',
+		'doroshopping_ui_wishlist_page',
+		'doroshopping_ui_cms_page',
+		'doroshopping_ui_404_page',
+		'doroshopping_ui_search_page',
+		'doroshopping_ui_about_page',
+		'doroshopping_ui_contact_page',
+		'doroshopping_ui_returns_page',
+		'doroshopping_ui_legal_page',
 	);
 	foreach ( $lang_sections as $i => $section_id ) {
 		if ( ! $wp_customize->get_section( $section_id ) ) {

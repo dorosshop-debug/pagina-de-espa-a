@@ -2,10 +2,16 @@
 /**
  * Lost password form — diseño DoroTheme.
  *
+ * Textos vía doroshopping_ui_text (Personalizar + packs por idioma).
+ *
  * @package Doroshopping
  */
 
 defined( 'ABSPATH' ) || exit;
+
+$ui = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
 
 $account_url = function_exists( 'doroshopping_get_account_url' ) ? doroshopping_get_account_url() : wc_get_page_permalink( 'myaccount' );
 
@@ -18,14 +24,14 @@ do_action( 'woocommerce_before_lost_password_form' );
 			<img src="<?php echo esc_url( doroshopping_logo_url() ); ?>" alt="<?php bloginfo( 'name' ); ?>">
 		</div>
 
-		<h1 class="doro-password-page__title"><?php esc_html_e( '¿Olvidaste tu contraseña?', 'doroshopping' ); ?></h1>
+		<h1 class="doro-password-page__title"><?php echo esc_html( $ui( 'doroshopping_ui_auth_lost_title' ) ); ?></h1>
 		<p class="doro-password-page__lead">
-			<?php esc_html_e( 'Introduce tu correo electrónico y te enviaremos un enlace para restablecerla.', 'doroshopping' ); ?>
+			<?php echo esc_html( $ui( 'doroshopping_ui_auth_lost_lead' ) ); ?>
 		</p>
 
 		<form method="post" class="woocommerce-ResetPassword lost_reset_password doro-password-page__form">
 			<p class="woocommerce-form-row form-row">
-				<label for="user_login"><?php esc_html_e( 'Correo electrónico', 'doroshopping' ); ?>&nbsp;<span class="required">*</span></label>
+				<label for="user_login"><?php echo esc_html( $ui( 'doroshopping_ui_auth_lost_email' ) ); ?>&nbsp;<span class="required">*</span></label>
 				<input class="woocommerce-Input woocommerce-Input--text input-text" type="text" name="user_login" id="user_login" autocomplete="username" required />
 			</p>
 
@@ -33,8 +39,8 @@ do_action( 'woocommerce_before_lost_password_form' );
 
 			<p class="woocommerce-form-row form-row">
 				<input type="hidden" name="wc_reset_password" value="true" />
-				<button type="submit" class="doro-password-page__submit woocommerce-Button button" value="<?php esc_attr_e( 'Restablecer contraseña', 'doroshopping' ); ?>">
-					<?php esc_html_e( 'Restablecer contraseña', 'doroshopping' ); ?>
+				<button type="submit" class="doro-password-page__submit woocommerce-Button button" value="<?php echo esc_attr( $ui( 'doroshopping_ui_auth_lost_submit' ) ); ?>">
+					<?php echo esc_html( $ui( 'doroshopping_ui_auth_lost_submit' ) ); ?>
 				</button>
 			</p>
 
@@ -42,7 +48,7 @@ do_action( 'woocommerce_before_lost_password_form' );
 		</form>
 
 		<p class="doro-password-page__footer">
-			<a href="<?php echo esc_url( $account_url ); ?>"><?php esc_html_e( 'Volver a iniciar sesión', 'doroshopping' ); ?></a>
+			<a href="<?php echo esc_url( $account_url ); ?>"><?php echo esc_html( $ui( 'doroshopping_ui_auth_lost_back' ) ); ?></a>
 		</p>
 	</div>
 </div>

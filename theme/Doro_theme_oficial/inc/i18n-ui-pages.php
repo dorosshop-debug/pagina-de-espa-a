@@ -1284,5 +1284,140 @@ function doroshopping_i18n_ui_page_defaults() {
 			'label'   => __( 'Auth: cerrar', 'doroshopping' ),
 			'section' => 'doroshopping_ui_auth',
 		),
+		'doroshopping_ui_auth_lost_title'        => array(
+			'default' => __( '¿Olvidaste tu contraseña?', 'doroshopping' ),
+			'label'   => __( 'Auth: recuperar titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_auth',
+		),
+		'doroshopping_ui_auth_lost_lead'         => array(
+			'default' => __( 'Introduce tu correo electrónico y te enviaremos un enlace para restablecerla.', 'doroshopping' ),
+			'label'   => __( 'Auth: recuperar lead', 'doroshopping' ),
+			'section' => 'doroshopping_ui_auth',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_auth_lost_email'        => array(
+			'default' => __( 'Correo electrónico', 'doroshopping' ),
+			'label'   => __( 'Auth: recuperar email', 'doroshopping' ),
+			'section' => 'doroshopping_ui_auth',
+		),
+		'doroshopping_ui_auth_lost_submit'       => array(
+			'default' => __( 'Restablecer contraseña', 'doroshopping' ),
+			'label'   => __( 'Auth: recuperar boton', 'doroshopping' ),
+			'section' => 'doroshopping_ui_auth',
+		),
+		'doroshopping_ui_auth_lost_back'         => array(
+			'default' => __( 'Volver a iniciar sesión', 'doroshopping' ),
+			'label'   => __( 'Auth: recuperar volver', 'doroshopping' ),
+			'section' => 'doroshopping_ui_auth',
+		),
+
+		// Página Cupones (plantilla page-coupons.php).
+		'doroshopping_ui_coupons_eyebrow'        => array(
+			'default' => __( 'Ofertas y descuentos', 'doroshopping' ),
+			'label'   => __( 'Cupones: eyebrow', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_title'          => array(
+			'default' => __( 'Mis cupones', 'doroshopping' ),
+			'label'   => __( 'Cupones: titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_lead'           => array(
+			'default' => __( 'Aplica un código de descuento y ahorra en tu próxima compra. Los cupones se validan automáticamente en el carrito.', 'doroshopping' ),
+			'label'   => __( 'Cupones: lead', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_coupons_applied_ok'     => array(
+			'default' => __( 'Cupón aplicado correctamente. Revisa tu carrito para ver el descuento.', 'doroshopping' ),
+			'label'   => __( 'Cupones: aplicado OK', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_coupons_apply_title'    => array(
+			'default' => __( 'Aplicar código', 'doroshopping' ),
+			'label'   => __( 'Cupones: aplicar titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_code_label'     => array(
+			'default' => __( 'Código de cupón', 'doroshopping' ),
+			'label'   => __( 'Cupones: label codigo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_code_ph'        => array(
+			'default' => __( 'Introduce tu código', 'doroshopping' ),
+			'label'   => __( 'Cupones: placeholder codigo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_apply_btn'      => array(
+			'default' => __( 'Aplicar cupón', 'doroshopping' ),
+			'label'   => __( 'Cupones: boton aplicar', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_hint'           => array(
+			'default' => __( 'También puedes aplicar cupones desde el <a href="%s">carrito</a> o el checkout.', 'doroshopping' ),
+			'label'   => __( 'Cupones: hint (usa %s = URL carrito)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_coupons_howto_title'    => array(
+			'default' => __( 'Cómo funcionan los cupones', 'doroshopping' ),
+			'label'   => __( 'Cupones: como funcionan', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_step1_title'    => array(
+			'default' => __( 'Consigue un código', 'doroshopping' ),
+			'label'   => __( 'Cupones: paso 1 titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_step1_text'     => array(
+			'default' => __( 'Recibe cupones por email, campañas o promociones activas de Doroshopping.', 'doroshopping' ),
+			'label'   => __( 'Cupones: paso 1 texto', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_coupons_step2_title'    => array(
+			'default' => __( 'Aplícalo aquí o en el carrito', 'doroshopping' ),
+			'label'   => __( 'Cupones: paso 2 titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_step2_text'     => array(
+			'default' => __( 'Introduce el código exacto. Distingue mayúsculas/minúsculas según indique la promoción.', 'doroshopping' ),
+			'label'   => __( 'Cupones: paso 2 texto', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_coupons_step3_title'    => array(
+			'default' => __( 'Disfruta el descuento', 'doroshopping' ),
+			'label'   => __( 'Cupones: paso 3 titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_step3_text'     => array(
+			'default' => __( 'El descuento se refleja al instante si el cupón es válido y cumple las condiciones.', 'doroshopping' ),
+			'label'   => __( 'Cupones: paso 3 texto', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_coupons_empty_title'    => array(
+			'default' => __( 'Aún no tienes cupones guardados', 'doroshopping' ),
+			'label'   => __( 'Cupones: vacio titulo', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_empty_text'     => array(
+			'default' => __( 'Cuando tengamos promociones activas o recibas un código personalizado, podrás usarlo aquí.', 'doroshopping' ),
+			'label'   => __( 'Cupones: vacio texto', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+			'type'    => 'textarea',
+		),
+		'doroshopping_ui_coupons_go_shop'        => array(
+			'default' => __( 'Ir a la tienda', 'doroshopping' ),
+			'label'   => __( 'Cupones: ir a tienda', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
+		'doroshopping_ui_coupons_go_account'     => array(
+			'default' => __( 'Mi cuenta', 'doroshopping' ),
+			'label'   => __( 'Cupones: mi cuenta', 'doroshopping' ),
+			'section' => 'doroshopping_ui_coupons',
+		),
 	);
 }

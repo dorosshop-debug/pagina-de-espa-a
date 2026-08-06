@@ -1085,14 +1085,16 @@ function initLocaleFlagOptions() {
         if (e.key === 'Escape') closeAll();
     });
 
-    // Guardar: feedback inmediato.
+    // Guardar: feedback inmediato (sin texto; solo estado de carga).
     var form = document.querySelector('[data-locale-form]');
     if (form) {
         form.addEventListener('submit', function () {
             var btn = form.querySelector('.header-dropdown__submit');
             if (btn) {
                 btn.disabled = true;
-                btn.textContent = 'Guardando?';
+                btn.classList.add('is-loading');
+                btn.setAttribute('aria-busy', 'true');
+                btn.textContent = '';
             }
         });
     }

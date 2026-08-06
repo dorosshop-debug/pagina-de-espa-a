@@ -2,6 +2,9 @@
 /**
  * Plantilla de páginas estáticas (CMS).
  *
+ * Cromado (eyebrows, TOC, enlaces) vía doroshopping_ui_text.
+ * El cuerpo sigue siendo el contenido del editor / Elementor.
+ *
  * @package Doroshopping
  */
 
@@ -10,6 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 get_header();
+
+$ui = static function ( $key ) {
+	return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
+};
 
 $queried_id = get_queried_object_id();
 $slug       = (string) get_post_field( 'post_name', $queried_id );
@@ -44,23 +51,23 @@ if ( $is_legal ) {
 
 $eyebrow = '';
 if ( $is_legal ) {
-	$eyebrow = __( 'Información legal', 'doroshopping' );
+	$eyebrow = $ui( 'doroshopping_ui_cms_eyebrow_legal' );
 } elseif ( $is_info ) {
-	$eyebrow = __( 'Guía de compra', 'doroshopping' );
+	$eyebrow = $ui( 'doroshopping_ui_cms_eyebrow_info' );
 }
 
 $related = array();
 if ( $is_legal || $is_info ) {
 	$related = array(
-		'metodos-de-pago'          => __( 'Métodos de pago', 'doroshopping' ),
-		'envios'                   => __( 'Envíos', 'doroshopping' ),
-		'proteccion-del-comprador' => __( 'Protección del comprador', 'doroshopping' ),
-		'politica-de-devoluciones' => __( 'Devoluciones', 'doroshopping' ),
-		'terminos-y-condiciones'   => __( 'Términos', 'doroshopping' ),
-		'aviso-legal'              => __( 'Aviso legal', 'doroshopping' ),
-		'politica-de-cookies'      => __( 'Cookies', 'doroshopping' ),
-		'politica-de-privacidad'   => __( 'Privacidad', 'doroshopping' ),
-		'centro-de-ayuda'          => __( 'Centro de ayuda', 'doroshopping' ),
+		'metodos-de-pago'          => 'doroshopping_ui_cms_rel_payments',
+		'envios'                   => 'doroshopping_ui_cms_rel_shipping',
+		'proteccion-del-comprador' => 'doroshopping_ui_cms_rel_protect',
+		'politica-de-devoluciones' => 'doroshopping_ui_cms_rel_returns',
+		'terminos-y-condiciones'   => 'doroshopping_ui_cms_rel_terms',
+		'aviso-legal'              => 'doroshopping_ui_cms_rel_legal',
+		'politica-de-cookies'      => 'doroshopping_ui_cms_rel_cookies',
+		'politica-de-privacidad'   => 'doroshopping_ui_cms_rel_privacy',
+		'centro-de-ayuda'          => 'doroshopping_ui_cms_rel_help',
 	);
 	unset( $related[ $slug ] );
 }
@@ -77,12 +84,11 @@ if ( $is_legal || $is_info ) {
 				<?php if ( $is_legal ) : ?>
 					<p class="doro-page__lead">
 						<?php
+						$updated = get_the_modified_date() ? get_the_modified_date() : get_the_date();
 						echo esc_html(
-							sprintf(
-								/* translators: %s: last updated date */
-								__( 'Última actualización: %s', 'doroshopping' ),
-								get_the_modified_date() ? get_the_modified_date() : get_the_date()
-							)
+							function_exists( 'doroshopping_ui_sprintf' )
+								? doroshopping_ui_sprintf( 'doroshopping_ui_cms_updated', $updated )
+								: sprintf( $ui( 'doroshopping_ui_cms_updated' ), $updated )
 						);
 						?>
 					</p>
@@ -98,18 +104,18 @@ if ( $is_legal || $is_info ) {
 			?>
 			<div class="doro-page__layout<?php echo $is_legal ? ' doro-page__layout--legal' : ''; ?>">
 				<?php if ( $is_legal ) : ?>
-					<aside class="doro-page__sidebar" aria-label="<?php esc_attr_e( 'Índice de la página', 'doroshopping' ); ?>">
+					<aside class="doro-page__sidebar" aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_cms_toc_aria' ) ); ?>">
 						<nav class="doro-page__toc" data-doro-toc hidden>
-							<p class="doro-page__toc-title"><?php esc_html_e( 'En esta página', 'doroshopping' ); ?></p>
+							<p class="doro-page__toc-title"><?php echo esc_html( $ui( 'doroshopping_ui_cms_toc_title' ) ); ?></p>
 							<ol class="doro-page__toc-list" data-doro-toc-list></ol>
 						</nav>
 						<?php if ( ! empty( $related ) ) : ?>
-							<nav class="doro-page__related" aria-label="<?php esc_attr_e( 'Páginas relacionadas', 'doroshopping' ); ?>">
-								<p class="doro-page__toc-title"><?php esc_html_e( 'También te puede interesar', 'doroshopping' ); ?></p>
+							<nav class="doro-page__related" aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_cms_related_aria' ) ); ?>">
+								<p class="doro-page__toc-title"><?php echo esc_html( $ui( 'doroshopping_ui_cms_related_title' ) ); ?></p>
 								<ul class="doro-page__related-list">
 									<?php
 									$count = 0;
-									foreach ( $related as $rel_slug => $rel_label ) :
+									foreach ( $related as $rel_slug => $rel_key ) :
 										if ( $count >= 5 ) {
 											break;
 										}
@@ -117,7 +123,7 @@ if ( $is_legal || $is_info ) {
 										?>
 										<li>
 											<a href="<?php echo esc_url( doroshopping_get_page_url( $rel_slug ) ); ?>">
-												<?php echo esc_html( $rel_label ); ?>
+												<?php echo esc_html( $ui( $rel_key ) ); ?>
 											</a>
 										</li>
 									<?php endforeach; ?>
@@ -139,18 +145,18 @@ if ( $is_legal || $is_info ) {
 
 					<?php if ( ( $is_info || $is_legal ) && ! empty( $related ) ) : ?>
 						<footer class="doro-page__footer-links">
-							<p class="doro-page__footer-links-title"><?php esc_html_e( 'Enlaces útiles', 'doroshopping' ); ?></p>
+							<p class="doro-page__footer-links-title"><?php echo esc_html( $ui( 'doroshopping_ui_cms_footer_links' ) ); ?></p>
 							<div class="doro-page__footer-links-row">
 								<?php
 								$i = 0;
-								foreach ( $related as $rel_slug => $rel_label ) :
+								foreach ( $related as $rel_slug => $rel_key ) :
 									if ( $i >= 4 ) {
 										break;
 									}
 									++$i;
 									?>
 									<a class="doro-page__pill" href="<?php echo esc_url( doroshopping_get_page_url( $rel_slug ) ); ?>">
-										<?php echo esc_html( $rel_label ); ?>
+										<?php echo esc_html( $ui( $rel_key ) ); ?>
 									</a>
 								<?php endforeach; ?>
 							</div>
