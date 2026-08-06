@@ -122,17 +122,22 @@ if ( is_product_taxonomy() ) {
 
 $categories = array();
 if ( taxonomy_exists( 'product_cat' ) ) {
-	$categories = get_terms(
-		array(
-			'taxonomy'   => 'product_cat',
-			'hide_empty' => true,
-			'parent'     => 0,
-			'exclude'    => $exclude_ids,
-			'number'     => 0,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
-		)
+	$cat_args = array(
+		'taxonomy'   => 'product_cat',
+		'hide_empty' => true,
+		'parent'     => 0,
+		'exclude'    => $exclude_ids,
+		'number'     => 0,
+		'orderby'    => 'name',
+		'order'      => 'ASC',
 	);
+	if ( function_exists( 'pll_current_language' ) ) {
+		$lang = sanitize_key( (string) pll_current_language( 'slug' ) );
+		if ( $lang ) {
+			$cat_args['lang'] = $lang;
+		}
+	}
+	$categories = get_terms( $cat_args );
 	if ( is_wp_error( $categories ) ) {
 		$categories = array();
 	}

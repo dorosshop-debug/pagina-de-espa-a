@@ -39,15 +39,17 @@ function doroshopping_ajax_live_search() {
     $total = 0;
 
     if ( function_exists( 'wc_get_products' ) ) {
-        $query = new WP_Query(
-            array(
-                'post_type'      => 'product',
-                'post_status'    => 'publish',
-                's'              => $term,
-                'posts_per_page' => 8,
-                'orderby'        => 'relevance',
-            )
+        $query_args = array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            's'              => $term,
+            'posts_per_page' => 8,
+            'orderby'        => 'relevance',
         );
+        if ( function_exists( 'doroshopping_pll_product_query_args' ) ) {
+            $query_args = doroshopping_pll_product_query_args( $query_args );
+        }
+        $query = new WP_Query( $query_args );
 
         $total = (int) $query->found_posts;
 

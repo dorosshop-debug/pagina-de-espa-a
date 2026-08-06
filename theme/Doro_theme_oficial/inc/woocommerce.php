@@ -235,15 +235,27 @@ function doroshopping_more_products_section() {
         : ( function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' ) );
 
     $ids = wc_get_products(
-        array(
-            'status'  => 'publish',
-            'limit'   => $batch,
-            'page'    => 1,
-            'orderby' => 'date',
-            'order'   => 'DESC',
-            'return'  => 'ids',
-            'exclude' => array( $exclude_id ),
-        )
+        function_exists( 'doroshopping_pll_product_query_args' )
+            ? doroshopping_pll_product_query_args(
+                array(
+                    'status'  => 'publish',
+                    'limit'   => $batch,
+                    'page'    => 1,
+                    'orderby' => 'date',
+                    'order'   => 'DESC',
+                    'return'  => 'ids',
+                    'exclude' => array( $exclude_id ),
+                )
+            )
+            : array(
+                'status'  => 'publish',
+                'limit'   => $batch,
+                'page'    => 1,
+                'orderby' => 'date',
+                'order'   => 'DESC',
+                'return'  => 'ids',
+                'exclude' => array( $exclude_id ),
+            )
     );
 
     if ( empty( $ids ) ) {

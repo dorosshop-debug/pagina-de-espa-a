@@ -106,6 +106,89 @@ function doroshopping_get_current_language_code() {
 }
 
 /**
+ * Term ID en el idioma actual (p. ej. categoría del Customizer guardada en ES).
+ *
+ * @param int    $term_id  Term ID origen.
+ * @param string $taxonomy Taxonomía.
+ * @return int
+ */
+function doroshopping_pll_term_id( $term_id, $taxonomy = 'product_cat' ) {
+    $term_id  = absint( $term_id );
+    $taxonomy = sanitize_key( (string) $taxonomy );
+    if ( $term_id <= 0 || ! function_exists( 'pll_get_term' ) ) {
+        return $term_id;
+    }
+
+    $lang = doroshopping_get_current_language_code();
+    if ( ! $lang ) {
+        return $term_id;
+    }
+
+    $translated = pll_get_term( $term_id, $lang );
+    return $translated ? absint( $translated ) : $term_id;
+}
+
+/**
+ * Post/product ID en el idioma actual.
+ *
+ * @param int $post_id Post ID origen.
+ * @return int
+ */
+function doroshopping_pll_post_id( $post_id ) {
+    $post_id = absint( $post_id );
+    if ( $post_id <= 0 || ! function_exists( 'pll_get_post' ) ) {
+        return $post_id;
+    }
+
+    $lang = doroshopping_get_current_language_code();
+    if ( ! $lang ) {
+        return $post_id;
+    }
+
+    $translated = pll_get_post( $post_id, $lang );
+    return $translated ? absint( $translated ) : $post_id;
+}
+
+/**
+ * Producto WC en el idioma actual (si existe traducción enlazada).
+ *
+ * @param WC_Product|null $product Producto.
+ * @return WC_Product|null
+ */
+function doroshopping_pll_product( $product ) {
+    if ( ! $product || ! is_a( $product, 'WC_Product' ) || ! function_exists( 'wc_get_product' ) ) {
+        return $product;
+    }
+
+    $id = doroshopping_pll_post_id( $product->get_id() );
+    if ( $id === (int) $product->get_id() ) {
+        return $product;
+    }
+
+    $translated = wc_get_product( $id );
+    return $translated ? $translated : $product;
+}
+
+/**
+ * Args de consulta de productos con idioma Polylang.
+ *
+ * @param array<string,mixed> $args Args.
+ * @return array<string,mixed>
+ */
+function doroshopping_pll_product_query_args( $args = array() ) {
+    if ( ! is_array( $args ) ) {
+        $args = array();
+    }
+    if ( function_exists( 'pll_current_language' ) ) {
+        $lang = sanitize_key( (string) pll_current_language( 'slug' ) );
+        if ( $lang && empty( $args['lang'] ) ) {
+            $args['lang'] = $lang;
+        }
+    }
+    return $args;
+}
+
+/**
  * Etiqueta de idioma para el botón del header.
  *
  * @return string

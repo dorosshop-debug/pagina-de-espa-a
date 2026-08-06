@@ -66,6 +66,9 @@ $doroshopping_tile_url = static function ( $term_id ) {
     if ( $term_id <= 0 || ! taxonomy_exists( 'product_cat' ) ) {
         return '#';
     }
+    if ( function_exists( 'doroshopping_pll_term_id' ) ) {
+        $term_id = doroshopping_pll_term_id( $term_id, 'product_cat' );
+    }
     $link = get_term_link( $term_id, 'product_cat' );
     return is_wp_error( $link ) ? '#' : $link;
 };

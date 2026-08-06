@@ -1392,11 +1392,29 @@ function doroshopping_get_products_by_category( $cat_id = 0, $limit = 8, $orderb
 
     $cat_id = absint( $cat_id );
     if ( $cat_id > 0 ) {
+        if ( function_exists( 'doroshopping_pll_term_id' ) ) {
+            $cat_id = doroshopping_pll_term_id( $cat_id, 'product_cat' );
+        }
         $term = get_term( $cat_id, 'product_cat' );
         if ( $term && ! is_wp_error( $term ) ) {
             $args['category'] = array( $term->slug );
         }
     }
 
-    return wc_get_products( $args );
+    if ( function_exists( 'doroshopping_pll_product_query_args' ) ) {
+        $args = doroshopping_pll_product_query_args( $args );
+    }
+
+    $products = wc_get_products( $args );
+    if ( ! is_array( $products ) ) {
+        return array();
+    }
+
+    if ( function_exists( 'doroshopping_pll_product' ) ) {
+        foreach ( $products as $i => $product ) {
+            $products[ $i ] = doroshopping_pll_product( $product );
+        }
+    }
+
+    return $products;
 }

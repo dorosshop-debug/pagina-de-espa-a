@@ -339,6 +339,10 @@ function doroshopping_render_home_product_card( $product ) {
         return '';
     }
 
+    if ( function_exists( 'doroshopping_pll_product' ) ) {
+        $product = doroshopping_pll_product( $product );
+    }
+
     $rating      = (float) $product->get_average_rating();
     $count       = (int) $product->get_review_count();
     $product_id  = $product->get_id();

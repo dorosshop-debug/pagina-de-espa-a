@@ -13,6 +13,9 @@ $ui = static function ( $key ) {
 };
 
 $cat_id    = absint( get_theme_mod( 'doroshopping_home_featured_cat', 0 ) );
+if ( $cat_id > 0 && function_exists( 'doroshopping_pll_term_id' ) ) {
+	$cat_id = doroshopping_pll_term_id( $cat_id, 'product_cat' );
+}
 $max_limit = absint( get_theme_mod( 'doroshopping_home_featured_limit', 90 ) );
 if ( $max_limit < 30 ) {
 	$max_limit = 30;
