@@ -19,6 +19,9 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 
 if ( function_exists( 'doroshopping_pll_product' ) ) {
     $product = doroshopping_pll_product( $product );
+    if ( function_exists( 'doroshopping_pll_sync_loop_globals' ) ) {
+        doroshopping_pll_sync_loop_globals( $product );
+    }
 }
 
 $product_id  = $product->get_id();

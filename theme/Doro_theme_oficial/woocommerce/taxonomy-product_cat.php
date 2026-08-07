@@ -1,7 +1,7 @@
 <?php
 /**
  * Plantilla de archivo de categoría de producto (product_cat).
- * Layout: título + subcategorías + filtros + productos (cards Home).
+ * Hero visual alineado con Ofertas + subcategorías + filtros + productos.
  *
  * @package Doroshopping
  */
@@ -38,35 +38,46 @@ if ( is_wp_error( $children ) ) {
 }
 
 $placeholder = function_exists( 'wc_placeholder_img_src' ) ? wc_placeholder_img_src( 'woocommerce_thumbnail' ) : '';
+$intro       = ! empty( $term->description )
+    ? wp_strip_all_tags( $term->description )
+    : $ui( 'doroshopping_ui_shop_cat_lead' );
+if ( '' === $intro ) {
+    $intro = $ui( 'doroshopping_ui_shop_offers_lead' );
+}
 ?>
 
 <main id="main-content" class="doro-category">
-    <div class="doro-category__title-bar">
-        <div class="doro-category__title-inner">
-            <nav class="doro-category__breadcrumb woocommerce-breadcrumb" aria-label="<?php esc_attr_e( 'Migas de pan', 'doroshopping' ); ?>">
-                <?php
-                if ( function_exists( 'woocommerce_breadcrumb' ) ) {
-                    woocommerce_breadcrumb(
-                        array(
-                            'delimiter'   => ' <span class="doro-category__breadcrumb-sep" aria-hidden="true">/</span> ',
-                            'wrap_before' => '',
-                            'wrap_after'  => '',
-                            'before'      => '',
-                            'after'       => '',
-                            'home'        => _x( 'Inicio', 'breadcrumb', 'doroshopping' ),
-                        )
-                    );
-                }
-                ?>
-            </nav>
-            <h1 class="doro-category__title"><?php echo esc_html( $term->name ); ?></h1>
-            <?php if ( ! empty( $term->description ) ) : ?>
-                <p class="doro-category__intro"><?php echo esc_html( wp_strip_all_tags( $term->description ) ); ?></p>
-            <?php endif; ?>
-        </div>
-    </div>
-
     <div class="doro-category__container">
+        <nav class="doro-category__breadcrumb woocommerce-breadcrumb" aria-label="<?php esc_attr_e( 'Migas de pan', 'doroshopping' ); ?>">
+            <?php
+            if ( function_exists( 'woocommerce_breadcrumb' ) ) {
+                woocommerce_breadcrumb(
+                    array(
+                        'delimiter'   => ' <span class="doro-category__breadcrumb-sep" aria-hidden="true">/</span> ',
+                        'wrap_before' => '',
+                        'wrap_after'  => '',
+                        'before'      => '',
+                        'after'       => '',
+                        'home'        => _x( 'Inicio', 'breadcrumb', 'doroshopping' ),
+                    )
+                );
+            }
+            ?>
+        </nav>
+
+        <section class="doro-offers-hero doro-offers-hero--category" aria-label="<?php echo esc_attr( $term->name ); ?>">
+            <div class="doro-offers-hero__badge"><?php echo esc_html( $ui( 'doroshopping_ui_shop_cat_badge' ) ); ?></div>
+            <h1 class="doro-offers-hero__title"><?php echo esc_html( $term->name ); ?></h1>
+            <?php if ( $intro ) : ?>
+                <p class="doro-offers-hero__text"><?php echo esc_html( $intro ); ?></p>
+            <?php endif; ?>
+            <ul class="doro-offers-hero__tags" aria-hidden="true">
+                <li><?php echo esc_html( $ui( 'doroshopping_ui_shop_ship_fast' ) ); ?></li>
+                <li><?php echo esc_html( $ui( 'doroshopping_ui_shop_pay_secure' ) ); ?></li>
+                <li><?php echo esc_html( $ui( 'doroshopping_ui_shop_returns_easy' ) ); ?></li>
+            </ul>
+        </section>
+
         <?php if ( ! empty( $children ) ) : ?>
             <section class="doro-category__subs" aria-label="<?php echo esc_attr( $ui( 'doroshopping_ui_shop_cat_subs' ) ); ?>">
                 <div class="doro-category__subs-grid">

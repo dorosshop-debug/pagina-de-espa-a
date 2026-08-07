@@ -106,14 +106,52 @@ function doroshopping_get_current_language_code() {
 }
 
 /**
+ * Normaliza un valor a post ID sin pasar objetos a absint() (evita warning en load.php).
+ *
+ * @param mixed $value ID, WP_Post u objeto con ->ID.
+ * @return int
+ */
+function doroshopping_normalize_post_id( $value ) {
+    if ( $value instanceof WP_Post ) {
+        return (int) $value->ID;
+    }
+    if ( is_object( $value ) && isset( $value->ID ) && is_numeric( $value->ID ) ) {
+        return (int) $value->ID;
+    }
+    if ( is_numeric( $value ) ) {
+        return absint( $value );
+    }
+    return 0;
+}
+
+/**
+ * Normaliza un valor a term ID sin pasar objetos a absint().
+ *
+ * @param mixed $value ID, WP_Term u objeto con ->term_id.
+ * @return int
+ */
+function doroshopping_normalize_term_id( $value ) {
+    if ( $value instanceof WP_Term ) {
+        return (int) $value->term_id;
+    }
+    if ( is_object( $value ) && isset( $value->term_id ) && is_numeric( $value->term_id ) ) {
+        return (int) $value->term_id;
+    }
+    if ( is_numeric( $value ) ) {
+        return absint( $value );
+    }
+    return 0;
+}
+
+/**
  * Term ID en el idioma actual (p. ej. categoría del Customizer guardada en ES).
  *
- * @param int    $term_id  Term ID origen.
- * @param string $taxonomy Taxonomía.
+ * @param int|WP_Term $term_id  Term ID origen.
+ * @param string      $taxonomy Taxonomía.
  * @return int
  */
 function doroshopping_pll_term_id( $term_id, $taxonomy = 'product_cat' ) {
-    $term_id  = absint( $term_id );
+    $term_id  = doroshopping_normalize_term_id( $term_id );
     $taxonomy = sanitize_key( (string) $taxonomy );
     if ( $term_id <= 0 || ! function_exists( 'pll_get_term' ) ) {
         return $term_id;
@@ -125,17 +163,17 @@ function doroshopping_pll_term_id( $term_id, $taxonomy = 'product_cat' ) {
     }
 
     $translated = pll_get_term( $term_id, $lang );
-    return $translated ? absint( $translated ) : $term_id;
+    return $translated ? doroshopping_normalize_term_id( $translated ) : $term_id;
 }
 
 /**
  * Post/product ID en el idioma actual.
  *
- * @param int $post_id Post ID origen.
+ * @param int|WP_Post $post_id Post ID origen.
  * @return int
  */
 function doroshopping_pll_post_id( $post_id ) {
-    $post_id = absint( $post_id );
+    $post_id = doroshopping_normalize_post_id( $post_id );
     if ( $post_id <= 0 || ! function_exists( 'pll_get_post' ) ) {
         return $post_id;
     }
@@ -146,7 +184,7 @@ function doroshopping_pll_post_id( $post_id ) {
     }
 
     $translated = pll_get_post( $post_id, $lang );
-    return $translated ? absint( $translated ) : $post_id;
+    return $translated ? doroshopping_normalize_post_id( $translated ) : $post_id;
 }
 
 /**
@@ -167,6 +205,37 @@ function doroshopping_pll_product( $product ) {
 
     $translated = wc_get_product( $id );
     return $translated ? $translated : $product;
+}
+
+/**
+ * Alinea global $post / $product tras resolver traducción Polylang.
+ *
+ * @param WC_Product $product Producto ya resuelto.
+ * @return void
+ */
+function doroshopping_pll_sync_loop_globals( $product ) {
+    if ( ! $product || ! is_a( $product, 'WC_Product' ) ) {
+        return;
+    }
+
+    $id = (int) $product->get_id();
+    if ( $id <= 0 ) {
+        return;
+    }
+
+    $GLOBALS['product'] = $product;
+
+    if ( (int) get_the_ID() === $id ) {
+        return;
+    }
+
+    $post_object = get_post( $id );
+    if ( ! $post_object instanceof WP_Post ) {
+        return;
+    }
+
+    $GLOBALS['post'] = $post_object;
+    setup_postdata( $post_object );
 }
 
 /**
@@ -364,8 +433,8 @@ function doroshopping_get_header_currencies() {
                 'order'          => 'ASC',
             )
         );
-        foreach ( $yay_posts as $post ) {
-            $push( $post->post_title );
+        foreach ( $yay_posts as $yay_post ) {
+            $push( $yay_post->post_title );
         }
     }
     if ( class_exists( 'Yay_Currency\Helpers\Helper', false ) && is_callable( array( 'Yay_Currency\Helpers\Helper', 'get_currencies_post_type' ) ) ) {
@@ -686,7 +755,7 @@ function doroshopping_url_for_language( $lang, $fallback = '' ) {
         if ( $from_id && function_exists( 'pll_get_post' ) ) {
             $tr = pll_get_post( $from_id, $lang );
             if ( $tr ) {
-                $link = get_permalink( (int) $tr );
+                $link = get_permalink( doroshopping_normalize_post_id( $tr ) );
                 if ( $link ) {
                     return $link;
                 }
@@ -698,7 +767,7 @@ function doroshopping_url_for_language( $lang, $fallback = '' ) {
     if ( $from_id && 'term' === $from_type && function_exists( 'pll_get_term' ) ) {
         $tr = pll_get_term( $from_id, $lang );
         if ( $tr ) {
-            $link = get_term_link( (int) $tr );
+            $link = get_term_link( doroshopping_normalize_term_id( $tr ) );
             if ( ! is_wp_error( $link ) ) {
                 return $link;
             }
@@ -710,7 +779,7 @@ function doroshopping_url_for_language( $lang, $fallback = '' ) {
     if ( $from_id && in_array( $from_type, array( 'post', 'page', 'product' ), true ) && function_exists( 'pll_get_post' ) ) {
         $tr = pll_get_post( $from_id, $lang );
         if ( $tr ) {
-            $link = get_permalink( (int) $tr );
+            $link = get_permalink( doroshopping_normalize_post_id( $tr ) );
             if ( $link ) {
                 return $link;
             }

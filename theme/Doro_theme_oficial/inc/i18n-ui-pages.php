@@ -758,6 +758,17 @@ function doroshopping_i18n_ui_page_defaults() {
 			'label'   => __( 'Tienda: subcategorias', 'doroshopping' ),
 			'section' => 'doroshopping_ui_shop',
 		),
+		'doroshopping_ui_shop_cat_badge'         => array(
+			'default' => __( 'Categoría', 'doroshopping' ),
+			'label'   => __( 'Tienda: badge categoria', 'doroshopping' ),
+			'section' => 'doroshopping_ui_shop',
+		),
+		'doroshopping_ui_shop_cat_lead'          => array(
+			'default' => __( 'Explora esta categoría y encuentra lo que necesitas, con envío rápido y compra segura.', 'doroshopping' ),
+			'label'   => __( 'Tienda: lead categoria', 'doroshopping' ),
+			'section' => 'doroshopping_ui_shop',
+			'type'    => 'textarea',
+		),
 		'doroshopping_ui_shop_cat_more'          => array(
 			'default' => __( 'Más formas de comprar', 'doroshopping' ),
 			'label'   => __( 'Tienda: mas formas comprar', 'doroshopping' ),

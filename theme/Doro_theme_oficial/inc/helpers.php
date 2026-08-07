@@ -24,9 +24,11 @@ function doroshopping_get_star_rating_html( $rating = 0, $count = 0 ) {
         ? sprintf( __( 'Valoración %.1f de 5 (%d valoraciones)', 'doroshopping' ), $rating, $count )
         : __( 'Sin valoraciones', 'doroshopping' );
 
+    $star_path = 'M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z';
+
     ob_start();
     ?>
-    <div class="product-rating" role="img" aria-label="<?php echo esc_attr( $label ); ?>">
+    <div class="product-rating<?php echo $count > 0 ? ' product-rating--rated' : ''; ?>" role="img" aria-label="<?php echo esc_attr( $label ); ?>">
         <?php for ( $i = 1; $i <= 5; $i++ ) : ?>
             <?php
             $fill = 0;
@@ -39,16 +41,19 @@ function doroshopping_get_star_rating_html( $rating = 0, $count = 0 ) {
             }
             ?>
             <span class="product-rating__star" aria-hidden="true">
-                <svg class="product-rating__star-empty" viewBox="0 0 24 24" width="14" height="14">
-                    <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <svg class="product-rating__star-empty" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path d="<?php echo esc_attr( $star_path ); ?>" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>
                 </svg>
                 <span class="product-rating__star-fill" style="width: <?php echo esc_attr( (string) $fill ); ?>%;">
-                    <svg viewBox="0 0 24 24" width="14" height="14">
-                        <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.8 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8L12 2z" fill="currentColor"/>
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path d="<?php echo esc_attr( $star_path ); ?>" fill="#FFD100" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/>
                     </svg>
                 </span>
             </span>
         <?php endfor; ?>
+        <?php if ( $count > 0 ) : ?>
+            <span class="product-rating__count">(<?php echo esc_html( (string) $count ); ?>)</span>
+        <?php endif; ?>
     </div>
     <?php
     return ob_get_clean();

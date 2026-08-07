@@ -416,7 +416,9 @@ function doroshopping_polylang_sync_all_site_pages() {
 		if ( function_exists( 'pll_get_post' ) ) {
 			$in_default = pll_get_post( $source_id, $default );
 			if ( $in_default ) {
-				$source_id = (int) $in_default;
+				$source_id = function_exists( 'doroshopping_normalize_post_id' )
+					? doroshopping_normalize_post_id( $in_default )
+					: (int) $in_default;
 			}
 		}
 
@@ -445,7 +447,9 @@ function doroshopping_polylang_sync_all_site_pages() {
 
 			$existing = pll_get_post( $source_id, $lang );
 			if ( $existing ) {
-				$translations[ $lang ] = (int) $existing;
+				$translations[ $lang ] = function_exists( 'doroshopping_normalize_post_id' )
+					? doroshopping_normalize_post_id( $existing )
+					: (int) $existing;
 				$stats['linked']++;
 				continue;
 			}

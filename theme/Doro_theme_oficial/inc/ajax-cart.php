@@ -128,6 +128,11 @@ function doroshopping_get_cart_payload() {
  */
 function doroshopping_ajax_get_cart() {
     check_ajax_referer( 'doroshopping_cart', 'nonce' );
+
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'cart_read', 90, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
     doroshopping_ensure_wc_cart( false );
     wp_send_json_success( doroshopping_get_cart_payload() );
 }
@@ -270,6 +275,10 @@ add_action( 'wp_ajax_nopriv_doroshopping_add_to_cart', 'doroshopping_ajax_add_to
 function doroshopping_ajax_home_load_more() {
     check_ajax_referer( 'doroshopping_home', 'nonce' );
 
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'home_load_more', 40, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
     if ( ! function_exists( 'doroshopping_get_products_by_category' ) || ! function_exists( 'doroshopping_render_home_product_card' ) ) {
         wp_send_json_error( array( 'message' => 'unavailable' ), 500 );
     }
@@ -342,6 +351,10 @@ add_action( 'wp_ajax_nopriv_doroshopping_home_load_more', 'doroshopping_ajax_hom
  */
 function doroshopping_ajax_product_more_load() {
     check_ajax_referer( 'doroshopping_product_more', 'nonce' );
+
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'product_more', 40, 60 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
 
     if ( ! function_exists( 'wc_get_products' ) ) {
         wp_send_json_error( array( 'message' => 'unavailable' ), 500 );

@@ -391,3 +391,238 @@ function doroshopping_prefs_rate_limit_ok( $action ) {
 
 	return doroshopping_rate_limit( $action, max( 5, $limit ), max( 60, $window ) );
 }
+
+/**
+ * Clave transient de soft-ban por IP.
+ *
+ * @param string $ip IP.
+ * @return string
+ */
+function doroshopping_soft_ban_key( $ip = '' ) {
+	$ip = $ip ? (string) $ip : doroshopping_security_client_ip();
+	if ( ! $ip ) {
+		$ip = 'unknown';
+	}
+	return 'doro_sban_' . md5( $ip );
+}
+
+/**
+ * ¿IP en soft-ban temporal?
+ *
+ * @param string $ip IP.
+ * @return bool
+ */
+function doroshopping_is_soft_banned( $ip = '' ) {
+	return (bool) get_transient( doroshopping_soft_ban_key( $ip ) );
+}
+
+/**
+ * Soft-ban temporal por IP (no bloquea admin logueado).
+ *
+ * @param string $reason Motivo (junk_path, ajax_flood, rest_flood…).
+ * @param int    $ttl    Segundos (default 15 min).
+ * @return void
+ */
+function doroshopping_soft_ban_ip( $reason = 'abuse', $ttl = 0 ) {
+	// Nunca soft-ban / Fail2ban a crawlers de redes sociales o buscadores.
+	if ( function_exists( 'doroshopping_is_trusted_crawler' ) && doroshopping_is_trusted_crawler() ) {
+		return;
+	}
+
+	$reason = sanitize_key( (string) $reason );
+	$ttl    = $ttl > 0 ? (int) $ttl : (int) apply_filters( 'doroshopping_soft_ban_ttl', 15 * MINUTE_IN_SECONDS, $reason );
+	$ttl    = max( 60, $ttl );
+	$ip     = doroshopping_security_client_ip();
+
+	set_transient( doroshopping_soft_ban_key( $ip ), $reason ? $reason : 'abuse', $ttl );
+
+	// Línea parseable por Fail2ban (IP en claro solo aquí; el resto de logs sigue hasheado).
+	$ua  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? substr( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), 0, 120 ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	$uri = isset( $_SERVER['REQUEST_URI'] ) ? substr( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 0, 160 ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	$line = sprintf(
+		'[Doro ban-candidate] ip=%s reason=%s ttl=%d ua="%s" uri="%s"',
+		$ip ? $ip : 'unknown',
+		$reason ? $reason : 'abuse',
+		$ttl,
+		str_replace( '"', '', $ua ),
+		str_replace( '"', '', $uri )
+	);
+	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+	error_log( $line );
+
+	doroshopping_log_abuse( 'soft_ban_' . ( $reason ? $reason : 'abuse' ), $ip, 1, array( 'ttl' => $ttl ) );
+}
+
+/**
+ * Contar golpes de abuso; al superar umbral → soft-ban.
+ *
+ * @param string $bucket junk_path|filter_abuse|ajax_flood|rest_flood.
+ * @param int    $limit  Golpes antes de ban.
+ * @param int    $window Ventana de conteo.
+ * @return bool True si acaba de banear.
+ */
+function doroshopping_abuse_strike( $bucket, $limit = 8, $window = 300 ) {
+	$bucket = sanitize_key( (string) $bucket );
+	$limit  = max( 2, (int) $limit );
+	$window = max( 60, (int) $window );
+	$ip     = doroshopping_security_client_ip();
+	if ( ! $ip ) {
+		$ip = 'unknown';
+	}
+
+	$key   = 'doro_strike_' . md5( $bucket . '|' . $ip );
+	$count = (int) get_transient( $key ) + 1;
+	set_transient( $key, $count, $window );
+
+	if ( $count < $limit ) {
+		return false;
+	}
+
+	doroshopping_soft_ban_ip( $bucket );
+	delete_transient( $key );
+	return true;
+}
+
+/**
+ * Cortar petición si la IP está soft-baneada.
+ *
+ * @return void
+ */
+function doroshopping_enforce_soft_ban() {
+	if ( is_admin() && ! wp_doing_ajax() ) {
+		return;
+	}
+	if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
+		return;
+	}
+	if ( ! doroshopping_is_soft_banned() ) {
+		return;
+	}
+
+	if ( wp_doing_ajax() ) {
+		status_header( 429 );
+		nocache_headers();
+		header( 'Retry-After: 900' );
+		wp_send_json_error(
+			array(
+				'message' => __( 'Demasiadas peticiones. Inténtalo más tarde.', 'doroshopping' ),
+			),
+			429
+		);
+	}
+
+	status_header( 429 );
+	nocache_headers();
+	header( 'Retry-After: 900' );
+	header( 'X-Robots-Tag: noindex, nofollow' );
+	exit;
+}
+add_action( 'init', 'doroshopping_enforce_soft_ban', -1 );
+
+/**
+ * Rate limit global para admin-ajax.php (solo visitantes / nopriv).
+ *
+ * @return void
+ */
+function doroshopping_ajax_global_rate_limit() {
+	if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) {
+		return;
+	}
+	if ( is_user_logged_in() ) {
+		return;
+	}
+
+	$action = isset( $_REQUEST['action'] ) ? sanitize_key( wp_unslash( $_REQUEST['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	if ( ! $action ) {
+		return;
+	}
+
+	// Acciones del core / heartbeat: no tocar.
+	$skip = array( 'heartbeat', 'wp-compression-test', 'logged-in' );
+	/**
+	 * @param string[] $skip Actions to skip.
+	 */
+	$skip = apply_filters( 'doroshopping_ajax_rate_limit_skip', $skip );
+	if ( in_array( $action, (array) $skip, true ) ) {
+		return;
+	}
+
+	/**
+	 * Límite global AJAX anónimo: 90 / 60s por IP.
+	 *
+	 * @param int    $limit  Limit.
+	 * @param string $action Action.
+	 */
+	$limit = (int) apply_filters( 'doroshopping_ajax_global_rate_limit', 90, $action );
+	/**
+	 * @param int    $window Window.
+	 * @param string $action Action.
+	 */
+	$window = (int) apply_filters( 'doroshopping_ajax_global_rate_window', 60, $action );
+
+	if ( doroshopping_rate_limit( 'ajax_global', max( 20, $limit ), max( 30, $window ) ) ) {
+		return;
+	}
+
+	doroshopping_abuse_strike( 'ajax_flood', 3, 10 * MINUTE_IN_SECONDS );
+	doroshopping_rate_limit_ajax_block();
+}
+add_action( 'admin_init', 'doroshopping_ajax_global_rate_limit', 0 );
+
+/**
+ * Rate limit REST pública (store / wc / wp/v2 posts).
+ *
+ * @param mixed           $result  Response.
+ * @param WP_REST_Server  $server  Server.
+ * @param WP_REST_Request $request Request.
+ * @return mixed|WP_Error
+ */
+function doroshopping_rest_rate_limit( $result, $server, $request ) {
+	unset( $server );
+
+	if ( is_user_logged_in() ) {
+		return $result;
+	}
+
+	$route = $request instanceof WP_REST_Request ? (string) $request->get_route() : '';
+	if ( '' === $route ) {
+		return $result;
+	}
+
+	// Solo rutas ruidosas / enumerables.
+	$watch = (bool) preg_match( '#^/(wc|wc-store|wc/store|wp/v2)/(products|product|cart|checkout|customers|users|posts|pages)#', $route );
+	/**
+	 * @param bool   $watch Watch this route.
+	 * @param string $route Route.
+	 */
+	if ( ! apply_filters( 'doroshopping_rest_rate_limit_watch', $watch, $route ) ) {
+		return $result;
+	}
+
+	/**
+	 * @param int    $limit Limit.
+	 * @param string $route Route.
+	 */
+	$limit = (int) apply_filters( 'doroshopping_rest_rate_limit', 60, $route );
+	/**
+	 * @param int    $window Window.
+	 * @param string $route  Route.
+	 */
+	$window = (int) apply_filters( 'doroshopping_rest_rate_window', 60, $route );
+
+	if ( doroshopping_rate_limit( 'rest_public', max( 15, $limit ), max( 30, $window ) ) ) {
+		return $result;
+	}
+
+	doroshopping_abuse_strike( 'rest_flood', 3, 10 * MINUTE_IN_SECONDS );
+
+	return new WP_Error(
+		'doroshopping_rest_rate_limited',
+		__( 'Demasiadas peticiones. Espera un momento e inténtalo de nuevo.', 'doroshopping' ),
+		array(
+			'status'       => 429,
+			'retry_after'  => 60,
+		)
+	);
+}
+add_filter( 'rest_pre_dispatch', 'doroshopping_rest_rate_limit', 5, 3 );
