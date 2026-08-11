@@ -443,13 +443,62 @@
     content: none !important;
 }
 
-/* Cards: ver components/product-card.css (.home-product-card) */
+/* Cards: mismo diseño que Home (components/product-card.css) */
 .doro-shop ul.products li.product,
-.woocommerce ul.products li.product {
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product {
     margin: 0 !important;
     width: auto !important;
     float: none !important;
     padding: 0 !important;
+    text-align: left !important;
+}
+
+/* Anular tipografía/precio nativo de WooCommerce en el loop */
+.doro-shop ul.products li.product .woocommerce-loop-product__title,
+.woocommerce ul.products li.product .woocommerce-loop-product__title,
+.doro-shop ul.products li.product .price,
+.woocommerce ul.products li.product .price {
+    margin: 0;
+}
+
+.doro-shop ul.products li.product .home-product-card__price,
+.woocommerce ul.products li.product .home-product-card__price,
+.woocommerce-page ul.products li.product .home-product-card__price {
+    font-size: 1.45rem !important;
+    font-weight: 800 !important;
+    color: #ff3b00 !important;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.doro-shop ul.products li.product .home-product-card__price .woocommerce-Price-amount,
+.doro-shop ul.products li.product .home-product-card__price .amount,
+.woocommerce ul.products li.product .home-product-card__price .woocommerce-Price-amount,
+.woocommerce ul.products li.product .home-product-card__price .amount {
+    color: #ff3b00 !important;
+    font-weight: 800 !important;
+}
+
+.doro-shop ul.products li.product .home-product-card__price del,
+.woocommerce ul.products li.product .home-product-card__price del {
+    font-size: 0.85rem !important;
+    color: #9a9a9a !important;
+    font-weight: 400 !important;
+}
+
+.doro-shop ul.products li.product .home-product-card__name,
+.woocommerce ul.products li.product .home-product-card__name {
+    font-size: var(--font-size-sm) !important;
+    font-weight: 400 !important;
+    color: var(--color-grey-text) !important;
+}
+
+.doro-shop ul.products li.product .button,
+.woocommerce ul.products li.product > .button,
+.woocommerce ul.products li.product > a.button {
+    display: none !important;
 }
 
 .woocommerce-pagination {
@@ -489,6 +538,13 @@
     .doro-shop ul.products,
     .woocommerce ul.products {
         grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .doro-shop ul.products li.product .home-product-card__price,
+    .woocommerce ul.products li.product .home-product-card__price {
+        font-size: 1.25rem !important;
     }
 }
 

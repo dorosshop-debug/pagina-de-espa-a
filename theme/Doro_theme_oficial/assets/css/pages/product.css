@@ -321,20 +321,37 @@
     color: var(--color-orange);
 }
 
-.doro-product__summary .price {
+.doro-product__summary .price,
+.woocommerce.single-product div.product .doro-product__summary .price,
+.woocommerce div.product .summary .price {
     display: block;
-    color: #e53935;
-    font-size: 26px;
-    font-weight: 700;
+    color: #ff3b00;
+    font-size: 1.75rem;
+    font-weight: 800;
     margin: 0 0 10px;
-    line-height: 1.1;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.doro-product__summary .price .woocommerce-Price-amount,
+.doro-product__summary .price .amount,
+.woocommerce.single-product div.product .doro-product__summary .price .woocommerce-Price-amount,
+.woocommerce.single-product div.product .doro-product__summary .price .amount {
+    color: #ff3b00;
+    font-weight: 800;
 }
 
 .doro-product__summary .price del {
-    font-size: 13px;
-    color: var(--color-grey-text);
+    font-size: 0.95rem;
+    color: #9a9a9a;
     font-weight: 400;
-    margin-left: 6px;
+    margin-left: 8px;
+}
+
+.doro-product__summary .price del .woocommerce-Price-amount,
+.doro-product__summary .price del .amount {
+    color: #9a9a9a;
+    font-weight: 400;
 }
 
 .doro-product__summary .price ins {
@@ -1089,7 +1106,9 @@
 .doro-product__more-wrap .home-product-card__price,
 .doro-product__below .related .home-product-card__price,
 .doro-product__below .upsells .home-product-card__price {
-    font-size: 14px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ff3b00;
 }
 
 .doro-product__related-wrap .home-product-card__name,
@@ -1278,7 +1297,7 @@
     }
 
     .doro-product__summary .price {
-        font-size: 24px;
+        font-size: 1.55rem;
     }
 
     .doro-product__secondary {
@@ -1368,7 +1387,7 @@
     }
 
     .doro-product__summary .price {
-        font-size: 22px;
+        font-size: 1.4rem;
     }
 }
 

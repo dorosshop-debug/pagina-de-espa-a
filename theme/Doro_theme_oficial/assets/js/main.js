@@ -1888,6 +1888,10 @@ function initLiveSearch() {
 
         if (!input || !panel || !list) return;
 
+        var mobileMq = typeof window.matchMedia === 'function'
+            ? window.matchMedia('(max-width: 1100px)')
+            : null;
+
         function escapeHtml(str) {
             return String(str == null ? '' : str)
                 .replace(/&/g, '&amp;')
@@ -1896,14 +1900,50 @@ function initLiveSearch() {
                 .replace(/"/g, '&quot;');
         }
 
+        function syncPanelPosition() {
+            if (!mobileMq || !mobileMq.matches) {
+                wrap.classList.remove('is-live-search-open');
+                wrap.style.removeProperty('--live-search-left');
+                wrap.style.removeProperty('--live-search-width');
+                wrap.style.removeProperty('--live-search-top');
+                wrap.style.removeProperty('--live-search-max-height');
+                return;
+            }
+
+            var rect = input.getBoundingClientRect();
+            var gutter = 12;
+            var left = Math.max(gutter, rect.left);
+            var width = Math.min(rect.width, window.innerWidth - (gutter * 2));
+            if (left + width > window.innerWidth - gutter) {
+                left = Math.max(gutter, window.innerWidth - gutter - width);
+            }
+
+            wrap.style.setProperty('--live-search-left', left + 'px');
+            wrap.style.setProperty('--live-search-width', width + 'px');
+            wrap.style.setProperty('--live-search-top', (rect.bottom + 8) + 'px');
+            wrap.style.setProperty(
+                '--live-search-max-height',
+                Math.max(160, window.innerHeight - rect.bottom - 16) + 'px'
+            );
+        }
+
         function openPanel() {
             panel.hidden = false;
             input.setAttribute('aria-expanded', 'true');
+            if (mobileMq && mobileMq.matches) {
+                wrap.classList.add('is-live-search-open');
+                syncPanelPosition();
+            }
         }
 
         function closePanel() {
             panel.hidden = true;
             input.setAttribute('aria-expanded', 'false');
+            wrap.classList.remove('is-live-search-open');
+            wrap.style.removeProperty('--live-search-left');
+            wrap.style.removeProperty('--live-search-width');
+            wrap.style.removeProperty('--live-search-top');
+            wrap.style.removeProperty('--live-search-max-height');
         }
 
         function setLoading(on) {
@@ -1921,6 +1961,7 @@ function initLiveSearch() {
                 if (emptyEl) emptyEl.hidden = false;
                 if (allLink) allLink.hidden = true;
                 openPanel();
+                syncPanelPosition();
                 return;
             }
 
@@ -1933,7 +1974,7 @@ function initLiveSearch() {
                         '<div class="live-search__thumb">' +
                             (item.image ? '<img src="' + escapeHtml(item.image) + '" alt="">' : '') +
                         '</div>' +
-                        '<div>' +
+                        '<div class="live-search__meta">' +
                             '<p class="live-search__title">' + escapeHtml(item.title) + '</p>' +
                             (item.sku ? '<p class="live-search__sku">SKU: ' + escapeHtml(item.sku) + '</p>' : '') +
                         '</div>' +
@@ -1948,6 +1989,7 @@ function initLiveSearch() {
                 allLink.textContent = (cfg.i18n && cfg.i18n.viewAll) || 'Ver todos los resultados';
             }
             openPanel();
+            syncPanelPosition();
         }
 
         function search(term) {
@@ -1963,6 +2005,7 @@ function initLiveSearch() {
 
             setLoading(true);
             openPanel();
+            syncPanelPosition();
 
             var url = cfg.ajaxUrl +
                 '?action=doroshopping_live_search' +
@@ -2003,8 +2046,13 @@ function initLiveSearch() {
         input.addEventListener('focus', function () {
             if (input.value.trim().length >= minChars && list.children.length) {
                 openPanel();
+            } else if (mobileMq && mobileMq.matches && !panel.hidden) {
+                syncPanelPosition();
             }
         });
+
+        window.addEventListener('resize', syncPanelPosition);
+        window.addEventListener('scroll', syncPanelPosition, true);
 
         document.addEventListener('click', function (e) {
             if (!wrap.contains(e.target)) closePanel();

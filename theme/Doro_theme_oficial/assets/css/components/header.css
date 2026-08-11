@@ -891,6 +891,7 @@
         align-items: center;
         gap: 8px 12px;
         padding: 8px 16px 10px;
+        overflow-x: clip;
     }
 
     .site-header__brand {
@@ -907,6 +908,8 @@
     .site-header__search-wrap {
         grid-area: search;
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
         flex: 1 1 100%;
     }
 
@@ -931,6 +934,7 @@
     .site-header__top {
         padding: 6px 12px 8px;
         gap: 8px;
+        overflow-x: clip;
     }
 
     .site-header__logo img {

@@ -190,7 +190,11 @@ ul.products li.product.home-product-card:hover {
 }
 
 .home-product-card__price .woocommerce-Price-amount,
-.home-product-card__price .amount {
+.home-product-card__price .amount,
+.woocommerce .home-product-card__price .woocommerce-Price-amount,
+.woocommerce .home-product-card__price .amount,
+.woocommerce ul.products li.product .price,
+.woocommerce ul.products li.product .price .amount {
     color: #ff3b00;
     font-weight: 800;
 }
