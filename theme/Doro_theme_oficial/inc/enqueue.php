@@ -297,6 +297,8 @@ function doroshopping_enqueue_assets() {
         'doroshopping-main',
         'doroshoppingShipping',
         array(
+            'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
+            'prefsNonce' => wp_create_nonce( 'doroshopping_shipping_prefs' ),
             'restUrl'   => esc_url_raw( rest_url( 'doro/v1/bigbuy-shipping' ) ),
             'nonce'     => wp_create_nonce( 'wp_rest' ),
             'country'   => isset( $loc['code'] ) ? $loc['code'] : 'ES',

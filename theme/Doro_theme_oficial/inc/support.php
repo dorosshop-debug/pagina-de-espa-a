@@ -151,6 +151,11 @@ function doroshopping_handle_apply_coupon() {
 		exit;
 	}
 
+	if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'coupon_apply', 12, 300 ) ) {
+		wp_safe_redirect( add_query_arg( 'coupon_error', __( 'Demasiados intentos. Espera unos minutos.', 'doroshopping' ), $redirect ) );
+		exit;
+	}
+
 	$code = isset( $_POST['coupon_code'] ) ? sanitize_text_field( wp_unslash( $_POST['coupon_code'] ) ) : '';
 	$code = trim( $code );
 	if ( function_exists( 'wc_format_coupon_code' ) ) {

@@ -494,19 +494,38 @@ function doroshopping_bigbuy_quote( $country, $postcode, $lines ) {
 }
 
 /**
+ * ¿Permitir cotización remota BigBuy vía REST? (filtro / constante DORO_BIGBUY_SSR_ONLY).
+ *
+ * @return bool
+ */
+function doroshopping_bigbuy_allow_remote_quote() {
+    if ( defined( 'DORO_BIGBUY_SSR_ONLY' ) && DORO_BIGBUY_SSR_ONLY ) {
+        return false;
+    }
+    return (bool) apply_filters( 'doroshopping_bigbuy_allow_remote_quote', true );
+}
+
+/**
+ * Permiso REST BigBuy: nonce wp_rest obligatorio.
+ *
+ * @param WP_REST_Request $request Request.
+ * @return bool
+ */
+function doroshopping_bigbuy_rest_permission( WP_REST_Request $request ) {
+    $nonce = $request->get_header( 'X-WP-Nonce' );
+    if ( ! $nonce ) {
+        $nonce = $request->get_param( '_wpnonce' );
+    }
+    return (bool) ( $nonce && wp_verify_nonce( $nonce, 'wp_rest' ) );
+}
+
+/**
  * REST: POST /wp-json/doro/v1/bigbuy-shipping
  *
  * @param WP_REST_Request $request Request.
  * @return WP_REST_Response
  */
 function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
-    $nonce = $request->get_header( 'X-WP-Nonce' );
-    if ( ! $nonce ) {
-        $nonce = $request->get_param( '_wpnonce' );
-    }
-    // En preview/local sin nonce: solo fallback (no llama a BigBuy API).
-    $nonce_ok = $nonce && wp_verify_nonce( $nonce, 'wp_rest' );
-
     if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'bigbuy_ship', 20, 60 ) ) {
         return new WP_REST_Response(
             array(
@@ -520,6 +539,16 @@ function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
     $country  = strtoupper( sanitize_text_field( (string) $request->get_param( 'country' ) ) );
     $postcode = sanitize_text_field( (string) $request->get_param( 'postcode' ) );
     $lines    = $request->get_param( 'products' );
+
+    if ( function_exists( 'doroshopping_is_allowed_country_code' ) && ! doroshopping_is_allowed_country_code( $country ) ) {
+        return new WP_REST_Response(
+            array(
+                'success' => false,
+                'message' => __( 'País de envío no válido.', 'doroshopping' ),
+            ),
+            400
+        );
+    }
 
     if ( ! is_array( $lines ) || empty( $lines ) ) {
         $product_id = absint( $request->get_param( 'product_id' ) );
@@ -570,6 +599,30 @@ function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
         );
     }
 
+    if ( is_array( $lines ) && count( $lines ) > 15 ) {
+        $lines = array_slice( $lines, 0, 15 );
+    }
+
+    // Bloquear líneas de preview / referencias vacías (evita abuso de API).
+    if ( is_array( $lines ) ) {
+        $lines = array_values(
+            array_filter(
+                $lines,
+                static function ( $line ) {
+                    if ( ! is_array( $line ) ) {
+                        return false;
+                    }
+                    $ref = isset( $line['reference'] ) ? strtoupper( (string) $line['reference'] ) : '';
+                    $sku = isset( $line['sku'] ) ? strtoupper( (string) $line['sku'] ) : '';
+                    if ( in_array( 'PREVIEW', array( $ref, $sku ), true ) ) {
+                        return false;
+                    }
+                    return '' !== $ref || '' !== $sku;
+                }
+            )
+        );
+    }
+
     if ( ! $country ) {
         return new WP_REST_Response(
             array(
@@ -580,9 +633,13 @@ function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
         );
     }
 
-    // Sin nonce válido: estimación local (evita abuso de la API BigBuy).
-    if ( ! $nonce_ok || ! doroshopping_bigbuy_api_key() ) {
-        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, $nonce_ok ? 'no_api_key' : 'no_nonce' ), 200 );
+    // Sin clave API, modo SSR-only o sin líneas válidas: estimación local.
+    if ( ! doroshopping_bigbuy_allow_remote_quote() || ! doroshopping_bigbuy_api_key() || empty( $lines ) ) {
+        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'local_only' ), 200 );
+    }
+
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'bigbuy_ship_api', 8, 60 ) ) {
+        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'rate_limit' ), 200 );
     }
 
     $parsed = doroshopping_bigbuy_quote( $country, $postcode, $lines );
@@ -599,9 +656,7 @@ function doroshopping_register_bigbuy_rest() {
         array(
             'methods'             => 'POST',
             'callback'            => 'doroshopping_bigbuy_shipping_endpoint',
-            'permission_callback' => function () {
-                return true; // Lectura pública de tarifas; el nonce se valida en callback.
-            },
+            'permission_callback' => 'doroshopping_bigbuy_rest_permission',
         )
     );
 }

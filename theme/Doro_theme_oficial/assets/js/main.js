@@ -2815,7 +2815,7 @@ function initBigBuyShipping() {
     function countryCode() {
         var fromCfg = cfg && cfg.country ? String(cfg.country).toUpperCase() : '';
         var fromCookie = (readCookie('doroshopping_country') || '').toUpperCase();
-        var code = fromCookie || fromCfg || 'ES';
+        var code = fromCfg || fromCookie || 'ES';
         if (code === 'UK') code = 'GB';
         return code.length >= 2 ? code.slice(0, 2) : 'ES';
     }
@@ -2823,6 +2823,20 @@ function initBigBuyShipping() {
     function postcode() {
         if (cfg && cfg.postcode) return String(cfg.postcode);
         return readCookie('doroshopping_postcode') || '';
+    }
+
+    var saveHintTimer = null;
+    function persistShippingHint(country, pc) {
+        if (!cfg || !cfg.ajaxUrl || !cfg.prefsNonce) return;
+        clearTimeout(saveHintTimer);
+        saveHintTimer = setTimeout(function () {
+            var body = new FormData();
+            body.append('action', 'doroshopping_save_shipping_hint');
+            body.append('nonce', cfg.prefsNonce);
+            if (country) body.append('country', country);
+            if (pc !== undefined && pc !== null) body.append('postcode', pc);
+            fetch(cfg.ajaxUrl, { method: 'POST', body: body, credentials: 'same-origin' }).catch(function () {});
+        }, 400);
     }
 
     function countryLabel(code) {
@@ -2952,13 +2966,13 @@ function initBigBuyShipping() {
             var val = String(t.value || '').toUpperCase();
             if (val.length >= 2) {
                 if (cfg) cfg.country = val.slice(0, 2);
-                document.cookie = 'doroshopping_country=' + encodeURIComponent(val.slice(0, 2)) + ';path=/;max-age=31536000';
+                persistShippingHint(val.slice(0, 2), undefined);
                 refresh();
             }
         }
         if (t.id === 'shipping-cp' || t.name === 'codigo_postal') {
             if (cfg) cfg.postcode = t.value || '';
-            document.cookie = 'doroshopping_postcode=' + encodeURIComponent(t.value || '') + ';path=/;max-age=31536000';
+            persistShippingHint(undefined, t.value || '');
             refresh();
         }
     });
@@ -2970,7 +2984,7 @@ function initBigBuyShipping() {
         var val = String(opt.getAttribute('data-value') || '').toUpperCase();
         if (val.length < 2) return;
         if (cfg) cfg.country = val.slice(0, 2);
-        document.cookie = 'doroshopping_country=' + encodeURIComponent(val.slice(0, 2)) + ';path=/;max-age=31536000';
+        persistShippingHint(val.slice(0, 2), undefined);
         setTimeout(refresh, 30);
     });
 

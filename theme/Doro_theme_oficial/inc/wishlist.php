@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 define( 'DOROSHOPPING_WISHLIST_META', '_doroshopping_wishlist' );
 define( 'DOROSHOPPING_WISHLIST_COOKIE', 'doroshopping_wishlist' );
+define( 'DOROSHOPPING_WISHLIST_MAX', 100 );
 
 /**
  * Obtiene IDs de wishlist del usuario (meta) o cookie (invitado).
@@ -46,14 +47,23 @@ function doroshopping_get_wishlist_ids() {
  */
 function doroshopping_save_wishlist_ids( $ids ) {
     $ids = array_values( array_unique( array_filter( array_map( 'absint', (array) $ids ) ) ) );
+    $max = defined( 'DOROSHOPPING_WISHLIST_MAX' ) ? (int) DOROSHOPPING_WISHLIST_MAX : 100;
+    if ( $max > 0 && count( $ids ) > $max ) {
+        $ids = array_slice( $ids, 0, $max );
+    }
 
     if ( is_user_logged_in() ) {
         update_user_meta( get_current_user_id(), DOROSHOPPING_WISHLIST_META, $ids );
     }
 
     $expire = time() + MONTH_IN_SECONDS;
-    setcookie( DOROSHOPPING_WISHLIST_COOKIE, wp_json_encode( $ids ), $expire, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl(), true );
-    $_COOKIE[ DOROSHOPPING_WISHLIST_COOKIE ] = wp_json_encode( $ids );
+    $json   = wp_json_encode( $ids );
+    if ( function_exists( 'doroshopping_set_cookie' ) ) {
+        doroshopping_set_cookie( DOROSHOPPING_WISHLIST_COOKIE, $json, $expire, true );
+    } else {
+        setcookie( DOROSHOPPING_WISHLIST_COOKIE, $json, $expire, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl(), true );
+    }
+    $_COOKIE[ DOROSHOPPING_WISHLIST_COOKIE ] = $json;
 }
 
 /**
@@ -159,6 +169,15 @@ function doroshopping_ajax_toggle_wishlist() {
         unset( $ids[ $key ] );
         $ids = array_values( $ids );
     } else {
+        $max = defined( 'DOROSHOPPING_WISHLIST_MAX' ) ? (int) DOROSHOPPING_WISHLIST_MAX : 100;
+        if ( $max > 0 && count( $ids ) >= $max ) {
+            wp_send_json_error(
+                array(
+                    'message' => __( 'La lista de deseos está llena. Elimina algún producto para añadir otro.', 'doroshopping' ),
+                ),
+                400
+            );
+        }
         $ids[] = $product_id;
         $added = true;
     }

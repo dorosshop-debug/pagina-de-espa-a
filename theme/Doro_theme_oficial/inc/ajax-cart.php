@@ -82,7 +82,9 @@ function doroshopping_get_cart_payload() {
             'product_id' => $product_id,
             'name'       => wp_strip_all_tags( $product->get_name() ),
             'quantity'   => $quantity,
-            'price_html' => WC()->cart->get_product_price( $product ),
+            'price_html' => function_exists( 'doroshopping_sanitize_price_html' )
+                ? doroshopping_sanitize_price_html( WC()->cart->get_product_price( $product ) )
+                : wp_kses_post( WC()->cart->get_product_price( $product ) ),
             'image'      => $image_url,
             'permalink'  => get_permalink( $product_id ),
             'max_qty'    => $product->get_max_purchase_quantity() > 0 ? $product->get_max_purchase_quantity() : 99,
@@ -105,7 +107,9 @@ function doroshopping_get_cart_payload() {
         $recommendations[] = array(
             'id'         => $rec->get_id(),
             'name'       => wp_strip_all_tags( $rec->get_name() ),
-            'price_html' => $rec->get_price_html(),
+            'price_html' => function_exists( 'doroshopping_sanitize_price_html' )
+                ? doroshopping_sanitize_price_html( $rec->get_price_html() )
+                : wp_kses_post( $rec->get_price_html() ),
             'image'      => $thumb_id
                 ? wp_get_attachment_image_url( $thumb_id, 'thumbnail' )
                 : wc_placeholder_img_src( 'thumbnail' ),
@@ -116,7 +120,9 @@ function doroshopping_get_cart_payload() {
     return array(
         'items'           => $items,
         'count'           => $count,
-        'subtotal_html'   => $subtotal_html,
+        'subtotal_html'   => function_exists( 'doroshopping_sanitize_price_html' )
+            ? doroshopping_sanitize_price_html( $subtotal_html )
+            : wp_kses_post( $subtotal_html ),
         'checkout_url'    => $checkout_url,
         'recommendations' => $recommendations,
         'empty_message'   => __( 'Tu carrito esta vacio.', 'doroshopping' ),
@@ -233,6 +239,15 @@ function doroshopping_ajax_add_to_cart() {
     $product = wc_get_product( $product_id );
     if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
         wp_send_json_error( array( 'message' => __( 'Este producto no se puede añadir.', 'doroshopping' ) ), 400 );
+    }
+
+    if ( ! $product->is_type( 'simple' ) ) {
+        wp_send_json_error(
+            array(
+                'message' => __( 'Selecciona opciones en la ficha del producto.', 'doroshopping' ),
+            ),
+            400
+        );
     }
 
     $added = WC()->cart->add_to_cart( $product_id, $quantity );

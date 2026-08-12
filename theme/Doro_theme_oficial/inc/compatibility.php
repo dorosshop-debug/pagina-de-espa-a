@@ -515,12 +515,21 @@ function doroshopping_apply_currency( $currency ) {
     if ( ! $currency ) {
         return;
     }
+    if ( function_exists( 'doroshopping_is_allowed_currency_code' ) && ! doroshopping_is_allowed_currency_code( $currency ) ) {
+        return;
+    }
+
+    if ( function_exists( 'doroshopping_set_cookie' ) ) {
+        doroshopping_set_cookie( 'doroshopping_currency', $currency, time() + YEAR_IN_SECONDS, false );
+    } else {
+        $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+        $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+        setcookie( 'doroshopping_currency', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
+    }
+    $_COOKIE['doroshopping_currency'] = $currency;
 
     $path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
     $domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
-
-    setcookie( 'doroshopping_currency', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
-    $_COOKIE['doroshopping_currency'] = $currency;
 
     // CURCY.
     setcookie( 'wmc_current_currency', $currency, time() + YEAR_IN_SECONDS, $path, $domain, is_ssl(), false );
@@ -829,6 +838,11 @@ function doroshopping_handle_locale_preferences() {
             if ( 'UK' === $country ) {
                 $country = 'GB';
             }
+            if ( function_exists( 'doroshopping_is_allowed_country_code' ) && ! doroshopping_is_allowed_country_code( $country ) ) {
+                nocache_headers();
+                wp_safe_redirect( $redirect );
+                exit;
+            }
             if ( function_exists( 'doroshopping_set_cookie' ) ) {
                 doroshopping_set_cookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, false );
             } else {
@@ -866,6 +880,11 @@ function doroshopping_handle_locale_preferences() {
 
     if ( ! empty( $_POST['divisa'] ) ) {
         $currency = strtoupper( sanitize_text_field( wp_unslash( $_POST['divisa'] ) ) );
+        if ( function_exists( 'doroshopping_is_allowed_currency_code' ) && ! doroshopping_is_allowed_currency_code( $currency ) ) {
+            nocache_headers();
+            wp_safe_redirect( $redirect );
+            exit;
+        }
         doroshopping_apply_currency( $currency );
         $redirect = add_query_arg(
             array(
@@ -915,6 +934,14 @@ function doroshopping_handle_shipping_preferences() {
 
     if ( $country ) {
         $country = substr( $country, 0, 2 );
+        if ( 'UK' === $country ) {
+            $country = 'GB';
+        }
+        if ( function_exists( 'doroshopping_is_allowed_country_code' ) && ! doroshopping_is_allowed_country_code( $country ) ) {
+            nocache_headers();
+            wp_safe_redirect( $redirect );
+            exit;
+        }
         if ( function_exists( 'doroshopping_set_cookie' ) ) {
             doroshopping_set_cookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, false );
         } else {
@@ -959,6 +986,53 @@ function doroshopping_handle_shipping_preferences() {
 add_action( 'admin_post_doroshopping_save_shipping', 'doroshopping_handle_shipping_preferences' );
 add_action( 'admin_post_nopriv_doroshopping_save_shipping', 'doroshopping_handle_shipping_preferences' );
 add_action( 'template_redirect', 'doroshopping_handle_shipping_preferences', 5 );
+
+/**
+ * Guardar país/CP vía AJAX (cookies HttpOnly desde el servidor).
+ */
+function doroshopping_ajax_save_shipping_hint() {
+    check_ajax_referer( 'doroshopping_shipping_prefs', 'nonce' );
+
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'shipping_hint', 30, 300 ) ) {
+        doroshopping_rate_limit_ajax_block();
+    }
+
+    $country  = isset( $_POST['country'] ) ? strtoupper( sanitize_text_field( wp_unslash( $_POST['country'] ) ) ) : '';
+    $postcode = isset( $_POST['postcode'] ) ? sanitize_text_field( wp_unslash( $_POST['postcode'] ) ) : '';
+
+    if ( $country ) {
+        $country = substr( $country, 0, 2 );
+        if ( 'UK' === $country ) {
+            $country = 'GB';
+        }
+        if ( function_exists( 'doroshopping_is_allowed_country_code' ) && ! doroshopping_is_allowed_country_code( $country ) ) {
+            wp_send_json_error( array( 'message' => 'invalid_country' ), 400 );
+        }
+        if ( function_exists( 'doroshopping_set_cookie' ) ) {
+            doroshopping_set_cookie( 'doroshopping_country', $country, time() + YEAR_IN_SECONDS, false );
+        }
+        $_COOKIE['doroshopping_country'] = $country;
+    }
+
+    if ( '' !== $postcode ) {
+        if ( strlen( $postcode ) > 20 ) {
+            $postcode = substr( $postcode, 0, 20 );
+        }
+        if ( function_exists( 'doroshopping_set_cookie' ) ) {
+            doroshopping_set_cookie( 'doroshopping_postcode', $postcode, time() + YEAR_IN_SECONDS, false );
+        }
+        $_COOKIE['doroshopping_postcode'] = $postcode;
+    }
+
+    wp_send_json_success(
+        array(
+            'country'  => $country ? $country : ( function_exists( 'doroshopping_get_header_location' ) ? doroshopping_get_header_location()['code'] : 'ES' ),
+            'postcode' => $postcode,
+        )
+    );
+}
+add_action( 'wp_ajax_doroshopping_save_shipping_hint', 'doroshopping_ajax_save_shipping_hint' );
+add_action( 'wp_ajax_nopriv_doroshopping_save_shipping_hint', 'doroshopping_ajax_save_shipping_hint' );
 
 /**
  * Copiar páginas esenciales a un nuevo idioma Polylang (helper admin).

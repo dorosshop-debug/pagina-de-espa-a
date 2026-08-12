@@ -15,8 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Evita editar temas/plugins desde el admin (si no esta definido en wp-config).
-if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
+// Opcional vía filtro (no forzar en temas comerciales; documentar en wp-config del sitio).
+if ( apply_filters( 'doroshopping_define_disallow_file_edit', false ) && ! defined( 'DISALLOW_FILE_EDIT' ) ) {
 	define( 'DISALLOW_FILE_EDIT', true );
 }
 
@@ -70,11 +70,6 @@ add_filter( 'the_generator', 'doroshopping_remove_version_rss' );
  */
 function doroshopping_block_author_enumeration() {
 	if ( is_admin() || ! isset( $_GET['author'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		return;
-	}
-
-	$author = (string) wp_unslash( $_GET['author'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	if ( ! preg_match( '/^\d+$/', $author ) ) {
 		return;
 	}
 
@@ -197,6 +192,61 @@ function doroshopping_set_cookie( $name, $value, $expires, $http_only = false ) 
 function doroshopping_clear_cookie( $name ) {
 	doroshopping_set_cookie( $name, '', time() - YEAR_IN_SECONDS, false );
 	unset( $_COOKIE[ $name ] );
+}
+
+/**
+ * País ISO permitido (lista del tema / filtro geo).
+ *
+ * @param string $country Código ISO-3166 alpha-2.
+ * @return bool
+ */
+function doroshopping_is_allowed_country_code( $country ) {
+	$country = strtoupper( sanitize_text_field( (string) $country ) );
+	if ( 'UK' === $country ) {
+		$country = 'GB';
+	}
+	if ( 2 !== strlen( $country ) || ! ctype_alpha( $country ) ) {
+		return false;
+	}
+
+	$allowed = function_exists( 'doroshopping_geo_supported_countries' )
+		? doroshopping_geo_supported_countries()
+		: array( 'ES', 'PT', 'FR', 'DE', 'IT', 'GB', 'CH' );
+
+	return in_array( $country, $allowed, true );
+}
+
+/**
+ * Moneda ISO permitida (lista del header / WooCommerce).
+ *
+ * @param string $currency Código ISO-4217.
+ * @return bool
+ */
+function doroshopping_is_allowed_currency_code( $currency ) {
+	$currency = strtoupper( sanitize_text_field( (string) $currency ) );
+	if ( ! preg_match( '/^[A-Z]{3}$/', $currency ) ) {
+		return false;
+	}
+
+	if ( function_exists( 'doroshopping_get_header_currencies' ) ) {
+		$allowed = array_keys( doroshopping_get_header_currencies() );
+		return in_array( $currency, $allowed, true );
+	}
+
+	$defaults = array( 'EUR', 'CHF', 'GBP', 'USD' );
+	$allowed  = apply_filters( 'doroshopping_allowed_currency_codes', $defaults );
+
+	return is_array( $allowed ) && in_array( $currency, $allowed, true );
+}
+
+/**
+ * Sanitiza HTML de precio WooCommerce para respuestas JSON/AJAX.
+ *
+ * @param string $html Price HTML.
+ * @return string
+ */
+function doroshopping_sanitize_price_html( $html ) {
+	return wp_kses_post( (string) $html );
 }
 
 /**

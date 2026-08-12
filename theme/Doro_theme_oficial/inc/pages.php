@@ -585,7 +585,10 @@ function doroshopping_install_admin_notice() {
     }
 
     if ( isset( $_GET['doroshopping_dismiss_notice'] ) && '1' === $_GET['doroshopping_dismiss_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        update_option( 'doroshopping_install_notice_dismissed', DOROSHOPPING_VERSION, false );
+        $nonce = isset( $_GET['_doroshopping_notice_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_doroshopping_notice_nonce'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( $nonce && wp_verify_nonce( $nonce, 'doroshopping_dismiss_notice' ) ) {
+            update_option( 'doroshopping_install_notice_dismissed', DOROSHOPPING_VERSION, false );
+        }
         return;
     }
 
@@ -593,7 +596,14 @@ function doroshopping_install_admin_notice() {
         return;
     }
 
-    $dismiss = esc_url( add_query_arg( 'doroshopping_dismiss_notice', '1' ) );
+    $dismiss = esc_url(
+        add_query_arg(
+            array(
+                'doroshopping_dismiss_notice' => '1',
+                '_doroshopping_notice_nonce'  => wp_create_nonce( 'doroshopping_dismiss_notice' ),
+            )
+        )
+    );
     $customizer = esc_url( admin_url( 'customize.php' ) );
     $wc_ok      = class_exists( 'WooCommerce' );
 

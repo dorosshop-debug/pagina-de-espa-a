@@ -65,7 +65,9 @@ function doroshopping_ajax_live_search() {
                 'id'         => $product->get_id(),
                 'title'      => wp_strip_all_tags( $product->get_name() ),
                 'url'        => $product->get_permalink(),
-                'price_html' => $product->get_price_html(),
+                'price_html' => function_exists( 'doroshopping_sanitize_price_html' )
+                    ? doroshopping_sanitize_price_html( $product->get_price_html() )
+                    : wp_kses_post( $product->get_price_html() ),
                 'image'      => $image_id
                     ? wp_get_attachment_image_url( $image_id, 'thumbnail' )
                     : wc_placeholder_img_src( 'thumbnail' ),

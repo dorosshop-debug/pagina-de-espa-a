@@ -37,7 +37,6 @@ function doroshopping_enable_ajax_add_to_cart() {
     }
 }
 add_action( 'after_switch_theme', 'doroshopping_enable_ajax_add_to_cart' );
-add_action( 'admin_init', 'doroshopping_enable_ajax_add_to_cart' );
 
 /**
  * En productos simples WC pone add-to-cart solo en el botón "Añadir".
