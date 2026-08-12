@@ -133,7 +133,8 @@ if ( ! $elementor_footer ) :
                     $instagram = trim( (string) get_theme_mod( 'doroshopping_social_instagram', '' ) );
                     $facebook  = trim( (string) get_theme_mod( 'doroshopping_social_facebook', '' ) );
                     $youtube   = trim( (string) get_theme_mod( 'doroshopping_social_youtube', '' ) );
-                    $has_social = $instagram || $facebook || $youtube;
+                    $whatsapp  = function_exists( 'doroshopping_get_whatsapp_url' ) ? doroshopping_get_whatsapp_url() : '';
+                    $has_social = $instagram || $facebook || $youtube || $whatsapp;
                     ?>
                     <?php if ( $instagram ) : ?>
                         <a href="<?php echo esc_url( $instagram ); ?>" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
@@ -148,6 +149,11 @@ if ( ! $elementor_footer ) :
                     <?php if ( $youtube ) : ?>
                         <a href="<?php echo esc_url( $youtube ); ?>" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
                             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.8 15.5v-7l6.3 3.5-6.3 3.5z"/></svg>
+                        </a>
+                    <?php endif; ?>
+                    <?php if ( $whatsapp ) : ?>
+                        <a class="site-footer__social-whatsapp" href="<?php echo esc_url( $whatsapp ); ?>" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12.05 0C5.5 0 .2 5.3.2 11.85c0 2.09.55 4.12 1.6 5.92L0 24l6.4-1.68a11.8 11.8 0 0 0 5.64 1.44h.01c6.55 0 11.85-5.3 11.85-11.85 0-3.16-1.23-6.14-3.4-8.41zM12.05 21.6h-.01a9.8 9.8 0 0 1-4.99-1.37l-.36-.21-3.79 1 1.01-3.7-.23-.38a9.8 9.8 0 0 1-1.5-5.22C2.18 6.4 6.6 2 12.05 2c2.62 0 5.08 1.02 6.93 2.87a9.72 9.72 0 0 1 2.87 6.93c0 5.45-4.43 9.8-9.8 9.8zm5.38-7.35c-.29-.15-1.74-.86-2.01-.96-.27-.1-.47-.15-.67.15-.2.29-.77.96-.94 1.16-.17.2-.35.22-.64.07-.29-.15-1.24-.46-2.36-1.46-.87-.78-1.46-1.74-1.63-2.03-.17-.29-.02-.45.13-.6.13-.13.29-.35.44-.52.15-.17.2-.29.29-.49.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.29-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.74-.71 1.99-1.4.25-.69.25-1.28.17-1.4-.07-.12-.27-.2-.56-.35z"/></svg>
                         </a>
                     <?php endif; ?>
                     <?php if ( ! $has_social ) : ?>

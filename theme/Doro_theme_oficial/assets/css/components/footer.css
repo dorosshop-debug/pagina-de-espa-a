@@ -183,25 +183,34 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+    flex-wrap: wrap;
 }
 
 .site-footer__social a {
     color: var(--color-white);
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: color var(--transition);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    transition: color var(--transition), background var(--transition), transform var(--transition);
 }
 
 .site-footer__social a:hover {
     color: var(--color-orange);
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateY(-2px);
 }
 
 .site-footer__social svg {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
+}
+
+.site-footer__social-whatsapp:hover {
+    color: #25d366;
 }
 
 .site-footer__social-hint {

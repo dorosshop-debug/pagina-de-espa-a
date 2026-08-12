@@ -657,8 +657,8 @@ function doroshopping_customize_register( $wp_customize ) {
     $wp_customize->add_control(
         'doroshopping_whatsapp',
         array(
-            'label'       => __( 'WhatsApp (Centro de ayuda)', 'doroshopping' ),
-            'description' => __( 'Número internacional sin espacios (ej. 34600000000) o URL completa de wa.me. Solo se muestra en Centro de ayuda.', 'doroshopping' ),
+            'label'       => __( 'WhatsApp', 'doroshopping' ),
+            'description' => __( 'Número internacional sin espacios (ej. 34600000000) o URL completa de wa.me. Se muestra en el footer y en Centro de ayuda.', 'doroshopping' ),
             'section'     => 'doroshopping_social',
             'type'        => 'text',
         )
