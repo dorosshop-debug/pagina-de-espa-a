@@ -122,7 +122,7 @@ if ( ! $elementor_header ) :
                 <button type="button" class="site-header__utility site-header__utility-btn" aria-expanded="false" aria-controls="dropdown-locale">
                     <img class="site-header__flag" src="<?php echo esc_url( function_exists( 'doroshopping_get_header_language_flag' ) ? doroshopping_get_header_language_flag() : get_template_directory_uri() . '/assets/images/flags/spain.png' ); ?>" alt="" width="24" height="24">
                     <span class="site-header__utility-text">
-                        <span class="site-header__utility-label"><?php echo esc_html( function_exists( 'doroshopping_get_header_language_label' ) ? doroshopping_get_header_language_label() : __( 'Español', 'doroshopping' ) ); ?></span>
+                        <span class="site-header__utility-label"><?php echo esc_html( function_exists( 'doroshopping_get_header_language_label' ) ? doroshopping_get_header_language_label() : ( function_exists( 'doroshopping_ui_language_label' ) ? doroshopping_ui_language_label( 'es' ) : __( 'Español', 'doroshopping' ) ) ); ?></span>
                         <span><?php echo esc_html( function_exists( 'doroshopping_get_header_currency_label' ) ? doroshopping_get_header_currency_label() : __( 'Moneda', 'doroshopping' ) ); ?></span>
                     </span>
                     <svg class="site-header__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>

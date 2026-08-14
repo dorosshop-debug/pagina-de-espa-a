@@ -67,26 +67,44 @@ function doroshopping_get_header_languages() {
                 if ( ! $flag ) {
                     $flag = $flags_uri . '/spain.png';
                 }
+                $label = function_exists( 'doroshopping_ui_language_label' )
+                    ? doroshopping_ui_language_label( $code )
+                    : ( isset( $lang['name'] ) ? (string) $lang['name'] : strtoupper( $code ) );
                 $out[ $code ] = array(
-                    'label' => isset( $lang['name'] ) ? (string) $lang['name'] : strtoupper( $code ),
+                    'label' => $label,
                     'flag'  => $flag,
                     'url'   => isset( $lang['url'] ) ? (string) $lang['url'] : '',
                 );
             }
         }
         if ( ! empty( $out ) ) {
+            $current = function_exists( 'doroshopping_get_current_language_code' )
+                ? doroshopping_get_current_language_code()
+                : '';
+            uasort(
+                $out,
+                static function ( $a, $b ) {
+                    return strcasecmp( (string) $a['label'], (string) $b['label'] );
+                }
+            );
+            if ( $current && isset( $out[ $current ] ) ) {
+                $first = array( $current => $out[ $current ] );
+                unset( $out[ $current ] );
+                $out = $first + $out;
+            }
             return $out;
         }
     }
 
-    return array(
-        'es' => array( 'label' => 'Español', 'flag' => $flag_map['es'], 'url' => '' ),
-        'en' => array( 'label' => 'English', 'flag' => $flag_map['en'], 'url' => '' ),
-        'de' => array( 'label' => 'Deutsch', 'flag' => $flag_map['de'], 'url' => '' ),
-        'fr' => array( 'label' => 'Français', 'flag' => $flag_map['fr'], 'url' => '' ),
-        'it' => array( 'label' => 'Italiano', 'flag' => $flag_map['it'], 'url' => '' ),
-        'pt' => array( 'label' => 'Português', 'flag' => $flag_map['pt'], 'url' => '' ),
+    $fallback = array(
+        'es' => array( 'label' => function_exists( 'doroshopping_ui_language_label' ) ? doroshopping_ui_language_label( 'es' ) : 'Español', 'flag' => $flag_map['es'], 'url' => '' ),
+        'en' => array( 'label' => function_exists( 'doroshopping_ui_language_label' ) ? doroshopping_ui_language_label( 'en' ) : 'English', 'flag' => $flag_map['en'], 'url' => '' ),
+        'de' => array( 'label' => function_exists( 'doroshopping_ui_language_label' ) ? doroshopping_ui_language_label( 'de' ) : 'Deutsch', 'flag' => $flag_map['de'], 'url' => '' ),
+        'fr' => array( 'label' => function_exists( 'doroshopping_ui_language_label' ) ? doroshopping_ui_language_label( 'fr' ) : 'Français', 'flag' => $flag_map['fr'], 'url' => '' ),
+        'it' => array( 'label' => function_exists( 'doroshopping_ui_language_label' ) ? doroshopping_ui_language_label( 'it' ) : 'Italiano', 'flag' => $flag_map['it'], 'url' => '' ),
+        'pt' => array( 'label' => function_exists( 'doroshopping_ui_language_label' ) ? doroshopping_ui_language_label( 'pt' ) : 'Português', 'flag' => $flag_map['pt'], 'url' => '' ),
     );
+    return $fallback;
 }
 
 /**
@@ -297,12 +315,15 @@ function doroshopping_get_header_currency_label() {
         return $list[ $code ]['label'];
     }
     $names = array(
-        'EUR' => 'Euro',
-        'USD' => 'US Dollar',
-        'GBP' => 'Pound',
-        'CHF' => 'Franco suizo',
+        'EUR' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'EUR' ) : 'Euro',
+        'USD' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'USD' ) : 'US Dollar',
+        'GBP' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'GBP' ) : 'Pound',
+        'CHF' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'CHF' ) : 'Franco suizo',
     );
-    $name = isset( $names[ $code ] ) ? $names[ $code ] : $code;
+    if ( isset( $names[ $code ] ) ) {
+        return $names[ $code ];
+    }
+    $name = $code;
     return $name . ' · ' . $code;
 }
 
@@ -364,19 +385,19 @@ function doroshopping_get_header_currencies() {
     $flags_uri = get_template_directory_uri() . '/assets/images/flags';
     $meta      = array(
         'EUR' => array(
-            'label' => 'Euro (€) - EUR',
+            'label' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'EUR' ) : 'Euro (€) - EUR',
             'flag'  => $flags_uri . '/euro.svg',
         ),
         'CHF' => array(
-            'label' => 'Franco suizo (CHF)',
+            'label' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'CHF' ) : 'Franco suizo (CHF)',
             'flag'  => $flags_uri . '/suiza.svg',
         ),
         'GBP' => array(
-            'label' => 'Libra esterlina (£) - GBP',
+            'label' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'GBP' ) : 'Libra esterlina (£) - GBP',
             'flag'  => $flags_uri . '/reino-unido.png',
         ),
         'USD' => array(
-            'label' => 'US Dollar ($) - USD',
+            'label' => function_exists( 'doroshopping_ui_currency_label' ) ? doroshopping_ui_currency_label( 'USD' ) : 'US Dollar ($) - USD',
             'flag'  => $flags_uri . '/euro.svg',
         ),
     );
@@ -712,11 +733,13 @@ function doroshopping_header_location_slot() {
     echo '<div class="site-header__plugin-slot site-header__plugin-slot--location" data-geo-location>';
     echo '<p class="header-dropdown__geo-hint">';
     echo esc_html(
-        sprintf(
-            /* translators: %s: country name */
-            __( 'Detectado: %s', 'doroshopping' ),
-            $loc['label']
-        )
+        function_exists( 'doroshopping_ui_sprintf' )
+            ? doroshopping_ui_sprintf( 'doroshopping_ui_locale_detected', $loc['label'] )
+            : sprintf(
+                /* translators: %s: country name */
+                __( 'Detectado: %s', 'doroshopping' ),
+                $loc['label']
+            )
     );
     echo '</p>';
     do_action( 'doroshopping_header_location', $loc );

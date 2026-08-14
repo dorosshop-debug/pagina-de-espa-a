@@ -103,6 +103,11 @@ function doroshopping_i18n_ui_chrome_defaults() {
 			'label'   => __( 'Cuenta: acceder', 'doroshopping' ),
 			'section' => 'doroshopping_ui_account',
 		),
+		'doroshopping_ui_account_google'     => array(
+			'default' => __( 'Inicia o Regístrate con Google', 'doroshopping' ),
+			'label'   => __( 'Cuenta: boton Google', 'doroshopping' ),
+			'section' => 'doroshopping_ui_account',
+		),
 		'doroshopping_ui_account_track'      => array(
 			'default' => __( 'Rastrear envio', 'doroshopping' ),
 			'label'   => __( 'Cuenta: rastrear envio', 'doroshopping' ),

@@ -67,6 +67,61 @@ function doroshopping_i18n_ui_page_defaults() {
 			'label'   => __( 'Locale: guardar', 'doroshopping' ),
 			'section' => 'doroshopping_ui_locale',
 		),
+		'doroshopping_ui_locale_detected'        => array(
+			'default' => __( 'Detectado: %s', 'doroshopping' ),
+			'label'   => __( 'Locale: detectado (usa %s)', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_lang_es'                => array(
+			'default' => __( 'Español', 'doroshopping' ),
+			'label'   => __( 'Idioma: espanol', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_lang_en'                => array(
+			'default' => __( 'Inglés', 'doroshopping' ),
+			'label'   => __( 'Idioma: ingles', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_lang_de'                => array(
+			'default' => __( 'Alemán', 'doroshopping' ),
+			'label'   => __( 'Idioma: aleman', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_lang_fr'                => array(
+			'default' => __( 'Francés', 'doroshopping' ),
+			'label'   => __( 'Idioma: frances', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_lang_it'                => array(
+			'default' => __( 'Italiano', 'doroshopping' ),
+			'label'   => __( 'Idioma: italiano', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_lang_pt'                => array(
+			'default' => __( 'Portugués', 'doroshopping' ),
+			'label'   => __( 'Idioma: portugues', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_currency_eur'           => array(
+			'default' => __( 'Euro (€) - EUR', 'doroshopping' ),
+			'label'   => __( 'Moneda: EUR', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_currency_chf'           => array(
+			'default' => __( 'Franco suizo (CHF)', 'doroshopping' ),
+			'label'   => __( 'Moneda: CHF', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_currency_gbp'           => array(
+			'default' => __( 'Libra esterlina (£) - GBP', 'doroshopping' ),
+			'label'   => __( 'Moneda: GBP', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
+		'doroshopping_ui_currency_usd'           => array(
+			'default' => __( 'Dólar estadounidense ($) - USD', 'doroshopping' ),
+			'label'   => __( 'Moneda: USD', 'doroshopping' ),
+			'section' => 'doroshopping_ui_locale',
+		),
 		'doroshopping_ui_country_es'             => array(
 			'default' => __( 'España', 'doroshopping' ),
 			'label'   => __( 'Pais: Espana', 'doroshopping' ),

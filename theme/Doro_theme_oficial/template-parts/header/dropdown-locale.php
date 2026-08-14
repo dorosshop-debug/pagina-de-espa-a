@@ -11,7 +11,11 @@ $ui        = static function ( $key ) {
 $flags_uri = get_template_directory_uri() . '/assets/images/flags';
 $languages = function_exists( 'doroshopping_get_header_languages' ) ? doroshopping_get_header_languages() : array();
 $lang_code = function_exists( 'doroshopping_get_current_language_code' ) ? doroshopping_get_current_language_code() : 'es';
-$location  = function_exists( 'doroshopping_get_header_location' ) ? doroshopping_get_header_location() : array( 'code' => 'ES', 'label' => 'España', 'map' => array() );
+$location  = function_exists( 'doroshopping_get_header_location' ) ? doroshopping_get_header_location() : array(
+	'code'  => 'ES',
+	'label' => function_exists( 'doroshopping_ui_country_label' ) ? doroshopping_ui_country_label( 'ES' ) : $ui( 'doroshopping_ui_country_es' ),
+	'map'   => array(),
+);
 $currencies = function_exists( 'doroshopping_get_header_currencies' ) ? doroshopping_get_header_currencies() : array();
 $currency_code = function_exists( 'doroshopping_get_current_currency_code' ) ? doroshopping_get_current_currency_code() : 'EUR';
 
@@ -48,9 +52,9 @@ if ( 'uk' === $selected_loc ) {
 }
 if ( empty( $currencies ) ) {
 	$currencies = array(
-		'EUR' => array( 'label' => 'Euro (€) - EUR', 'flag' => $flags_uri . '/euro.svg' ),
-		'CHF' => array( 'label' => 'Franco suizo (CHF)', 'flag' => $flags_uri . '/suiza.svg' ),
-		'GBP' => array( 'label' => 'Libra esterlina (£) - GBP', 'flag' => $flags_uri . '/reino-unido.png' ),
+		'EUR' => array( 'label' => $ui( 'doroshopping_ui_currency_eur' ), 'flag' => $flags_uri . '/euro.svg' ),
+		'CHF' => array( 'label' => $ui( 'doroshopping_ui_currency_chf' ), 'flag' => $flags_uri . '/suiza.svg' ),
+		'GBP' => array( 'label' => $ui( 'doroshopping_ui_currency_gbp' ), 'flag' => $flags_uri . '/reino-unido.png' ),
 	);
 }
 if ( ! isset( $currencies[ $currency_code ] ) ) {

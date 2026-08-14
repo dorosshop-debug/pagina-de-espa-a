@@ -266,6 +266,54 @@ function doroshopping_ui_country_label( $code ) {
 }
 
 /**
+ * Nombre de idioma en el idioma de la interfaz (no autónimo de Polylang).
+ *
+ * @param string $code Slug (es, en, de, fr, it, pt).
+ * @return string
+ */
+function doroshopping_ui_language_label( $code ) {
+	$normalized = strtolower( str_replace( '_', '-', (string) $code ) );
+	$parts      = explode( '-', $normalized );
+	$code       = sanitize_key( $parts[0] );
+	$map  = array(
+		'es' => 'doroshopping_ui_lang_es',
+		'en' => 'doroshopping_ui_lang_en',
+		'de' => 'doroshopping_ui_lang_de',
+		'fr' => 'doroshopping_ui_lang_fr',
+		'it' => 'doroshopping_ui_lang_it',
+		'pt' => 'doroshopping_ui_lang_pt',
+	);
+
+	if ( isset( $map[ $code ] ) ) {
+		return doroshopping_ui_text( $map[ $code ] );
+	}
+
+	return strtoupper( $code );
+}
+
+/**
+ * Etiqueta de moneda para el selector del header.
+ *
+ * @param string $code ISO 4217.
+ * @return string
+ */
+function doroshopping_ui_currency_label( $code ) {
+	$code = strtoupper( sanitize_text_field( (string) $code ) );
+	$map  = array(
+		'EUR' => 'doroshopping_ui_currency_eur',
+		'CHF' => 'doroshopping_ui_currency_chf',
+		'GBP' => 'doroshopping_ui_currency_gbp',
+		'USD' => 'doroshopping_ui_currency_usd',
+	);
+
+	if ( isset( $map[ $code ] ) ) {
+		return doroshopping_ui_text( $map[ $code ] );
+	}
+
+	return $code;
+}
+
+/**
  * Tiempo estimado “X - Y días hábiles” multiidioma.
  *
  * @param string $range Rango numérico, p. ej. "2 - 4".

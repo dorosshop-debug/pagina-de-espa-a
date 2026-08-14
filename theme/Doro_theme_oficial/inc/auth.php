@@ -254,7 +254,7 @@ function doroshopping_render_google_button( $context = 'page' ) {
             <path fill="#4A90E2" d="M3.5 7.3C2.9 8.5 2.5 9.9 2.5 11.5s.4 3 1 4.2c0 .1 3.1-2.4 3.1-2.4-.2-.5-.3-1.1-.3-1.7 0-.6.1-1.2.3-1.7L3.5 7.3z"/>
             <path fill="#FBBC05" d="M12 5.1c1.3 0 2.5.5 3.4 1.3l2.6-2.6C16.4 2.3 14.4 1.5 12 1.5 8.3 1.5 5.1 3.5 3.5 7.3l3.1 2.4C7.9 6.6 9.8 5.1 12 5.1z"/>
         </svg>
-        <span><?php esc_html_e( 'Inicia o Regístrate con Google', 'doroshopping' ); ?></span>
+        <span><?php echo esc_html( function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( 'doroshopping_ui_account_google' ) : __( 'Inicia o Regístrate con Google', 'doroshopping' ) ); ?></span>
     </a>
     <?php
     /**
