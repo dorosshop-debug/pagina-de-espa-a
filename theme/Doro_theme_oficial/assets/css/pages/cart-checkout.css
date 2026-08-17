@@ -141,7 +141,7 @@
     width: 100%;
     height: 44px;
     padding: 0 20px;
-    border-radius: 999px;
+    border-radius: 6px;
     font-weight: 700;
     font-size: var(--font-size-base);
     text-decoration: none !important;
@@ -155,7 +155,7 @@
 }
 
 .doro-cesta-empty__btn--primary {
-    background: var(--color-red-accent);
+    background: var(--color-orange);
     color: var(--color-white) !important;
 }
 
@@ -249,8 +249,8 @@
     justify-content: center;
     width: 100%;
     height: 48px;
-    border-radius: 999px;
-    background: var(--color-red-accent);
+    border-radius: 6px;
+    background: var(--color-orange);
     color: var(--color-white) !important;
     font-weight: 700;
     font-size: var(--font-size-base);
@@ -836,7 +836,7 @@
 .doro-checkout-helper__cta {
     flex: 0 0 auto;
     padding: 6px 12px;
-    border-radius: 999px;
+    border-radius: 6px;
     background: var(--color-orange);
     color: #fff;
     font-size: 12px;
@@ -1250,6 +1250,25 @@
     border: none;
 }
 
+.doro-checkout-summary__row--shipping span:last-child {
+    font-weight: 700;
+    color: var(--color-dark);
+    white-space: nowrap;
+}
+
+.doro-checkout-summary__row--shipping.is-pending span:last-child {
+    font-weight: 600;
+    color: var(--color-grey-text);
+    white-space: normal;
+    text-align: right;
+}
+
+.doro-checkout-summary__shipping-meta {
+    margin: -4px 0 6px;
+    font-size: 12px;
+    color: var(--color-grey-text);
+}
+
 .doro-checkout-summary table {
     width: 100%;
 }
@@ -1287,8 +1306,8 @@
     align-items: center;
     justify-content: center;
     border: none;
-    border-radius: 999px;
-    background: var(--color-red-accent) !important;
+    border-radius: 6px;
+    background: var(--color-orange);
     color: var(--color-white) !important;
     font-weight: 700;
     font-size: var(--font-size-base);
@@ -1526,7 +1545,7 @@ body.doro-modal-open > .select2-dropdown {
 .doro-modal__btn {
     height: 44px;
     padding: 0 22px;
-    border-radius: 999px;
+    border-radius: 6px;
     font-weight: 700;
     font-family: inherit;
     font-size: var(--font-size-base);
@@ -1535,7 +1554,7 @@ body.doro-modal-open > .select2-dropdown {
 
 .doro-modal__btn--primary {
     border: none;
-    background: var(--color-red-accent);
+    background: var(--color-orange);
     color: var(--color-white);
 }
 
@@ -1633,7 +1652,7 @@ body.doro-modal-open > .select2-dropdown {
     justify-content: center;
     min-height: 44px;
     padding: 0 20px;
-    border-radius: 999px;
+    border-radius: 6px;
     font-weight: 700;
     font-size: 14px;
     text-decoration: none;

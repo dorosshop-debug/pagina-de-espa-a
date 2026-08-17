@@ -110,6 +110,7 @@ function doroshopping_get_theme_mod( $key, $default = false ) {
 function doroshopping_i18n_home_setting_defs() {
 	$defs = array();
 	for ( $i = 1; $i <= 3; $i++ ) {
+		$defs[ 'doroshopping_hero_' . $i . '_bg' ]       = 'media';
 		$defs[ 'doroshopping_hero_' . $i . '_image' ]    = 'media';
 		$defs[ 'doroshopping_hero_' . $i . '_title' ]    = 'text';
 		$defs[ 'doroshopping_hero_' . $i . '_subtitle' ] = 'text';

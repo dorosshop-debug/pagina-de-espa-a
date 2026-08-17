@@ -314,9 +314,31 @@ function doroshopping_checkout_seed_customer_country() {
     if ( ! WC()->customer->get_shipping_country() ) {
         WC()->customer->set_shipping_country( $country );
     }
+
+    $postcode = function_exists( 'doroshopping_get_shipping_postcode' ) ? doroshopping_get_shipping_postcode() : '';
+    if ( $postcode && ! WC()->customer->get_shipping_postcode() ) {
+        WC()->customer->set_shipping_postcode( $postcode );
+    }
+    if ( $postcode && ! WC()->customer->get_billing_postcode() ) {
+        WC()->customer->set_billing_postcode( $postcode );
+    }
 }
 add_action( 'woocommerce_checkout_init', 'doroshopping_checkout_seed_customer_country', 5 );
 add_action( 'woocommerce_before_checkout_form', 'doroshopping_checkout_seed_customer_country', 1 );
+
+/**
+ * Recalcular envío/totales tras sembrar país.
+ *
+ * @return void
+ */
+function doroshopping_checkout_recalc_shipping() {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+        return;
+    }
+    WC()->cart->calculate_shipping();
+    WC()->cart->calculate_totals();
+}
+add_action( 'woocommerce_before_checkout_form', 'doroshopping_checkout_recalc_shipping', 20 );
 
 /**
  * País preferido: cookie del header → cliente WC → ES.
@@ -385,6 +407,17 @@ function doroshopping_checkout_posted_country_fallback( $posted_data ) {
     if ( ! $ship && $fallback ) {
         WC()->customer->set_shipping_country( $fallback );
     }
+
+    $post = isset( $data['billing_postcode'] ) ? sanitize_text_field( $data['billing_postcode'] ) : '';
+    if ( ! $post && isset( $data['shipping_postcode'] ) ) {
+        $post = sanitize_text_field( $data['shipping_postcode'] );
+    }
+    if ( ! $post && function_exists( 'doroshopping_get_shipping_postcode' ) ) {
+        $post = doroshopping_get_shipping_postcode();
+    }
+    if ( $post && ! WC()->customer->get_shipping_postcode() ) {
+        WC()->customer->set_shipping_postcode( $post );
+    }
 }
 add_action( 'woocommerce_checkout_update_order_review', 'doroshopping_checkout_posted_country_fallback', 5 );
 
@@ -434,4 +467,169 @@ add_action( 'wp_head', 'doroshopping_guard_empty_selectors', 0 );
 function doroshopping_checkout_guard_empty_selectors() {
     doroshopping_guard_empty_selectors();
 }
+
+/**
+ * Calcular envío en checkout/carrito aunque falte la dirección completa.
+ *
+ * @param bool $ready Ready.
+ * @return bool
+ */
+function doroshopping_cart_ready_to_calc_shipping( $ready ) {
+    if ( $ready ) {
+        return true;
+    }
+    if ( ( function_exists( 'is_checkout' ) && is_checkout() ) || ( function_exists( 'is_cart' ) && is_cart() ) ) {
+        return true;
+    }
+    return $ready;
+}
+add_filter( 'woocommerce_cart_ready_to_calc_shipping', 'doroshopping_cart_ready_to_calc_shipping' );
+
+/**
+ * Extraer importe numérico de una etiqueta tipo "6.90 EUR".
+ *
+ * @param string $label Label.
+ * @return float
+ */
+function doroshopping_parse_shipping_cost_amount( $label ) {
+    if ( preg_match( '/([0-9]+(?:[.,][0-9]+)?)/', (string) $label, $m ) ) {
+        return (float) str_replace( ',', '.', $m[1] );
+    }
+    return 0.0;
+}
+
+/**
+ * Si WooCommerce no tiene tarifas, inyectar estimación por país (BigBuy / fallback).
+ *
+ * @param array $rates   Rates.
+ * @param array $package Package.
+ * @return array
+ */
+function doroshopping_ensure_checkout_shipping_rates( $rates, $package ) {
+    if ( ! empty( $rates ) ) {
+        return $rates;
+    }
+    if ( ! class_exists( 'WC_Shipping_Rate' ) ) {
+        return $rates;
+    }
+
+    $country = '';
+    if ( isset( $package['destination']['country'] ) ) {
+        $country = strtoupper( sanitize_text_field( (string) $package['destination']['country'] ) );
+    }
+    if ( ! $country && function_exists( 'doroshopping_get_preferred_country' ) ) {
+        $country = doroshopping_get_preferred_country();
+    }
+    if ( ! $country ) {
+        $country = 'ES';
+    }
+
+    $quote = function_exists( 'doroshopping_bigbuy_shipping_fallback' )
+        ? doroshopping_bigbuy_shipping_fallback( $country, 'checkout' )
+        : array();
+
+    $cost  = isset( $quote['cost'] ) ? doroshopping_parse_shipping_cost_amount( $quote['cost'] ) : 0.0;
+    $label = ! empty( $quote['carrier'] ) ? (string) $quote['carrier'] : __( 'Envío y transporte', 'doroshopping' );
+
+    $rate = new WC_Shipping_Rate(
+        'doro_estimate',
+        $label,
+        $cost,
+        array(),
+        'doro_estimate'
+    );
+
+    $rates['doro_estimate'] = $rate;
+    return $rates;
+}
+add_filter( 'woocommerce_package_rates', 'doroshopping_ensure_checkout_shipping_rates', 30, 2 );
+
+/**
+ * Elegir la tarifa estimada si no hay otra seleccionada.
+ *
+ * @param string $method  Method.
+ * @param array  $rates   Rates.
+ * @param string $chosen  Chosen.
+ * @return string
+ */
+function doroshopping_shipping_chosen_method( $method, $rates, $chosen ) {
+    unset( $method );
+    if ( $chosen && isset( $rates[ $chosen ] ) ) {
+        return $chosen;
+    }
+    if ( isset( $rates['doro_estimate'] ) ) {
+        return 'doro_estimate';
+    }
+    $ids = array_keys( (array) $rates );
+    return $ids ? (string) $ids[0] : '';
+}
+add_filter( 'woocommerce_shipping_chosen_method', 'doroshopping_shipping_chosen_method', 10, 3 );
+
+/**
+ * Filas de envío en el resumen (divs, no <tr>).
+ *
+ * @return void
+ */
+function doroshopping_render_checkout_shipping_rows() {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart || ! WC()->cart->needs_shipping() ) {
+        return;
+    }
+
+    $label = __( 'Envío y transporte', 'doroshopping' );
+    $packages = WC()->shipping() ? WC()->shipping()->get_packages() : array();
+    $chosen   = ( WC()->session ) ? (array) WC()->session->get( 'chosen_shipping_methods', array() ) : array();
+    $printed  = false;
+
+    foreach ( $packages as $i => $package ) {
+        $avail = isset( $package['rates'] ) ? $package['rates'] : array();
+        if ( empty( $avail ) ) {
+            continue;
+        }
+
+        $chosen_id = isset( $chosen[ $i ] ) ? $chosen[ $i ] : '';
+        $selected  = ( $chosen_id && isset( $avail[ $chosen_id ] ) ) ? $avail[ $chosen_id ] : reset( $avail );
+        if ( ! $selected ) {
+            continue;
+        }
+
+        $carrier = $selected->get_label();
+        echo '<div class="doro-checkout-summary__row doro-checkout-summary__row--shipping">';
+        echo '<span>' . esc_html( $label ) . '</span>';
+        echo '<span>' . wp_kses_post( WC()->cart->get_cart_shipping_total() ) . '</span>';
+        echo '</div>';
+        if ( $carrier ) {
+            echo '<div class="doro-checkout-summary__shipping-meta">';
+            echo esc_html( $carrier );
+            echo '</div>';
+        }
+        $printed = true;
+        break;
+    }
+
+    if ( $printed ) {
+        return;
+    }
+
+    echo '<div class="doro-checkout-summary__row doro-checkout-summary__row--shipping is-pending">';
+    echo '<span>' . esc_html( $label ) . '</span>';
+    echo '<span>' . esc_html__( 'Se calculará con tu dirección', 'doroshopping' ) . '</span>';
+    echo '</div>';
+}
+
+/**
+ * Refrescar el resumen lateral cuando WooCommerce actualiza el checkout.
+ *
+ * @param array $fragments Fragments.
+ * @return array
+ */
+function doroshopping_checkout_summary_fragments( $fragments ) {
+    ob_start();
+    get_template_part( 'template-parts/checkout/summary-live' );
+    $html = ob_get_clean();
+    if ( $html ) {
+        $fragments['.doro-checkout-summary__live'] = $html;
+    }
+    return $fragments;
+}
+add_filter( 'woocommerce_update_order_review_fragments', 'doroshopping_checkout_summary_fragments' );
 

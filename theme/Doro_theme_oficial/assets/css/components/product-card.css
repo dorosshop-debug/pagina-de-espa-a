@@ -183,7 +183,7 @@ ul.products li.product.home-product-card:hover {
 .home-product-card__price {
     font-size: 1.45rem;
     font-weight: 800;
-    color: #ff3b00;
+    color: var(--color-orange);
     margin-bottom: 6px;
     line-height: 1.15;
     letter-spacing: -0.02em;
@@ -195,7 +195,7 @@ ul.products li.product.home-product-card:hover {
 .woocommerce .home-product-card__price .amount,
 .woocommerce ul.products li.product .price,
 .woocommerce ul.products li.product .price .amount {
-    color: #ff3b00;
+    color: var(--color-orange);
     font-weight: 800;
 }
 

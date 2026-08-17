@@ -1201,6 +1201,7 @@ function initHeroCarousel() {
     var current = 0;
     var timer = null;
     var intervalMs = 5000;
+    var hovering = false;
 
     if (slides.length < 2) return;
 
@@ -1228,6 +1229,9 @@ function initHeroCarousel() {
 
     function startAuto() {
         stopAuto();
+        if (hovering) {
+            return;
+        }
         timer = setInterval(next, intervalMs);
     }
 
@@ -1259,8 +1263,14 @@ function initHeroCarousel() {
         });
     });
 
-    hero.addEventListener('mouseenter', stopAuto);
-    hero.addEventListener('mouseleave', startAuto);
+    hero.addEventListener('pointerenter', function () {
+        hovering = true;
+        stopAuto();
+    });
+    hero.addEventListener('pointerleave', function () {
+        hovering = false;
+        startAuto();
+    });
 
     startAuto();
 }

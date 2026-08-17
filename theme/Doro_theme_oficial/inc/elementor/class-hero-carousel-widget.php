@@ -42,9 +42,27 @@ class Hero_Carousel_Widget extends \Elementor\Widget_Base {
         $repeater = new \Elementor\Repeater();
 
         $repeater->add_control(
+            'bg_image',
+            array(
+                'label'       => __( 'Fondo (100% ancho)', 'doroshopping' ),
+                'type'        => \Elementor\Controls_Manager::MEDIA,
+                'default'     => array( 'url' => '' ),
+            )
+        );
+
+        $repeater->add_control(
+            'bg_color',
+            array(
+                'label'   => __( 'Color de fondo', 'doroshopping' ),
+                'type'    => \Elementor\Controls_Manager::COLOR,
+                'default' => '#f5f5f5',
+            )
+        );
+
+        $repeater->add_control(
             'image',
             array(
-                'label'   => __( 'Imagen', 'doroshopping' ),
+                'label'   => __( 'Imagen interior', 'doroshopping' ),
                 'type'    => \Elementor\Controls_Manager::MEDIA,
                 'default' => array( 'url' => '' ),
             )
@@ -157,24 +175,35 @@ class Hero_Carousel_Widget extends \Elementor\Widget_Base {
                     if ( 0 === $index ) {
                         $class .= ' is-active';
                     }
+                    $bg    = ! empty( $slide['bg_image']['url'] ) ? $slide['bg_image']['url'] : '';
                     $image = ! empty( $slide['image']['url'] ) ? $slide['image']['url'] : '';
-                    $url   = ! empty( $slide['cta_url']['url'] ) ? $slide['cta_url']['url'] : '#';
-                    $target = ! empty( $slide['cta_url']['is_external'] ) ? ' target="_blank"' : '';
-                    $rel    = ! empty( $slide['cta_url']['nofollow'] ) ? ' rel="nofollow"' : '';
+                    $bg_color = ! empty( $slide['bg_color'] ) ? $slide['bg_color'] : '#f5f5f5';
+                    $url      = ! empty( $slide['cta_url']['url'] ) ? $slide['cta_url']['url'] : '#';
+                    $target   = ! empty( $slide['cta_url']['is_external'] ) ? ' target="_blank"' : '';
+                    $rel      = ! empty( $slide['cta_url']['nofollow'] ) ? ' rel="nofollow"' : '';
                     ?>
-                    <article class="<?php echo esc_attr( $class ); ?>" data-slide="<?php echo esc_attr( (string) $index ); ?>" <?php echo 0 !== $index ? 'hidden' : ''; ?>>
-                        <?php if ( $image ) : ?>
-                            <img class="home-hero__image" src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $slide['title'] ); ?>">
+                    <article class="<?php echo esc_attr( $class ); ?>" data-slide="<?php echo esc_attr( (string) $index ); ?>" <?php echo 0 !== $index ? 'hidden' : ''; ?> style="background-color: <?php echo esc_attr( $bg_color ); ?>;">
+                        <?php if ( $bg ) : ?>
+                            <div class="home-hero__bg" aria-hidden="true">
+                                <img class="home-hero__bg-image" src="<?php echo esc_url( $bg ); ?>" alt="">
+                            </div>
                         <?php endif; ?>
-                        <div class="home-hero__content">
-                            <?php if ( ! empty( $slide['title'] ) ) : ?>
-                                <h2 class="home-hero__title"><?php echo esc_html( $slide['title'] ); ?></h2>
-                            <?php endif; ?>
-                            <?php if ( ! empty( $slide['subtitle'] ) ) : ?>
-                                <p class="home-hero__subtitle"><?php echo esc_html( $slide['subtitle'] ); ?></p>
-                            <?php endif; ?>
-                            <?php if ( ! empty( $slide['cta_text'] ) ) : ?>
-                                <a href="<?php echo esc_url( $url ); ?>" class="home-hero__cta"<?php echo $target . $rel; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $slide['cta_text'] ); ?></a>
+                        <div class="home-hero__inner">
+                            <div class="home-hero__content">
+                                <?php if ( ! empty( $slide['title'] ) ) : ?>
+                                    <h2 class="home-hero__title"><?php echo esc_html( $slide['title'] ); ?></h2>
+                                <?php endif; ?>
+                                <?php if ( ! empty( $slide['subtitle'] ) ) : ?>
+                                    <p class="home-hero__subtitle"><?php echo esc_html( $slide['subtitle'] ); ?></p>
+                                <?php endif; ?>
+                                <?php if ( ! empty( $slide['cta_text'] ) ) : ?>
+                                    <a href="<?php echo esc_url( $url ); ?>" class="home-hero__cta"<?php echo $target . $rel; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php echo esc_html( $slide['cta_text'] ); ?></a>
+                                <?php endif; ?>
+                            </div>
+                            <?php if ( $image ) : ?>
+                                <div class="home-hero__media-wrap">
+                                    <img class="home-hero__media" src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( isset( $slide['title'] ) ? $slide['title'] : '' ); ?>">
+                                </div>
                             <?php endif; ?>
                         </div>
                     </article>

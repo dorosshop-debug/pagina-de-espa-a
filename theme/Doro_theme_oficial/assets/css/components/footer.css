@@ -167,8 +167,8 @@
     bottom: 4px;
     padding: 0 18px;
     border: none;
-    border-radius: 999px;
-    background: #e53935;
+    border-radius: 6px;
+    background: var(--color-orange, #f8942d);
     color: var(--color-white);
     font-size: var(--font-size-sm);
     font-weight: 700;

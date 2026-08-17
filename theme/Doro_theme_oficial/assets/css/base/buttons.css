@@ -1,0 +1,56 @@
+/**
+ * Botones de acción: radio máximo 6px y naranja de marca.
+ */
+:root {
+    --radius-btn: 6px;
+}
+
+button.button,
+a.button,
+.button,
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.woocommerce #respond input#submit,
+input[type="submit"],
+input[type="button"],
+.single_add_to_cart_button,
+.added_to_cart,
+.doro-buybox__buy-now,
+.doro-buybox__wish,
+.doro-buybox__share,
+.doro-checkout-summary__cta,
+#place_order,
+#place_order.doro-checkout-summary__cta,
+.doro-cesta-summary__cta,
+.doro-cesta-empty__btn,
+.doro-checkout-helper__cta,
+.doro-modal__btn,
+.home-hero__cta,
+.home-promo__cta,
+.site-footer__newsletter button,
+.woocommerce-message a.button,
+.woocommerce-message .button,
+.woocommerce-info a.button {
+    border-radius: 6px !important;
+}
+
+.woocommerce a.button.alt,
+.woocommerce button.button.alt,
+.woocommerce input.button.alt,
+.woocommerce #respond input#submit.alt,
+.doro-checkout-summary__cta,
+#place_order,
+#place_order.doro-checkout-summary__cta,
+.doro-cesta-summary__cta,
+.doro-cesta-empty__btn--primary,
+.doro-modal__btn--primary,
+.doro-checkout-helper__cta,
+.single_add_to_cart_button,
+.woocommerce-message a.button,
+.woocommerce-message .button {
+    background: var(--color-orange, #f8942d) !important;
+    background-color: var(--color-orange, #f8942d) !important;
+    border-color: var(--color-orange, #f8942d) !important;
+    color: var(--color-white, #fff) !important;
+}

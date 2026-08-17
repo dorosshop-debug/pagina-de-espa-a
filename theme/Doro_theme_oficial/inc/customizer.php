@@ -104,7 +104,7 @@ function doroshopping_customize_register( $wp_customize ) {
         'doroshopping_home_images',
         array(
             'title'       => __( 'Home: banners e imagenes', 'doroshopping' ),
-            'description' => __( 'Hero, banner de la seccion 3 y productos flotantes. Usa «Idioma a editar» para EN/DE/FR/IT/PT. Los flotantes se configuran mas abajo (imagen + enlace).', 'doroshopping' ),
+            'description' => __( 'Hero: sube un fondo panorámico (100% ancho) y, aparte, la imagen interior (producto/gráfico). El texto y la imagen interior se quedan en el ancho de página. Usa «Idioma a editar» para EN/DE/FR/IT/PT.', 'doroshopping' ),
             'panel'       => 'doroshopping_panel',
         )
     );
@@ -117,6 +117,42 @@ function doroshopping_customize_register( $wp_customize ) {
 
     for ( $i = 1; $i <= 3; $i++ ) {
         $wp_customize->add_setting(
+            'doroshopping_hero_' . $i . '_bg',
+            array(
+                'default'           => 0,
+                'sanitize_callback' => 'absint',
+            )
+        );
+        $wp_customize->add_control(
+            new WP_Customize_Media_Control(
+                $wp_customize,
+                'doroshopping_hero_' . $i . '_bg',
+                array(
+                    'label'       => sprintf( __( 'Hero slide %d - fondo (100%% ancho)', 'doroshopping' ), $i ),
+                    'description' => __( 'Imagen de fondo a todo el ancho. Recomendado panorámico (~1920×350).', 'doroshopping' ),
+                    'section'     => 'doroshopping_home_images',
+                    'mime_type'   => 'image',
+                )
+            )
+        );
+        $wp_customize->add_setting(
+            'doroshopping_hero_' . $i . '_bg_color',
+            array(
+                'default'           => '#f5f5f5',
+                'sanitize_callback' => 'sanitize_hex_color',
+            )
+        );
+        $wp_customize->add_control(
+            new WP_Customize_Color_Control(
+                $wp_customize,
+                'doroshopping_hero_' . $i . '_bg_color',
+                array(
+                    'label'   => sprintf( __( 'Hero slide %d - color de fondo', 'doroshopping' ), $i ),
+                    'section' => 'doroshopping_home_images',
+                )
+            )
+        );
+        $wp_customize->add_setting(
             'doroshopping_hero_' . $i . '_image',
             array(
                 'default'           => 0,
@@ -128,9 +164,10 @@ function doroshopping_customize_register( $wp_customize ) {
                 $wp_customize,
                 'doroshopping_hero_' . $i . '_image',
                 array(
-                    'label'     => sprintf( __( 'Hero slide %d - imagen', 'doroshopping' ), $i ),
-                    'section'   => 'doroshopping_home_images',
-                    'mime_type' => 'image',
+                    'label'       => sprintf( __( 'Hero slide %d - imagen interior', 'doroshopping' ), $i ),
+                    'description' => __( 'Producto o gráfico dentro del contenedor de página. No se estira a todo el viewport.', 'doroshopping' ),
+                    'section'     => 'doroshopping_home_images',
+                    'mime_type'   => 'image',
                 )
             )
         );

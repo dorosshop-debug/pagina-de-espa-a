@@ -26,6 +26,7 @@ function doroshopping_enqueue_assets() {
     $base = array(
         'doroshopping-variables' => '/css/base/variables.css',
         'doroshopping-reset'     => '/css/base/reset.css',
+        'doroshopping-buttons'   => '/css/base/buttons.css',
         'doroshopping-typography'=> '/css/base/typography.css',
         'doroshopping-a11y'      => '/css/base/a11y.css',
     );

@@ -17,7 +17,6 @@ $ui = static function ( $key ) {
     return function_exists( 'doroshopping_ui_text' ) ? doroshopping_ui_text( $key ) : '';
 };
 
-$cart        = WC()->cart;
 $place_order = $ui( 'doroshopping_ui_checkout_place_order' );
 if ( '' === $place_order ) {
     $place_order = __( 'Realizar pedido', 'doroshopping' );
@@ -44,57 +43,7 @@ if ( '' === $legal_html ) {
 <div class="doro-checkout-summary">
     <h2 class="doro-checkout-summary__title"><?php echo esc_html( $ui( 'doroshopping_ui_checkout_summary' ) ); ?></h2>
 
-    <div class="doro-checkout-summary__rows">
-        <div class="doro-checkout-summary__row">
-            <span><?php echo esc_html( $ui( 'doroshopping_ui_checkout_subtotal' ) ); ?></span>
-            <span><?php wc_cart_totals_subtotal_html(); ?></span>
-        </div>
-
-        <?php foreach ( $cart->get_coupons() as $code => $coupon ) : ?>
-            <div class="doro-checkout-summary__row cart-discount coupon-<?php echo esc_attr( sanitize_title( $code ) ); ?>">
-                <span><?php wc_cart_totals_coupon_label( $coupon ); ?></span>
-                <span><?php wc_cart_totals_coupon_html( $coupon ); ?></span>
-            </div>
-        <?php endforeach; ?>
-
-        <?php if ( $cart->needs_shipping() && $cart->show_shipping() ) : ?>
-            <?php do_action( 'woocommerce_review_order_before_shipping' ); ?>
-            <?php wc_cart_totals_shipping_html(); ?>
-            <?php do_action( 'woocommerce_review_order_after_shipping' ); ?>
-        <?php endif; ?>
-
-        <?php foreach ( $cart->get_fees() as $fee ) : ?>
-            <div class="doro-checkout-summary__row fee">
-                <span><?php echo esc_html( $fee->name ); ?></span>
-                <span><?php wc_cart_totals_fee_html( $fee ); ?></span>
-            </div>
-        <?php endforeach; ?>
-
-        <?php if ( wc_tax_enabled() && ! $cart->display_prices_including_tax() ) : ?>
-            <?php if ( 'itemized' === get_option( 'woocommerce_tax_total_display' ) ) : ?>
-                <?php foreach ( $cart->get_tax_totals() as $code => $tax ) : ?>
-                    <div class="doro-checkout-summary__row tax-rate tax-rate-<?php echo esc_attr( sanitize_title( $code ) ); ?>">
-                        <span><?php echo esc_html( $tax->label ); ?></span>
-                        <span><?php echo wp_kses_post( $tax->formatted_amount ); ?></span>
-                    </div>
-                <?php endforeach; ?>
-            <?php else : ?>
-                <div class="doro-checkout-summary__row tax-total">
-                    <span><?php echo esc_html( WC()->countries->tax_or_vat() ); ?></span>
-                    <span><?php wc_cart_totals_taxes_total_html(); ?></span>
-                </div>
-            <?php endif; ?>
-        <?php endif; ?>
-    </div>
-
-    <div class="doro-checkout-summary__tax-note">
-        <?php echo esc_html( $ui( 'doroshopping_ui_checkout_tax_note' ) ); ?>
-    </div>
-
-    <div class="doro-checkout-summary__total">
-        <span><?php echo esc_html( $ui( 'doroshopping_ui_checkout_total' ) ); ?></span>
-        <strong><?php wc_cart_totals_order_total_html(); ?></strong>
-    </div>
+    <?php get_template_part( 'template-parts/checkout/summary-live' ); ?>
 
     <div class="doro-checkout-summary__place form-row place-order">
         <noscript>
