@@ -499,17 +499,115 @@ function doroshopping_parse_shipping_cost_amount( $label ) {
 }
 
 /**
- * Si WooCommerce no tiene tarifas, inyectar estimación por país (BigBuy / fallback).
+ * ¿Las tarifas actuales son solo las inyectadas por Doro?
+ *
+ * @param array $rates Rates.
+ * @return bool
+ */
+function doroshopping_shipping_rates_are_doro_only( $rates ) {
+    if ( empty( $rates ) || ! is_array( $rates ) ) {
+        return true;
+    }
+    foreach ( array_keys( $rates ) as $id ) {
+        $id = (string) $id;
+        if ( 0 !== strpos( $id, 'doro_' ) ) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Convertir cotización BigBuy/fallback en tarifas WC seleccionables.
+ *
+ * @param array  $quote   Cotización.
+ * @param string $country ISO2.
+ * @return array<string,WC_Shipping_Rate>
+ */
+function doroshopping_shipping_rates_from_quote( $quote, $country = 'ES' ) {
+    $out = array();
+    if ( ! class_exists( 'WC_Shipping_Rate' ) || ! is_array( $quote ) ) {
+        return $out;
+    }
+
+    $max_cost = (float) apply_filters( 'doroshopping_shipping_max_cost', 9999.0, $country );
+
+    $options = ! empty( $quote['options'] ) && is_array( $quote['options'] ) ? $quote['options'] : array();
+    if ( empty( $options ) ) {
+        $cost  = isset( $quote['cost'] ) ? doroshopping_parse_shipping_cost_amount( $quote['cost'] ) : 0.0;
+        $cost  = max( 0, min( $max_cost, $cost ) );
+        $label = ! empty( $quote['carrier'] ) ? sanitize_text_field( (string) $quote['carrier'] ) : __( 'Envío y transporte', 'doroshopping' );
+        $out['doro_estimate'] = new WC_Shipping_Rate( 'doro_estimate', $label, $cost, array(), 'doro_estimate' );
+        return $out;
+    }
+
+    $seen = array();
+    foreach ( array_slice( $options, 0, 8 ) as $i => $opt ) {
+        if ( ! is_array( $opt ) ) {
+            continue;
+        }
+        $raw_id = ! empty( $opt['id'] ) ? (string) $opt['id'] : (string) $i;
+        $slug   = sanitize_title( $raw_id );
+        if ( '' === $slug ) {
+            $slug = 'opt' . (int) $i;
+        }
+        $rate_id = 'doro_bb_' . $slug;
+        if ( isset( $seen[ $rate_id ] ) ) {
+            $rate_id .= '_' . (int) $i;
+        }
+        $seen[ $rate_id ] = true;
+
+        $cost = null;
+        if ( isset( $opt['cost'] ) && is_numeric( $opt['cost'] ) ) {
+            $cost = (float) $opt['cost'];
+        } elseif ( ! empty( $opt['cost_label'] ) ) {
+            $cost = doroshopping_parse_shipping_cost_amount( $opt['cost_label'] );
+        }
+        if ( null === $cost || $cost < 0 ) {
+            continue;
+        }
+        $cost = min( $max_cost, $cost );
+
+        $label = ! empty( $opt['carrier'] ) ? sanitize_text_field( (string) $opt['carrier'] ) : __( 'Envío', 'doroshopping' );
+        if ( ! empty( $opt['time'] ) ) {
+            $label .= ' — ' . sanitize_text_field( (string) $opt['time'] );
+        }
+
+        $out[ $rate_id ] = new WC_Shipping_Rate( $rate_id, $label, $cost, array(), 'doro_bigbuy' );
+    }
+
+    if ( empty( $out ) ) {
+        $cost  = isset( $quote['cost'] ) ? doroshopping_parse_shipping_cost_amount( $quote['cost'] ) : 0.0;
+        $cost  = max( 0, min( $max_cost, $cost ) );
+        $label = ! empty( $quote['carrier'] ) ? sanitize_text_field( (string) $quote['carrier'] ) : __( 'Envío y transporte', 'doroshopping' );
+        $out['doro_estimate'] = new WC_Shipping_Rate( 'doro_estimate', $label, $cost, array(), 'doro_estimate' );
+    }
+
+    return $out;
+}
+
+/**
+ * Cotizar envío real del package (BigBuy con líneas del carrito, o fallback escalado).
  *
  * @param array $rates   Rates.
  * @param array $package Package.
  * @return array
  */
 function doroshopping_ensure_checkout_shipping_rates( $rates, $package ) {
-    if ( ! empty( $rates ) ) {
+    static $memo = array();
+    static $busy = false;
+
+    if ( ! class_exists( 'WC_Shipping_Rate' ) ) {
         return $rates;
     }
-    if ( ! class_exists( 'WC_Shipping_Rate' ) ) {
+
+    // Evitar bucles / llamadas anidadas durante calculate_shipping.
+    if ( $busy ) {
+        return $rates;
+    }
+
+    // No cotizar en admin (salvo AJAX de frontend).
+    if ( is_admin() && ! ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
         return $rates;
     }
 
@@ -523,26 +621,104 @@ function doroshopping_ensure_checkout_shipping_rates( $rates, $package ) {
     if ( ! $country ) {
         $country = 'ES';
     }
+    if ( 'UK' === $country ) {
+        $country = 'GB';
+    }
 
-    $quote = function_exists( 'doroshopping_bigbuy_shipping_fallback' )
-        ? doroshopping_bigbuy_shipping_fallback( $country, 'checkout' )
+    $postcode = '';
+    if ( ! empty( $package['destination']['postcode'] ) ) {
+        $postcode = function_exists( 'doroshopping_bigbuy_sanitize_postcode' )
+            ? doroshopping_bigbuy_sanitize_postcode( (string) $package['destination']['postcode'] )
+            : sanitize_text_field( (string) $package['destination']['postcode'] );
+    } elseif ( function_exists( 'doroshopping_get_shipping_postcode' ) ) {
+        $postcode = doroshopping_get_shipping_postcode();
+    }
+
+    $lines   = function_exists( 'doroshopping_bigbuy_lines_from_package' )
+        ? doroshopping_bigbuy_lines_from_package( $package )
         : array();
+    $context = function_exists( 'doroshopping_bigbuy_shipping_context' )
+        ? doroshopping_bigbuy_shipping_context( $package )
+        : array( 'quantity' => 1, 'weight' => 0, 'billable_kg' => 1 );
 
-    $cost  = isset( $quote['cost'] ) ? doroshopping_parse_shipping_cost_amount( $quote['cost'] ) : 0.0;
-    $label = ! empty( $quote['carrier'] ) ? (string) $quote['carrier'] : __( 'Envío y transporte', 'doroshopping' );
+    $memo_key = md5( wp_json_encode( array( $country, $postcode, $lines, $context ) ) );
+    if ( isset( $memo[ $memo_key ] ) ) {
+        return $memo[ $memo_key ];
+    }
 
-    $rate = new WC_Shipping_Rate(
-        'doro_estimate',
-        $label,
-        $cost,
-        array(),
-        'doro_estimate'
-    );
+    $busy  = true;
+    $quote = null;
 
-    $rates['doro_estimate'] = $rate;
-    return $rates;
+    try {
+        // Con productos del carrito: cotizar siempre (API o fallback por kg), aunque WC tenga flat rate.
+        if ( ! empty( $lines ) && function_exists( 'doroshopping_bigbuy_quote' ) ) {
+            if ( function_exists( 'doroshopping_bigbuy_api_key' ) && doroshopping_bigbuy_api_key()
+                && ( ! function_exists( 'doroshopping_bigbuy_allow_remote_quote' ) || doroshopping_bigbuy_allow_remote_quote() ) ) {
+                $quote = doroshopping_bigbuy_quote( $country, $postcode, $lines );
+            }
+            if ( ! is_array( $quote ) || empty( $quote['success'] ) ) {
+                $quote = function_exists( 'doroshopping_bigbuy_shipping_fallback' )
+                    ? doroshopping_bigbuy_shipping_fallback( $country, 'checkout', $context )
+                    : null;
+            }
+        }
+
+        // Sin líneas (sin SKU BigBuy): si ya hay tarifas WC ajenas, respetarlas.
+        if ( empty( $lines ) ) {
+            if ( ! empty( $rates ) && ! doroshopping_shipping_rates_are_doro_only( $rates ) ) {
+                $memo[ $memo_key ] = $rates;
+                return $rates;
+            }
+            $quote = function_exists( 'doroshopping_bigbuy_shipping_fallback' )
+                ? doroshopping_bigbuy_shipping_fallback( $country, 'checkout_no_lines', $context )
+                : null;
+        }
+
+        if ( ! is_array( $quote ) || empty( $quote['success'] ) ) {
+            $memo[ $memo_key ] = $rates;
+            return $rates;
+        }
+
+        $doro_rates = doroshopping_shipping_rates_from_quote( $quote, $country );
+        if ( empty( $doro_rates ) ) {
+            $memo[ $memo_key ] = $rates;
+            return $rates;
+        }
+
+        $memo[ $memo_key ] = $doro_rates;
+        return $doro_rates;
+    } finally {
+        $busy = false;
+    }
 }
 add_filter( 'woocommerce_package_rates', 'doroshopping_ensure_checkout_shipping_rates', 30, 2 );
+
+/**
+ * Invalidar caché de tarifas WC al cambiar el carrito.
+ *
+ * @return void
+ */
+function doroshopping_invalidate_shipping_cache() {
+    static $done = false;
+    if ( $done ) {
+        return;
+    }
+    $done = true;
+
+    if ( ! function_exists( 'WC' ) ) {
+        return;
+    }
+    if ( WC()->shipping() && is_callable( array( WC()->shipping(), 'reset_shipping' ) ) ) {
+        WC()->shipping()->reset_shipping();
+    }
+    if ( WC()->session ) {
+        WC()->session->set( 'shipping_for_package_0', false );
+    }
+}
+add_action( 'woocommerce_cart_updated', 'doroshopping_invalidate_shipping_cache', 20 );
+add_action( 'woocommerce_add_to_cart', 'doroshopping_invalidate_shipping_cache', 20 );
+add_action( 'woocommerce_cart_item_removed', 'doroshopping_invalidate_shipping_cache', 20 );
+add_action( 'woocommerce_after_cart_item_quantity_update', 'doroshopping_invalidate_shipping_cache', 20 );
 
 /**
  * Elegir la tarifa estimada si no hay otra seleccionada.
@@ -560,13 +736,32 @@ function doroshopping_shipping_chosen_method( $method, $rates, $chosen ) {
     if ( isset( $rates['doro_estimate'] ) ) {
         return 'doro_estimate';
     }
+    // Preferir la más barata entre doro_bb_*.
+    $best_id   = '';
+    $best_cost = null;
+    foreach ( (array) $rates as $id => $rate ) {
+        if ( 0 !== strpos( (string) $id, 'doro_' ) ) {
+            continue;
+        }
+        $cost = is_object( $rate ) && method_exists( $rate, 'get_cost' ) ? (float) $rate->get_cost() : null;
+        if ( null === $cost ) {
+            continue;
+        }
+        if ( null === $best_cost || $cost < $best_cost ) {
+            $best_cost = $cost;
+            $best_id   = (string) $id;
+        }
+    }
+    if ( $best_id ) {
+        return $best_id;
+    }
     $ids = array_keys( (array) $rates );
     return $ids ? (string) $ids[0] : '';
 }
 add_filter( 'woocommerce_shipping_chosen_method', 'doroshopping_shipping_chosen_method', 10, 3 );
 
 /**
- * Filas de envío en el resumen (divs, no <tr>).
+ * Filas de envío en el resumen (divs, no <tr>) con selector de carrier.
  *
  * @return void
  */
@@ -575,7 +770,7 @@ function doroshopping_render_checkout_shipping_rows() {
         return;
     }
 
-    $label = __( 'Envío y transporte', 'doroshopping' );
+    $label    = __( 'Envío y transporte', 'doroshopping' );
     $packages = WC()->shipping() ? WC()->shipping()->get_packages() : array();
     $chosen   = ( WC()->session ) ? (array) WC()->session->get( 'chosen_shipping_methods', array() ) : array();
     $printed  = false;
@@ -592,16 +787,38 @@ function doroshopping_render_checkout_shipping_rows() {
             continue;
         }
 
-        $carrier = $selected->get_label();
         echo '<div class="doro-checkout-summary__row doro-checkout-summary__row--shipping">';
         echo '<span>' . esc_html( $label ) . '</span>';
         echo '<span>' . wp_kses_post( WC()->cart->get_cart_shipping_total() ) . '</span>';
         echo '</div>';
-        if ( $carrier ) {
-            echo '<div class="doro-checkout-summary__shipping-meta">';
-            echo esc_html( $carrier );
+
+        if ( count( $avail ) > 1 ) {
+            echo '<div class="doro-checkout-summary__shipping-methods" role="radiogroup" aria-label="' . esc_attr( $label ) . '">';
+            foreach ( $avail as $rate_id => $rate ) {
+                $input_id = 'doro_shipping_method_' . $i . '_' . sanitize_title( $rate_id );
+                $is_sel   = ( (string) $rate_id === (string) $chosen_id )
+                    || ( ! $chosen_id && $rate === $selected );
+                echo '<label class="doro-checkout-summary__ship-method' . ( $is_sel ? ' is-selected' : '' ) . '" for="' . esc_attr( $input_id ) . '">';
+                echo '<input type="radio" name="shipping_method[' . esc_attr( (string) $i ) . ']" '
+                    . 'data-index="' . esc_attr( (string) $i ) . '" '
+                    . 'id="' . esc_attr( $input_id ) . '" '
+                    . 'value="' . esc_attr( $rate_id ) . '" '
+                    . 'class="shipping_method" '
+                    . checked( $is_sel, true, false ) . ' />';
+                echo '<span class="doro-checkout-summary__ship-method-label">' . esc_html( $rate->get_label() ) . '</span>';
+                echo '<span class="doro-checkout-summary__ship-method-cost">' . wp_kses_post( wc_price( $rate->get_cost() ) ) . '</span>';
+                echo '</label>';
+            }
             echo '</div>';
+        } else {
+            $carrier = $selected->get_label();
+            if ( $carrier ) {
+                echo '<div class="doro-checkout-summary__shipping-meta">';
+                echo esc_html( $carrier );
+                echo '</div>';
+            }
         }
+
         $printed = true;
         break;
     }

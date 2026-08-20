@@ -511,7 +511,9 @@ function doroshopping_mega_menu_term_image( $term_id, $fallback = '' ) {
         return $fallback;
     }
 
-    $thumb_id = absint( get_term_meta( $term_id, 'thumbnail_id', true ) );
+    $thumb_id = function_exists( 'doroshopping_get_product_cat_thumbnail_id' )
+        ? doroshopping_get_product_cat_thumbnail_id( $term_id )
+        : absint( get_term_meta( $term_id, 'thumbnail_id', true ) );
     if ( ! $thumb_id && function_exists( 'get_woocommerce_term_meta' ) ) {
         // Compat tiendas antiguas.
         $thumb_id = absint( get_woocommerce_term_meta( $term_id, 'thumbnail_id', true ) );

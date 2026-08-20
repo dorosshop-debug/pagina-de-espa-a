@@ -22,10 +22,105 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string
  */
 function doroshopping_bigbuy_api_key() {
-    if ( defined( 'DORO_BIGBUY_API_KEY' ) && DORO_BIGBUY_API_KEY ) {
-        return (string) DORO_BIGBUY_API_KEY;
+    static $cached = null;
+    if ( null !== $cached ) {
+        return $cached;
     }
-    return (string) get_theme_mod( 'doroshopping_bigbuy_api_key', '' );
+    if ( defined( 'DORO_BIGBUY_API_KEY' ) && DORO_BIGBUY_API_KEY ) {
+        $cached = trim( (string) DORO_BIGBUY_API_KEY );
+        return $cached;
+    }
+    $cached = trim( (string) get_theme_mod( 'doroshopping_bigbuy_api_key', '' ) );
+    return $cached;
+}
+
+/**
+ * Sanear referencia / SKU BigBuy (longitud y caracteres).
+ *
+ * @param string $ref Referencia cruda.
+ * @return string
+ */
+function doroshopping_bigbuy_sanitize_reference( $ref ) {
+    $ref = sanitize_text_field( (string) $ref );
+    $ref = substr( $ref, 0, 64 );
+    // BigBuy suele usar alfanumérico, guiones y puntos.
+    $ref = preg_replace( '/[^A-Za-z0-9._\-\/]/', '', $ref );
+    return is_string( $ref ) ? $ref : '';
+}
+
+/**
+ * Sanear código postal (máx. 16).
+ *
+ * @param string $postcode CP.
+ * @return string
+ */
+function doroshopping_bigbuy_sanitize_postcode( $postcode ) {
+    $postcode = sanitize_text_field( (string) $postcode );
+    $postcode = preg_replace( '/[^\p{L}\p{N}\s\-]/u', '', $postcode );
+    return substr( is_string( $postcode ) ? trim( $postcode ) : '', 0, 16 );
+}
+
+/**
+ * Motivo seguro (sin mensajes internos de WP_Error / red).
+ *
+ * @param string $reason Reason.
+ * @return string
+ */
+function doroshopping_bigbuy_sanitize_reason( $reason ) {
+    $reason = sanitize_key( (string) $reason );
+    return substr( $reason, 0, 40 );
+}
+
+/**
+ * Normalizar y fusionar líneas de productos (límites anti-abuso).
+ *
+ * @param array $lines     Líneas crudas.
+ * @param int   $max_lines Máx. líneas.
+ * @param int   $max_qty   Máx. qty por línea.
+ * @return array<int,array{reference:string,sku:string,quantity:int}>
+ */
+function doroshopping_bigbuy_normalize_lines( $lines, $max_lines = 20, $max_qty = 99 ) {
+    $merged    = array();
+    $max_lines = max( 1, (int) $max_lines );
+    $max_qty   = max( 1, (int) $max_qty );
+
+    if ( ! is_array( $lines ) ) {
+        return array();
+    }
+
+    foreach ( $lines as $line ) {
+        if ( ! is_array( $line ) ) {
+            continue;
+        }
+        $ref = doroshopping_bigbuy_sanitize_reference( isset( $line['reference'] ) ? $line['reference'] : '' );
+        $sku = doroshopping_bigbuy_sanitize_reference( isset( $line['sku'] ) ? $line['sku'] : $ref );
+        if ( ! $ref && $sku ) {
+            $ref = $sku;
+        }
+        if ( ! $ref ) {
+            continue;
+        }
+        $upper = strtoupper( $ref );
+        if ( in_array( $upper, array( 'PREVIEW', 'TEST', 'NULL', 'UNDEFINED' ), true ) ) {
+            continue;
+        }
+        $qty = isset( $line['quantity'] ) ? absint( $line['quantity'] ) : 1;
+        $qty = max( 1, min( $max_qty, $qty ) );
+        if ( isset( $merged[ $ref ] ) ) {
+            $merged[ $ref ]['quantity'] = min( $max_qty, $merged[ $ref ]['quantity'] + $qty );
+        } else {
+            $merged[ $ref ] = array(
+                'reference' => $ref,
+                'sku'       => $sku ? $sku : $ref,
+                'quantity'  => $qty,
+            );
+        }
+        if ( count( $merged ) >= $max_lines ) {
+            break;
+        }
+    }
+
+    return array_values( $merged );
 }
 
 /**
@@ -101,63 +196,188 @@ function doroshopping_bigbuy_sanitize_endpoint( $url ) {
  */
 function doroshopping_get_shipping_postcode() {
     if ( ! empty( $_COOKIE['doroshopping_postcode'] ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-        return sanitize_text_field( wp_unslash( $_COOKIE['doroshopping_postcode'] ) );
+        return doroshopping_bigbuy_sanitize_postcode( wp_unslash( $_COOKIE['doroshopping_postcode'] ) );
     }
     if ( function_exists( 'WC' ) && WC()->customer ) {
-        return (string) WC()->customer->get_shipping_postcode();
+        return doroshopping_bigbuy_sanitize_postcode( WC()->customer->get_shipping_postcode() );
     }
     return '';
 }
 
 /**
- * Fallback local por país (si BigBuy no responde o no hay API key).
+ * Extraer importe numérico de una etiqueta tipo "6.90 EUR".
  *
- * @param string $country ISO2.
- * @param string $reason  Motivo opcional.
+ * @param string $label Label.
+ * @return float
+ */
+function doroshopping_bigbuy_parse_cost_amount( $label ) {
+    if ( preg_match( '/([0-9]+(?:[.,][0-9]+)?)/', (string) $label, $m ) ) {
+        return (float) str_replace( ',', '.', $m[1] );
+    }
+    return 0.0;
+}
+
+/**
+ * Contexto de peso/cantidad del package o carrito (para fallback escalado).
+ *
+ * @param array|null $package Package WC opcional.
+ * @return array{quantity:int,weight:float,billable_kg:int}
+ */
+function doroshopping_bigbuy_shipping_context( $package = null ) {
+    $quantity = 0;
+    $weight   = 0.0;
+
+    $contents = array();
+    if ( is_array( $package ) && ! empty( $package['contents'] ) && is_array( $package['contents'] ) ) {
+        $contents = $package['contents'];
+    } elseif ( function_exists( 'WC' ) && WC()->cart ) {
+        $contents = WC()->cart->get_cart();
+        if ( is_callable( array( WC()->cart, 'get_cart_contents_weight' ) ) ) {
+            $weight = (float) WC()->cart->get_cart_contents_weight();
+        }
+    }
+
+    foreach ( $contents as $item ) {
+        $qty = isset( $item['quantity'] ) ? absint( $item['quantity'] ) : 0;
+        $quantity += $qty;
+        if ( $weight <= 0 && ! empty( $item['data'] ) && is_a( $item['data'], 'WC_Product' ) ) {
+            $w = (float) $item['data']->get_weight();
+            if ( $w > 0 ) {
+                $weight += $w * max( 1, $qty );
+            }
+        }
+    }
+
+    if ( $quantity < 1 ) {
+        $quantity = 1;
+    }
+
+    // Kg facturables: peso real o 0,5 kg por unidad si no hay peso en catálogo.
+    $kg = $weight > 0 ? $weight : (float) $quantity * 0.5;
+    $billable_kg = max( 1, (int) ceil( $kg ) );
+
+    return array(
+        'quantity'    => $quantity,
+        'weight'      => round( $weight, 3 ),
+        'billable_kg' => $billable_kg,
+    );
+}
+
+/**
+ * Líneas BigBuy desde un package de WooCommerce.
+ *
+ * @param array $package Package.
+ * @return array<int,array{reference:string,sku:string,quantity:int}>
+ */
+function doroshopping_bigbuy_lines_from_package( $package ) {
+    $lines = array();
+    if ( empty( $package['contents'] ) || ! is_array( $package['contents'] ) ) {
+        return $lines;
+    }
+
+    foreach ( $package['contents'] as $item ) {
+        $product = isset( $item['data'] ) ? $item['data'] : null;
+        if ( ! $product || ! is_a( $product, 'WC_Product' ) ) {
+            continue;
+        }
+        $ref = doroshopping_bigbuy_product_reference( $product );
+        if ( ! $ref ) {
+            continue;
+        }
+        $ref = doroshopping_bigbuy_sanitize_reference( $ref );
+        if ( ! $ref ) {
+            continue;
+        }
+        $qty = isset( $item['quantity'] ) ? max( 1, min( 99, absint( $item['quantity'] ) ) ) : 1;
+        if ( isset( $lines[ $ref ] ) ) {
+            $lines[ $ref ]['quantity'] += $qty;
+        } else {
+            $lines[ $ref ] = array(
+                'reference' => $ref,
+                'sku'       => $ref,
+                'quantity'  => $qty,
+            );
+        }
+    }
+
+    return array_values( $lines );
+}
+
+/**
+ * Líneas BigBuy desde el carrito actual.
+ *
+ * @return array<int,array{reference:string,sku:string,quantity:int}>
+ */
+function doroshopping_bigbuy_lines_from_cart() {
+    if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+        return array();
+    }
+    return doroshopping_bigbuy_lines_from_package(
+        array(
+            'contents' => WC()->cart->get_cart(),
+        )
+    );
+}
+
+/**
+ * Fallback local por país (si BigBuy no responde o no hay API key).
+ * Escala por kg facturables / cantidad para no devolver siempre el mismo importe.
+ *
+ * @param string               $country  ISO2.
+ * @param string               $reason   Motivo opcional.
+ * @param array<string,mixed>  $context  quantity/weight/billable_kg opcionales.
  * @return array
  */
-function doroshopping_bigbuy_shipping_fallback( $country, $reason = '' ) {
+function doroshopping_bigbuy_shipping_fallback( $country, $reason = '', $context = array() ) {
     $country   = strtoupper( sanitize_text_field( $country ) );
     $fallbacks = array(
         'DE' => array(
             'carrier' => 'DHL / DPD',
             'range'   => '3 - 5',
             'cost'    => '8.90 EUR',
+            'currency'=> 'EUR',
         ),
         'GB' => array(
             'carrier' => 'Royal Mail / DHL',
             'range'   => '5 - 8',
             'cost'    => '12.90 GBP',
+            'currency'=> 'GBP',
         ),
         'UK' => array(
             'carrier' => 'Royal Mail / DHL',
             'range'   => '5 - 8',
             'cost'    => '12.90 GBP',
+            'currency'=> 'GBP',
         ),
         'ES' => array(
             'carrier' => 'Correos Express / SEUR',
             'range'   => '2 - 4',
             'cost'    => '6.90 EUR',
+            'currency'=> 'EUR',
         ),
         'FR' => array(
             'carrier' => 'Colissimo / DHL',
             'range'   => '3 - 5',
             'cost'    => '7.90 EUR',
+            'currency'=> 'EUR',
         ),
         'IT' => array(
             'carrier' => 'BRT / DHL',
             'range'   => '4 - 6',
             'cost'    => '8.90 EUR',
+            'currency'=> 'EUR',
         ),
         'PT' => array(
             'carrier' => 'CTT / DHL',
             'range'   => '3 - 5',
             'cost'    => '6.90 EUR',
+            'currency'=> 'EUR',
         ),
         'CH' => array(
             'carrier' => 'Swiss Post / DHL',
             'range'   => '5 - 8',
             'cost'    => '14.90 CHF',
+            'currency'=> 'CHF',
         ),
     );
 
@@ -175,16 +395,50 @@ function doroshopping_bigbuy_shipping_fallback( $country, $reason = '' ) {
             : __( 'Estimación local. Configura la API key de BigBuy en Personalizar o wp-config.', 'doroshopping' );
     }
 
+    if ( empty( $context ) || ! is_array( $context ) ) {
+        $context = doroshopping_bigbuy_shipping_context();
+    }
+    $billable = isset( $context['billable_kg'] ) ? max( 1, absint( $context['billable_kg'] ) ) : 1;
+    $base     = doroshopping_bigbuy_parse_cost_amount( $data['cost'] );
+    // 1.er kg = base; cada kg extra ≈ 40% del base (aprox. cuando no hay API).
+    $cost_num = $base + ( $base * 0.4 * max( 0, $billable - 1 ) );
+    $currency = isset( $data['currency'] ) ? $data['currency'] : 'EUR';
+    $cost_lbl = number_format( $cost_num, 2, '.', '' ) . ' ' . $currency;
+
+    $options = array(
+        array(
+            'id'           => 'fallback_standard',
+            'carrier'      => $data['carrier'],
+            'service_name' => 'standard',
+            'time'         => $time,
+            'cost'         => $cost_num,
+            'cost_label'   => $cost_lbl,
+        ),
+    );
+
+    // Opción "tipo DHL" un poco más cara para poder elegirla en checkout sin API.
+    $dhl_num = round( $cost_num * 1.25, 2 );
+    $options[] = array(
+        'id'           => 'fallback_dhl',
+        'carrier'      => 'DHL',
+        'service_name' => 'dhl',
+        'time'         => $time,
+        'cost'         => $dhl_num,
+        'cost_label'   => number_format( $dhl_num, 2, '.', '' ) . ' ' . $currency,
+    );
+
     return array(
-        'success'  => true,
-        'source'   => 'fallback',
-        'carrier'  => $data['carrier'],
-        'time'     => $time,
-        'cost'     => $data['cost'],
-        'note'     => $note,
-        'country'  => $country,
-        'options'  => array(),
-        'reason'   => $reason ? sanitize_key( $reason ) : '',
+        'success'     => true,
+        'source'      => 'fallback',
+        'carrier'     => $data['carrier'],
+        'time'        => $time,
+        'cost'        => $cost_lbl,
+        'note'        => $note,
+        'country'     => $country,
+        'options'     => $options,
+        'reason'      => $reason ? doroshopping_bigbuy_sanitize_reason( $reason ) : '',
+        'billable_kg' => $billable,
+        'quantity'    => isset( $context['quantity'] ) ? absint( $context['quantity'] ) : 1,
     );
 }
 
@@ -369,24 +623,18 @@ function doroshopping_bigbuy_product_reference( $product ) {
  */
 function doroshopping_bigbuy_shipping_payload( $country, $postcode, $products ) {
     $delivery = array(
-        'isoCountry' => strtoupper( $country ),
+        'isoCountry' => strtoupper( sanitize_text_field( (string) $country ) ),
     );
+    $postcode = doroshopping_bigbuy_sanitize_postcode( $postcode );
     if ( $postcode ) {
         $delivery['postcode'] = $postcode;
     }
 
     $lines = array();
-    foreach ( $products as $product ) {
-        $ref = isset( $product['reference'] ) ? (string) $product['reference'] : '';
-        if ( ! $ref && ! empty( $product['sku'] ) ) {
-            $ref = (string) $product['sku'];
-        }
-        if ( ! $ref ) {
-            continue;
-        }
+    foreach ( doroshopping_bigbuy_normalize_lines( $products, 20, 99 ) as $product ) {
         $lines[] = array(
-            'reference' => $ref,
-            'quantity'  => isset( $product['quantity'] ) ? max( 1, absint( $product['quantity'] ) ) : 1,
+            'reference' => $product['reference'],
+            'quantity'  => $product['quantity'],
         );
     }
 
@@ -407,9 +655,11 @@ function doroshopping_bigbuy_shipping_payload( $country, $postcode, $products ) 
  * @return array
  */
 function doroshopping_bigbuy_quote( $country, $postcode, $lines ) {
+    static $memo = array();
+
     $country  = strtoupper( sanitize_text_field( $country ) );
-    $postcode = sanitize_text_field( $postcode );
-    $lines    = is_array( $lines ) ? $lines : array();
+    $postcode = doroshopping_bigbuy_sanitize_postcode( $postcode );
+    $lines    = doroshopping_bigbuy_normalize_lines( $lines, 20, 99 );
 
     if ( ! $country ) {
         return array(
@@ -418,86 +668,108 @@ function doroshopping_bigbuy_quote( $country, $postcode, $lines ) {
         );
     }
 
-    $products = array();
-    foreach ( $lines as $line ) {
-        $ref = isset( $line['reference'] ) ? sanitize_text_field( $line['reference'] ) : '';
-        $sku = isset( $line['sku'] ) ? sanitize_text_field( $line['sku'] ) : $ref;
-        $qty = isset( $line['quantity'] ) ? max( 1, absint( $line['quantity'] ) ) : 1;
-        if ( ! $ref && ! $sku ) {
-            continue;
+    $memo_key = md5( wp_json_encode( array( $country, $postcode, doroshopping_bigbuy_mode(), $lines ) ) );
+    if ( isset( $memo[ $memo_key ] ) ) {
+        return $memo[ $memo_key ];
+    }
+
+    $products = $lines;
+    $qty_sum  = 0;
+    foreach ( $products as $line ) {
+        $qty_sum += isset( $line['quantity'] ) ? absint( $line['quantity'] ) : 1;
+    }
+
+    $context = doroshopping_bigbuy_shipping_context();
+    if ( $qty_sum > 0 ) {
+        $context['quantity'] = $qty_sum;
+        if ( empty( $context['weight'] ) || $context['weight'] <= 0 ) {
+            $context['billable_kg'] = max( 1, (int) ceil( $qty_sum * 0.5 ) );
         }
-        $products[] = array(
-            'reference' => $ref ? $ref : $sku,
-            'sku'       => $sku ? $sku : $ref,
-            'quantity'  => $qty,
-        );
     }
 
     if ( empty( $products ) ) {
-        return doroshopping_bigbuy_shipping_fallback( $country, 'no_sku' );
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback( $country, 'no_sku', $context );
+        return $memo[ $memo_key ];
     }
 
     $api_key = doroshopping_bigbuy_api_key();
     if ( ! $api_key ) {
-        return doroshopping_bigbuy_shipping_fallback( $country, 'no_api_key' );
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback( $country, 'no_api_key', $context );
+        return $memo[ $memo_key ];
     }
 
-    // Cache corta para no saturar la API (misma clave país+CP+productos).
-    $cache_key = 'doro_bb_ship_' . md5(
-        wp_json_encode(
-            array(
-                'c' => $country,
-                'p' => $postcode,
-                'm' => doroshopping_bigbuy_mode(),
-                'l' => $products,
-            )
-        )
-    );
-    $cached = get_transient( $cache_key );
+    if ( ! doroshopping_bigbuy_allow_remote_quote() ) {
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback( $country, 'ssr_only', $context );
+        return $memo[ $memo_key ];
+    }
+
+    $cache_key = 'doro_bb_ship_' . $memo_key;
+    $cached    = get_transient( $cache_key );
     if ( is_array( $cached ) && ! empty( $cached['success'] ) ) {
-        $cached['cached'] = true;
+        $cached['cached']  = true;
+        $memo[ $memo_key ] = $cached;
         return $cached;
     }
 
-    $payload = doroshopping_bigbuy_shipping_payload( $country, $postcode, $products );
+    $endpoint = doroshopping_bigbuy_endpoint();
+    if ( ! doroshopping_bigbuy_sanitize_endpoint( $endpoint ) ) {
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback( $country, 'bad_endpoint', $context );
+        return $memo[ $memo_key ];
+    }
 
+    $payload  = doroshopping_bigbuy_shipping_payload( $country, $postcode, $products );
     $response = wp_remote_post(
-        doroshopping_bigbuy_endpoint(),
+        $endpoint,
         array(
-            'timeout' => 12,
-            'headers' => array(
+            'timeout'     => 8,
+            'redirection' => 0,
+            'headers'     => array(
                 'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type'  => 'application/json',
                 'Accept'        => 'application/json',
             ),
-            'body'    => wp_json_encode( $payload ),
+            'body'        => wp_json_encode( $payload ),
         )
     );
 
     if ( is_wp_error( $response ) ) {
-        return doroshopping_bigbuy_shipping_fallback( $country, $response->get_error_message() );
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback( $country, 'http_error', $context );
+        return $memo[ $memo_key ];
     }
 
     $code = (int) wp_remote_retrieve_response_code( $response );
-    $body = json_decode( wp_remote_retrieve_body( $response ), true );
+    $raw  = wp_remote_retrieve_body( $response );
+    if ( strlen( (string) $raw ) > 200000 ) {
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback( $country, 'oversized', $context );
+        return $memo[ $memo_key ];
+    }
+    $body = json_decode( (string) $raw, true );
 
     if ( $code < 200 || $code >= 300 || ! is_array( $body ) ) {
-        return doroshopping_bigbuy_shipping_fallback( $country, 'http_' . $code );
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback( $country, 'http_' . $code, $context );
+        return $memo[ $memo_key ];
     }
 
     $parsed = doroshopping_parse_bigbuy_shipping_response( $body, $country );
     if ( ! empty( $parsed['success'] ) && 'bigbuy' === ( $parsed['source'] ?? '' ) ) {
         set_transient( $cache_key, $parsed, 15 * MINUTE_IN_SECONDS );
+        $memo[ $memo_key ] = $parsed;
+        return $parsed;
     }
 
+    if ( ! empty( $parsed['success'] ) && 'fallback' === ( $parsed['source'] ?? '' ) ) {
+        $memo[ $memo_key ] = doroshopping_bigbuy_shipping_fallback(
+            $country,
+            isset( $parsed['reason'] ) ? $parsed['reason'] : 'parsed_fallback',
+            $context
+        );
+        return $memo[ $memo_key ];
+    }
+
+    $memo[ $memo_key ] = $parsed;
     return $parsed;
 }
 
-/**
- * ¿Permitir cotización remota BigBuy vía REST? (filtro / constante DORO_BIGBUY_SSR_ONLY).
- *
- * @return bool
- */
 function doroshopping_bigbuy_allow_remote_quote() {
     if ( defined( 'DORO_BIGBUY_SSR_ONLY' ) && DORO_BIGBUY_SSR_ONLY ) {
         return false;
@@ -512,11 +784,20 @@ function doroshopping_bigbuy_allow_remote_quote() {
  * @return bool
  */
 function doroshopping_bigbuy_rest_permission( WP_REST_Request $request ) {
+    // Solo POST JSON desde el propio sitio (nonce de sesión WP).
     $nonce = $request->get_header( 'X-WP-Nonce' );
     if ( ! $nonce ) {
         $nonce = $request->get_param( '_wpnonce' );
     }
-    return (bool) ( $nonce && wp_verify_nonce( $nonce, 'wp_rest' ) );
+    if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+        return false;
+    }
+    // Rechazar content-types raros (ataque / scraping).
+    $ctype = strtolower( (string) $request->get_header( 'Content-Type' ) );
+    if ( $ctype && false === strpos( $ctype, 'application/json' ) && false === strpos( $ctype, 'application/x-www-form-urlencoded' ) ) {
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -526,7 +807,7 @@ function doroshopping_bigbuy_rest_permission( WP_REST_Request $request ) {
  * @return WP_REST_Response
  */
 function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
-    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'bigbuy_ship', 20, 60 ) ) {
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'bigbuy_ship', 15, 60 ) ) {
         return new WP_REST_Response(
             array(
                 'success' => false,
@@ -537,8 +818,12 @@ function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
     }
 
     $country  = strtoupper( sanitize_text_field( (string) $request->get_param( 'country' ) ) );
-    $postcode = sanitize_text_field( (string) $request->get_param( 'postcode' ) );
-    $lines    = $request->get_param( 'products' );
+    $postcode = doroshopping_bigbuy_sanitize_postcode( (string) $request->get_param( 'postcode' ) );
+    $use_cart = (bool) $request->get_param( 'use_cart' );
+
+    if ( 'UK' === $country ) {
+        $country = 'GB';
+    }
 
     if ( function_exists( 'doroshopping_is_allowed_country_code' ) && ! doroshopping_is_allowed_country_code( $country ) ) {
         return new WP_REST_Response(
@@ -547,79 +832,6 @@ function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
                 'message' => __( 'País de envío no válido.', 'doroshopping' ),
             ),
             400
-        );
-    }
-
-    if ( ! is_array( $lines ) || empty( $lines ) ) {
-        $product_id = absint( $request->get_param( 'product_id' ) );
-        $quantity   = max( 1, absint( $request->get_param( 'quantity' ) ) );
-
-        if ( ! $product_id || ! $country ) {
-            return new WP_REST_Response(
-                array(
-                    'success' => false,
-                    'message' => __( 'Faltan datos para calcular el envío.', 'doroshopping' ),
-                ),
-                400
-            );
-        }
-
-        if ( ! function_exists( 'wc_get_product' ) ) {
-            return new WP_REST_Response(
-                array(
-                    'success' => false,
-                    'message' => __( 'WooCommerce no está disponible.', 'doroshopping' ),
-                ),
-                500
-            );
-        }
-
-        $product = wc_get_product( $product_id );
-        if ( ! $product ) {
-            return new WP_REST_Response(
-                array(
-                    'success' => false,
-                    'message' => __( 'Producto no encontrado.', 'doroshopping' ),
-                ),
-                404
-            );
-        }
-
-        $ref = doroshopping_bigbuy_product_reference( $product );
-        if ( ! $ref ) {
-            return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'no_sku' ), 200 );
-        }
-
-        $lines = array(
-            array(
-                'reference' => $ref,
-                'sku'       => $ref,
-                'quantity'  => $quantity,
-            ),
-        );
-    }
-
-    if ( is_array( $lines ) && count( $lines ) > 15 ) {
-        $lines = array_slice( $lines, 0, 15 );
-    }
-
-    // Bloquear líneas de preview / referencias vacías (evita abuso de API).
-    if ( is_array( $lines ) ) {
-        $lines = array_values(
-            array_filter(
-                $lines,
-                static function ( $line ) {
-                    if ( ! is_array( $line ) ) {
-                        return false;
-                    }
-                    $ref = isset( $line['reference'] ) ? strtoupper( (string) $line['reference'] ) : '';
-                    $sku = isset( $line['sku'] ) ? strtoupper( (string) $line['sku'] ) : '';
-                    if ( in_array( 'PREVIEW', array( $ref, $sku ), true ) ) {
-                        return false;
-                    }
-                    return '' !== $ref || '' !== $sku;
-                }
-            )
         );
     }
 
@@ -633,22 +845,99 @@ function doroshopping_bigbuy_shipping_endpoint( WP_REST_Request $request ) {
         );
     }
 
-    // Sin clave API, modo SSR-only o sin líneas válidas: estimación local.
-    if ( ! doroshopping_bigbuy_allow_remote_quote() || ! doroshopping_bigbuy_api_key() || empty( $lines ) ) {
-        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'local_only' ), 200 );
+    // Solo fuentes de confianza para la API remota (evita sondeo de SKU / quema de cuota).
+    $trusted    = false;
+    $lines      = array();
+    $product_id = absint( $request->get_param( 'product_id' ) );
+    $cart_lines = doroshopping_bigbuy_lines_from_cart();
+
+    if ( $use_cart && ! empty( $cart_lines ) ) {
+        $lines   = $cart_lines;
+        $trusted = true;
+    } elseif ( $product_id ) {
+        $quantity = max( 1, min( 99, absint( $request->get_param( 'quantity' ) ) ) );
+
+        if ( ! function_exists( 'wc_get_product' ) ) {
+            return new WP_REST_Response(
+                array(
+                    'success' => false,
+                    'message' => __( 'WooCommerce no está disponible.', 'doroshopping' ),
+                ),
+                500
+            );
+        }
+
+        $product = wc_get_product( $product_id );
+        if ( ! $product || 'publish' !== $product->get_status() ) {
+            return new WP_REST_Response(
+                array(
+                    'success' => false,
+                    'message' => __( 'Producto no encontrado.', 'doroshopping' ),
+                ),
+                404
+            );
+        }
+
+        $ref = doroshopping_bigbuy_product_reference( $product );
+        if ( ! $ref ) {
+            $weight = (float) $product->get_weight() * $quantity;
+            $ctx    = array(
+                'quantity'    => $quantity,
+                'weight'      => $weight,
+                'billable_kg' => max( 1, (int) ceil( max( $weight, $quantity * 0.5 ) ) ),
+            );
+            return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'no_sku', $ctx ), 200 );
+        }
+
+        $lines   = array(
+            array(
+                'reference' => $ref,
+                'sku'       => $ref,
+                'quantity'  => $quantity,
+            ),
+        );
+        $trusted = true;
+    } elseif ( ! empty( $cart_lines ) ) {
+        $lines   = $cart_lines;
+        $trusted = true;
     }
 
-    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'bigbuy_ship_api', 8, 60 ) ) {
-        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'rate_limit' ), 200 );
+    // products[] del cliente: solo fallback local (nunca API remota).
+    if ( empty( $lines ) ) {
+        $client_lines = doroshopping_bigbuy_normalize_lines( $request->get_param( 'products' ), 10, 20 );
+        if ( ! empty( $client_lines ) ) {
+            $lines   = $client_lines;
+            $trusted = false;
+        }
+    }
+
+    $lines = doroshopping_bigbuy_normalize_lines( $lines, 20, 99 );
+    $ctx   = doroshopping_bigbuy_shipping_context();
+    if ( ! empty( $lines ) ) {
+        $qty = 0;
+        foreach ( $lines as $line ) {
+            $qty += isset( $line['quantity'] ) ? absint( $line['quantity'] ) : 1;
+        }
+        $ctx['quantity']    = max( 1, $qty );
+        $ctx['billable_kg'] = max( 1, (int) ceil( max( (float) $ctx['weight'], $ctx['quantity'] * 0.5 ) ) );
+    }
+
+    if ( empty( $lines ) ) {
+        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'no_lines', $ctx ), 200 );
+    }
+
+    if ( ! $trusted || ! doroshopping_bigbuy_allow_remote_quote() || ! doroshopping_bigbuy_api_key() ) {
+        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, $trusted ? 'local_only' : 'untrusted_lines', $ctx ), 200 );
+    }
+
+    if ( function_exists( 'doroshopping_rate_limit' ) && ! doroshopping_rate_limit( 'bigbuy_ship_api', 6, 60 ) ) {
+        return new WP_REST_Response( doroshopping_bigbuy_shipping_fallback( $country, 'rate_limit', $ctx ), 200 );
     }
 
     $parsed = doroshopping_bigbuy_quote( $country, $postcode, $lines );
     return new WP_REST_Response( $parsed, 200 );
 }
 
-/**
- * Registrar ruta REST.
- */
 function doroshopping_register_bigbuy_rest() {
     register_rest_route(
         'doro/v1',

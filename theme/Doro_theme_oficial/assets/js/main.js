@@ -2875,14 +2875,56 @@ function initBigBuyShipping() {
         var eta = root.querySelector('[data-shipping-eta]');
         var cost = root.querySelector('[data-shipping-cost]');
         var note = root.querySelector('[data-shipping-note]');
+        var optionsWrap = root.querySelector('[data-shipping-options]');
 
         if (dest) dest.textContent = countryLabel(code);
         if (carrier) carrier.textContent = data.carrier || '-';
         if (eta) eta.textContent = data.time || '-';
         if (cost) cost.textContent = data.cost || '-';
-        if (note) note.textContent = data.note || '';
+        if (note) {
+            var extra = '';
+            if (data.source === 'fallback' && data.billable_kg) {
+                extra = ' (~' + data.billable_kg + ' kg)';
+            }
+            note.textContent = (data.note || '') + extra;
+        }
+
+        if (optionsWrap) {
+            optionsWrap.innerHTML = '';
+            var opts = Array.isArray(data.options) ? data.options : [];
+            if (opts.length > 1) {
+                optionsWrap.hidden = false;
+                opts.forEach(function (opt, idx) {
+                    if (!opt) return;
+                    var btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'doro-cesta-summary__ship-opt' + (idx === 0 ? ' is-active' : '');
+                    btn.setAttribute('data-ship-opt', String(idx));
+                    var cLabel = opt.carrier || opt.service_name || 'Envío';
+                    var cCost = opt.cost_label || (opt.cost != null ? String(opt.cost) : '');
+                    btn.textContent = cLabel + (cCost ? ' — ' + cCost : '');
+                    btn.addEventListener('click', function () {
+                        optionsWrap.querySelectorAll('.doro-cesta-summary__ship-opt').forEach(function (el) {
+                            el.classList.remove('is-active');
+                        });
+                        btn.classList.add('is-active');
+                        if (carrier) carrier.textContent = opt.carrier || '-';
+                        if (eta) eta.textContent = opt.time || '-';
+                        if (cost) cost.textContent = cCost || '-';
+                        if (cfg) {
+                            cfg.preferredCarrier = opt.carrier || '';
+                            cfg.preferredOptionId = opt.id || '';
+                        }
+                    });
+                    optionsWrap.appendChild(btn);
+                });
+            } else {
+                optionsWrap.hidden = true;
+            }
+        }
 
         root.setAttribute('data-shipping-ready', data.success ? '1' : '0');
+        root.setAttribute('data-shipping-source', data.source || '');
         root.hidden = false;
         root.classList.remove('is-loading');
     }
@@ -2914,15 +2956,20 @@ function initBigBuyShipping() {
             postcode: postcode()
         };
 
-        if (context === 'cart' && cfg && Array.isArray(cfg.cartLines) && cfg.cartLines.length) {
-            payload.products = cfg.cartLines;
+        if (context === 'cart') {
+            // El servidor lee el carrito WC (cantidades reales).
+            payload.use_cart = true;
+            if (cfg && Array.isArray(cfg.cartLines) && cfg.cartLines.length) {
+                payload.products = cfg.cartLines;
+            }
         } else if (productId > 0) {
             payload.product_id = productId;
             payload.quantity = qty;
         } else if (cfg && Array.isArray(cfg.cartLines) && cfg.cartLines.length) {
+            payload.use_cart = true;
             payload.products = cfg.cartLines;
         } else {
-            payload.products = [{ reference: 'PREVIEW', sku: 'PREVIEW', quantity: 1 }];
+            payload.use_cart = true;
         }
 
         return { payload: payload, code: code };
@@ -3001,6 +3048,24 @@ function initBigBuyShipping() {
     var qtyInput = document.querySelector('.doro-buybox form.cart input.qty');
     if (qtyInput) {
         qtyInput.addEventListener('change', refresh);
+    }
+
+    function refreshAfterCartChange() {
+        // Tras AJAX el carrito WC ya tiene las cantidades nuevas; use_cart las lee en servidor.
+        if (cfg) {
+            cfg.cartLines = [];
+        }
+        clearTimeout(refreshAfterCartChange._t);
+        refreshAfterCartChange._t = setTimeout(refresh, 400);
+    }
+
+    document.body.addEventListener('added_to_cart', refreshAfterCartChange);
+    document.body.addEventListener('removed_from_cart', refreshAfterCartChange);
+    document.body.addEventListener('wc_fragments_refreshed', refreshAfterCartChange);
+    document.body.addEventListener('updated_cart_totals', refreshAfterCartChange);
+    document.body.addEventListener('updated_wc_div', refreshAfterCartChange);
+    if (window.jQuery) {
+        jQuery(document.body).on('added_to_cart removed_from_cart updated_cart_totals updated_wc_div wc_fragments_refreshed', refreshAfterCartChange);
     }
 
     refresh();

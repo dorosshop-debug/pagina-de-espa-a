@@ -50,6 +50,7 @@ $continue_label = function_exists( 'doroshopping_ui_sprintf' )
             <li><span><?php echo esc_html( $ui( 'doroshopping_ui_cart_time' ) ); ?></span> <strong data-shipping-eta>&mdash;</strong></li>
             <li><span><?php echo esc_html( $ui( 'doroshopping_ui_cart_cost' ) ); ?></span> <strong data-shipping-cost>&mdash;</strong></li>
         </ul>
+        <div class="doro-cesta-summary__shipping-options" data-shipping-options hidden></div>
         <p class="doro-cesta-summary__shipping-note" data-shipping-note></p>
     </div>
 

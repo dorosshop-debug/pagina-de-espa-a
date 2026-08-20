@@ -83,7 +83,9 @@ if ( '' === $intro ) {
                 <div class="doro-category__subs-grid">
                     <?php foreach ( $children as $child ) : ?>
                         <?php
-                        $thumb_id = (int) get_term_meta( $child->term_id, 'thumbnail_id', true );
+                        $thumb_id = function_exists( 'doroshopping_get_product_cat_thumbnail_id' )
+                            ? doroshopping_get_product_cat_thumbnail_id( $child->term_id )
+                            : (int) get_term_meta( $child->term_id, 'thumbnail_id', true );
                         $img_url  = $thumb_id ? wp_get_attachment_image_url( $thumb_id, 'woocommerce_thumbnail' ) : '';
                         if ( ! $img_url ) {
                             $img_url = $placeholder;

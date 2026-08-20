@@ -185,6 +185,129 @@ function doroshopping_pll_term_id( $term_id, $taxonomy = 'product_cat' ) {
 }
 
 /**
+ * Miniatura WooCommerce de una categoría (thumbnail_id), con fallback Polylang.
+ * Si la categoría traducida no tiene imagen, usa la del idioma por defecto / otras traducciones.
+ *
+ * @param int $term_id Term ID.
+ * @return int Attachment ID o 0.
+ */
+function doroshopping_get_product_cat_thumbnail_id( $term_id ) {
+    $term_id = absint( $term_id );
+    if ( $term_id <= 0 ) {
+        return 0;
+    }
+
+    $read_thumb = static function ( $id ) {
+        $id       = absint( $id );
+        $thumb_id = absint( get_term_meta( $id, 'thumbnail_id', true ) );
+        if ( ! $thumb_id && function_exists( 'get_woocommerce_term_meta' ) ) {
+            $thumb_id = absint( get_woocommerce_term_meta( $id, 'thumbnail_id', true ) );
+        }
+        return $thumb_id;
+    };
+
+    $thumb_id = $read_thumb( $term_id );
+    if ( $thumb_id ) {
+        return $thumb_id;
+    }
+
+    // Buscar en traducciones Polylang (misma categoría, otro idioma).
+    if ( ! function_exists( 'pll_get_term' ) ) {
+        return 0;
+    }
+
+    $candidates = array();
+    if ( function_exists( 'pll_get_term_translations' ) ) {
+        $map = pll_get_term_translations( $term_id );
+        if ( is_array( $map ) ) {
+            foreach ( $map as $tr_id ) {
+                $tr_id = absint( $tr_id );
+                if ( $tr_id && $tr_id !== $term_id ) {
+                    $candidates[] = $tr_id;
+                }
+            }
+        }
+    }
+
+    // Preferir idioma por defecto primero.
+    if ( function_exists( 'pll_default_language' ) && function_exists( 'pll_get_term' ) ) {
+        $def = sanitize_key( (string) pll_default_language( 'slug' ) );
+        if ( $def ) {
+            $def_id = absint( pll_get_term( $term_id, $def ) );
+            if ( $def_id && $def_id !== $term_id ) {
+                array_unshift( $candidates, $def_id );
+            }
+        }
+    }
+
+    $candidates = array_unique( array_filter( $candidates ) );
+    foreach ( $candidates as $other_id ) {
+        $other_thumb = $read_thumb( $other_id );
+        if ( $other_thumb ) {
+            return $other_thumb;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Copiar thumbnail_id de la categoría origen a sus traducciones (si estánían).
+ *
+ * @param int $term_id Term ID guardado.
+ * @return void
+ */
+function doroshopping_sync_product_cat_thumbnail_translations( $term_id ) {
+    $term_id = absint( $term_id );
+    if ( $term_id <= 0 || ! taxonomy_exists( 'product_cat' ) ) {
+        return;
+    }
+    if ( ! function_exists( 'pll_get_term_translations' ) ) {
+        return;
+    }
+
+    $map = pll_get_term_translations( $term_id );
+    if ( ! is_array( $map ) || count( $map ) < 2 ) {
+        return;
+    }
+
+    // Imagen fuente: la del término actual o la primera traducción que tenga.
+    $source_thumb = absint( get_term_meta( $term_id, 'thumbnail_id', true ) );
+    if ( ! $source_thumb ) {
+        foreach ( $map as $tr_id ) {
+            $tr_id = absint( $tr_id );
+            if ( ! $tr_id ) {
+                continue;
+            }
+            $candidate = absint( get_term_meta( $tr_id, 'thumbnail_id', true ) );
+            if ( $candidate ) {
+                $source_thumb = $candidate;
+                break;
+            }
+        }
+    }
+
+    if ( ! $source_thumb ) {
+        return;
+    }
+
+    foreach ( $map as $tr_id ) {
+        $tr_id = absint( $tr_id );
+        if ( ! $tr_id ) {
+            continue;
+        }
+        $existing = absint( get_term_meta( $tr_id, 'thumbnail_id', true ) );
+        if ( $existing ) {
+            continue; // No pisar imagen propia de la traducción.
+        }
+        update_term_meta( $tr_id, 'thumbnail_id', $source_thumb );
+    }
+}
+add_action( 'created_product_cat', 'doroshopping_sync_product_cat_thumbnail_translations', 20 );
+add_action( 'edited_product_cat', 'doroshopping_sync_product_cat_thumbnail_translations', 20 );
+add_action( 'pll_save_term', 'doroshopping_sync_product_cat_thumbnail_translations', 20 );
+
+/**
  * Post/product ID en el idioma actual.
  *
  * @param int|WP_Post $post_id Post ID origen.
